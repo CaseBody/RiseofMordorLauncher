@@ -44,5 +44,11 @@ namespace RiseofMordorLauncher
                 // Something went wrong! Steam is closed?
             }
         }
+
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                DragMove();
+        }
     }
 }

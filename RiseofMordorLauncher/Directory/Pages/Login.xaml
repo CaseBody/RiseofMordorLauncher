@@ -1,0 +1,67 @@
+﻿<Page x:Class="RiseofMordorLauncher.Directory.Pages.Login"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="650" d:DesignWidth="1200"
+      Title="MainLauncher">
+
+    <Grid>
+        <Grid>
+            <Image Source="../Images/Placeholder.png"/>
+        </Grid>
+        
+        <Grid Background="OrangeRed" Visibility="{Binding steam_error_shown}">
+            <StackPanel>
+                <Image Source="../Images/warning_sign.png" Width="300" Margin="0 15 0 0"/>
+                <TextBlock Text="Steam Error" FontWeight="Black" FontFamily="Arial" FontSize="40" HorizontalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" FontFamily="Arial" Text="The SteamClient was not detected. Please ensure you have Steam opened." FontSize="25"/>
+                <Border BorderThickness="1" Background="Black" Width="200" Margin="0 75 0 0" CornerRadius="20" Cursor="Hand">
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" Text="RETRY" FontWeight="ExtraBold" FontSize="35" Foreground="White" Padding="20" Cursor="Hand"/>
+                    <Border.InputBindings>
+                        <MouseBinding Command="{Binding SteamRetryCommand}" MouseAction="LeftClick"/>
+                    </Border.InputBindings>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Background="OrangeRed" Visibility="{Binding attila_error_shown}">
+            <StackPanel>
+                <Image Source="../Images/warning_sign.png" Width="300" Margin="0 15 0 0"/>
+                <TextBlock Text="Installation Error" FontWeight="Black" FontFamily="Arial" FontSize="40" HorizontalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" TextWrapping="WrapWithOverflow" FontFamily="Arial" Text="Total War: Attila Steam installation was not detected. Please ensure you have Total War: Attila installed." FontSize="25"/>
+                <Border BorderThickness="1" Background="Black" Width="200" Margin="0 75 0 0" CornerRadius="20">
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" Text="RETRY" FontWeight="ExtraBold" FontSize="35" Foreground="White" Padding="20" Cursor="Hand"/>
+                    <Border.InputBindings>
+                        <MouseBinding Command="{Binding AttilaRetryCommand}" MouseAction="LeftClick"/>
+                    </Border.InputBindings>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Grid Background="OrangeRed" Visibility="{Binding internet_error_shown}">
+            <StackPanel>
+                <Image Source="../Images/warning_sign.png" Width="300" Margin="0 15 0 0"/>
+                <TextBlock Text="Connection Error" FontWeight="Black" FontFamily="Arial" FontSize="40" HorizontalAlignment="Center"/>
+                <TextBlock HorizontalAlignment="Center" TextWrapping="WrapWithOverflow" FontFamily="Arial" Text="An internet connection could not be made. You will not be able to download updates until you reconnect." FontSize="25"/>
+                <StackPanel Orientation="Vertical">
+                    <Border BorderThickness="1" Background="Black" Width="460" Margin="0 50 0 0" CornerRadius="20">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" Text="CONTINUE OFFLINE" FontWeight="ExtraBold" FontSize="35" Foreground="White" Padding="20" Cursor="Hand"/>
+                        <Border.InputBindings>
+                            <MouseBinding Command="{Binding InternetOfflineCommand}" MouseAction="LeftClick"/>
+                        </Border.InputBindings>
+                    </Border>
+                    <Border BorderThickness="1" Background="Black" Width="200" Margin="0 20 0 0" CornerRadius="20">
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontFamily="Arial" Text="RETRY" FontWeight="ExtraBold" FontSize="35" Foreground="White" Padding="20" Cursor="Hand"/>
+                        <Border.InputBindings>
+                            <MouseBinding Command="{Binding InternetRetryCommand}" MouseAction="LeftClick"/>
+                        </Border.InputBindings>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+     
+</Page>

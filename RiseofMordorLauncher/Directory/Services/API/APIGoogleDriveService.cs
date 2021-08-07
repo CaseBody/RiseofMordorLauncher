@@ -18,7 +18,7 @@ namespace RiseofMordorLauncher
 {
     public class APIGoogleDriveService : IGoogleDriveService
     {
-        public async Task DownloadFile(string file_name, string output_path)
+        public Task DownloadFile(string file_name, string output_path)
         {
             string[] Scopes = { DriveService.Scope.DriveReadonly };
             string ApplicationName = "RiseofMordorLauncher";
@@ -64,7 +64,7 @@ namespace RiseofMordorLauncher
             }
 
             var request = service.Files.Get(file_id);
-            var stream = new System.IO.MemoryStream();
+            var stream = new MemoryStream();
 
             // Add a handler which will be notified on progress changes.
             // It will notify on each chunk download and when the
@@ -75,7 +75,7 @@ namespace RiseofMordorLauncher
                 {
                     case Google.Apis.Download.DownloadStatus.Completed:
                         {
-                            using (System.IO.FileStream file = new System.IO.FileStream(output_path, System.IO.FileMode.Create, System.IO.FileAccess.Write))
+                            using (var file = new FileStream(output_path, FileMode.Create, FileAccess.Write))
                             {
                                 stream.WriteTo(file);
                             }
@@ -83,8 +83,10 @@ namespace RiseofMordorLauncher
                         }
                 }
             };
+
             request.Download(stream);
 
+            return Task.CompletedTask;
         }
     }
 }

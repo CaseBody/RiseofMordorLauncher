@@ -19,14 +19,15 @@ namespace RiseofMordorLauncher
                 var youtube_api = new YoutubeClient();
                 var rom_channel_videos = await youtube_api.Channels.GetUploadsAsync("UCangGj6TUjUb9ri8CXcxQuw");
 
-                YouTubeData data = new YouTubeData();
+                var data = new YouTubeData();
                 data.ThumbnailUrl = rom_channel_videos.ElementAt(0).Thumbnails.ElementAt(0).Url;
                 data.VideoUrl = $"https://youtube.com/embed/{rom_channel_videos.ElementAt(0).Id}";
                 return data;
             }
-            catch
+            catch (Exception ex)
             {
-                YouTubeData data = new YouTubeData();
+                Console.WriteLine(ex.Message);
+                var data = new YouTubeData();
                 return data;
             }
 

@@ -24,7 +24,23 @@ namespace RiseofMordorLauncher.Directory.Pages
     {
         public MainLauncher()
         {
+            InitializeComponent();
         }
 
+        //private void Expander_MouseEnter(object sender, MouseEventArgs e)
+        //{
+        //    if (sender is Expander exp)
+        //    {
+        //        exp.IsExpanded = true;
+        //    }
+        //}
+
+        //private void Expander_MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //    if (sender is Expander exp)
+        //    {
+        //        exp.IsExpanded = false;
+        //    }
+        //}
     }
 }

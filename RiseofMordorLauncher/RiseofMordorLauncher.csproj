@@ -189,11 +189,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Directory\ItemTemplates\SubmodTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Directory\Pages\Login.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Directory\Pages\MainLauncher.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Directory\Pages\SubmodsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -214,12 +222,16 @@
     <Compile Include="Directory\Data\ModVersion.cs" />
     <Compile Include="Directory\Data\SharedData.cs" />
     <Compile Include="Directory\Data\SteamUser.cs" />
+    <Compile Include="Directory\Data\SubmodModel.cs" />
     <Compile Include="Directory\Data\YouTubeData.cs" />
     <Compile Include="Directory\Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
     <Compile Include="Directory\Pages\MainLauncher.xaml.cs">
       <DependentUpon>MainLauncher.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Directory\Pages\SubmodsPage.xaml.cs">
+      <DependentUpon>SubmodsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Directory\Services\API\APIGoogleDriveService.cs" />
     <Compile Include="Directory\Services\API\APISteamUserService.cs" />
@@ -235,6 +247,7 @@
     <Compile Include="Directory\ViewModels\BaseViewModel.cs" />
     <Compile Include="Directory\ViewModels\LoginViewModel.cs" />
     <Compile Include="Directory\ViewModels\MainLauncherViewModel.cs" />
+    <Compile Include="Directory\ViewModels\SubmodsViewModel.cs" />
     <Compile Include="Directory\ViewModels\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

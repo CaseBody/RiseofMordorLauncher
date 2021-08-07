@@ -62,6 +62,12 @@
 
             <StackPanel Margin="80 30">
                 <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" FontFamily="Arial" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
+            </StackPanel>
+
+            <!-- MouseEnter="Expander_MouseEnter"
+                 MouseLeave="Expander_MouseLeave" -->
+            
+            <Expander Margin="80 30">
                 <RichTextBox BorderThickness="0" Height="220" Foreground="#fc9b00" Background="Black" Opacity="0.9" IsReadOnly="True">
                     <FlowDocument>
                         <Paragraph>
@@ -69,7 +75,17 @@
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
-            </StackPanel>
+            </Expander>
+
+            <Button Content="Submods"
+                    Foreground="OrangeRed"
+                    BorderThickness="0"
+                    FontSize="32"
+                    FontWeight="SemiBold"
+                    Height="80"
+                    Width="180"
+                    Command="{Binding SubmodsPageCmd}"
+                    Style="{StaticResource DarkButton}"/>
 
             <StackPanel Margin="80 30" Grid.Column="1" Visibility="{Binding ShowVideo}">
                 <Border BorderThickness="1" Width="113" BorderBrush="Black" HorizontalAlignment="Left">

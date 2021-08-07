@@ -1,0 +1,33 @@
+﻿<Page x:Class="RiseofMordorLauncher.Directory.Pages.SubmodsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="650"
+      d:DesignWidth="1200">
+
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="../ItemTemplates/SubmodTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+
+    <ScrollViewer>
+        <Grid>
+            <Grid.Background>
+                <ImageBrush ImageSource="../Images/background_three.png" Stretch="UniformToFill"/>
+            </Grid.Background>
+
+            <ItemsControl ItemsSource="{Binding SubmodsList}"
+                          ItemTemplate="{StaticResource SubmodTemplate}">
+            
+            </ItemsControl>
+
+        </Grid>
+    </ScrollViewer>
+
+</Page>

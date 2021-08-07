@@ -14,11 +14,13 @@ namespace RiseofMordorLauncher
     {
         private readonly SharedData SharedData = new SharedData();
 
-        private MainLauncherViewModel mainLauncherViewModel = new MainLauncherViewModel();
+        private readonly MainLauncherViewModel mainLauncherViewModel = new MainLauncherViewModel();
         private LoginViewModel loginViewModel = new LoginViewModel();
+        private readonly SubmodsViewModel submodsViewModel = new SubmodsViewModel();
 
         private MainLauncher MainLauncherPage = new MainLauncher();
-        private Login LoginPage = new Login();
+        private readonly Login LoginPage     = new Login();
+        private readonly SubmodsPage SubmodsPage   = new SubmodsPage();
         public Page CurrentPage { get; set; }
 
         // Load login page
@@ -28,7 +30,7 @@ namespace RiseofMordorLauncher
             loginViewModel.SwitchPageEvent += SwitchPage;
             loginViewModel.Load();
             LoginPage.DataContext = loginViewModel;
-            LoginPage.InitializeComponent();
+
             CurrentPage = LoginPage;
         }
 
@@ -43,7 +45,6 @@ namespace RiseofMordorLauncher
                     mainLauncherViewModel.SwitchPageEvent += SwitchPage;
                     await mainLauncherViewModel.Load();
                     MainLauncherPage.DataContext = mainLauncherViewModel;
-                    MainLauncherPage.InitializeComponent();
                     CurrentPage = MainLauncherPage;
                     break;
 
@@ -53,10 +54,18 @@ namespace RiseofMordorLauncher
                     loginViewModel.SwitchPageEvent += SwitchPage;
                     loginViewModel.Load();
                     CurrentPage = LoginPage;
-                    LoginPage.InitializeComponent();
+                    break;
+
+                case ApplicationPage.Submods:
+                    //submodsViewModel = new SubmodsViewModel();
+                    //submodsViewModel.SharedData = SharedData;
+                    //submodsViewModel.SwitchPageEvent += SwitchPage;
+                    //submodsViewModel.Load();
+                    
+                    SubmodsPage.DataContext = submodsViewModel;
+                    CurrentPage = SubmodsPage;
                     break;
             }
-
 
         }
 

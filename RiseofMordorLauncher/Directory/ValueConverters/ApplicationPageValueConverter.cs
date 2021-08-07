@@ -17,7 +17,6 @@ namespace RiseofMordorLauncher
             {
                 case ApplicationPage.MainLauncher:
                     return new MainLauncher();
-
                 default:
                     Debugger.Break();
                     return null;

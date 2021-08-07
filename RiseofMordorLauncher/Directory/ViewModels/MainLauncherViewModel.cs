@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RiseofMordorLauncher.Directory.Services;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RiseofMordorLauncher
 {
@@ -21,7 +23,16 @@ namespace RiseofMordorLauncher
         public string YouTubeVideoURL { get; set; }
         public SharedData SharedData { get; set; }
         public Visibility ShowVideo { get; set; } = Visibility.Visible;
-
+        
+        private ICommand _submodsPageCmd;
+        public ICommand SubmodsPageCmd
+        {
+            get
+            {
+                return _submodsPageCmd ?? (_submodsPageCmd = new CommandHandler(() => SwitchPage(ApplicationPage.Submods), () => true));
+            }
+        }
+        
         public async Task Load()
         {
 

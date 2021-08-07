@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace RiseofMordorLauncher.Directory.Pages
 {
     /// <summary>
-    /// Interaction logic for MainLauncher.xaml
+    /// Interaction logic for SubmodsPage.xaml
     /// </summary>
-    public partial class Login : Page
+    public partial class SubmodsPage : Page
     {
-        public Login()
+        public SubmodsPage()
         {
             InitializeComponent();
         }

@@ -23,6 +23,8 @@ namespace RiseofMordorLauncher
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly WindowViewModel viewModel = new WindowViewModel();
+
         public MainWindow()
         {
             try
@@ -36,12 +38,12 @@ namespace RiseofMordorLauncher
                 //    Attila.Start();
                 //    Attila.WaitForInputIdle();
 
-                this.DataContext = new WindowViewModel();
+                DataContext = viewModel;
 
             }
-            catch (System.Exception e)
+            catch (Exception ex)
             {
-                // Something went wrong! Steam is closed?
+                Console.WriteLine(ex.Message);
             }
         }
 

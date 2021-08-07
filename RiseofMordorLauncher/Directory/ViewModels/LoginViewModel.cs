@@ -15,84 +15,137 @@ namespace RiseofMordorLauncher
     {
         #region Variables
         public SharedData SharedData { get; set; }
-
-        public Visibility internet_error_shown { get; set; } = Visibility.Hidden;
-        public Visibility attila_error_shown { get; set; } = Visibility.Hidden;
-        public Visibility steam_error_shown { get; set; } = Visibility.Hidden;
+        public Visibility OfflineBtnVisibility      { get; private set; }
+        public Visibility LoadingScreenVisibility   { get; private set; }
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
+
+        public string ErrorClass        { get; private set; }
+        public string ErrorDescription  { get; private set; }
+
+        private bool _isSteamAPIInit;
 
         #endregion
 
         #region Functionality
-        // Start checks
-        public async void Load()
+        public LoginViewModel()
         {
-            await Task.Delay(1500); // give time to initiliaze, otherwise switching to main launcher page bugs out.
-            CheckSteam();
+            _isSteamAPIInit         = false;
+            OfflineBtnVisibility    = Visibility.Hidden;
+            LoadingScreenVisibility = Visibility.Visible;
         }
 
-        // first check, ensure steam is running. Mandatory
-        public void CheckSteam()
+        // Start checks
+        public void Load()
         {
-            SteamAPI.Init();
-            
-            if (SteamAPI.IsSteamRunning())
+            //await Task.Delay(1500); // give time to initiliaze, otherwise switching to main launcher page bugs out.
+
+            if (_isSteamAPIInit == false)
             {
-                steam_error_shown = Visibility.Hidden;
-                CheckAttilaInstalled();
+                _isSteamAPIInit = InitSteamAPI();
+                if (_isSteamAPIInit == false)
+                {
+                    return;
+                }
             }
+
+            var isSteamRunning = CheckSteam();
+            if (isSteamRunning == false)
+                return;
+
+            var isAttilaInstalled = CheckAttilaInstalled();
+            if (isAttilaInstalled == false)
+                return;
+
+            var isOnline = CheckInternet();
+            if (isOnline == false)
+                return;
             else
+                Continue(offline: false);
+        }
+
+        private void DisplayError(string errClass, string errDescr, bool showOfflineBtn, bool showLoadingScreen)
+        {
+            LoadingScreenVisibility = showLoadingScreen ? Visibility.Visible : Visibility.Hidden;
+            OfflineBtnVisibility    = showOfflineBtn ? Visibility.Visible : Visibility.Hidden;
+            ErrorClass              = errClass;
+            ErrorDescription        = errDescr;
+
+            Console.WriteLine(errDescr);
+        }
+
+        private bool InitSteamAPI()
+        {
+            bool didInit = SteamAPI.Init();
+            if (didInit == false)
             {
-                steam_error_shown = Visibility.Visible;
+                DisplayError("STEAM ERROR", "The Steam API failed to initiliase.", false, false);
             }
+
+            return didInit;
+        }
+        
+        /// <summary>
+        /// First check, ensure steam is running. Mandatory
+        /// </summary>
+        /// <returns>True if Steam client is running; False if it isn't</returns>
+        private bool CheckSteam()
+        {
+            bool isSteamRunning = SteamAPI.IsSteamRunning();
+            if (isSteamRunning == false)
+            {
+                DisplayError("STEAM ERROR", "The Steam client was not detected. Please ensure you have Steam opened.", false, false);
+            }
+
+            return isSteamRunning;
         }
 
         // second check, ensure Attila is installed. Mandatory
-        public void CheckAttilaInstalled()
+        private bool CheckAttilaInstalled()
         {
-            SteamAPI.Init();
-            AppId_t attila_appid = (AppId_t)325610;
-
-            if (SteamApps.BIsAppInstalled(attila_appid))
+            bool isAttilaInstalled = SteamApps.BIsAppInstalled((AppId_t)325610);
+            if (isAttilaInstalled == false)
             {
-                attila_error_shown = Visibility.Hidden;
-                CheckInternet();
-            }
-            else
-            {
-                attila_error_shown = Visibility.Visible;
+                DisplayError("ATTILA WAS NOT DETECTED", "Total War: Attila Steam installation was not detected. Please ensure you have Total War: Attila installed.", false, false);
             }
 
+            return isAttilaInstalled; 
         }
 
         // third check, check if there is an internet connection. If not, offer to start in Offline mode.
-        public void CheckInternet()
+        private bool CheckInternet()
         {
             try
             {
-                Ping myPing = new Ping();
-                String host = "google.com";
-                byte[] buffer = new byte[32];
-                int timeout = 1000;
-                PingOptions pingOptions = new PingOptions();
-                PingReply reply = myPing.Send(host, timeout, buffer, pingOptions);
-                
-                if (reply.Status == IPStatus.Success)
+                var myPing      = new Ping();
+                var host        = "google.com";
+                var buffer      = new byte[32];
+                var timeout     = 1000;
+                var pingOptions = new PingOptions();
+                var reply       = myPing.Send(host, timeout, buffer, pingOptions);
+
+                bool isOnline = reply.Status == IPStatus.Success;
+                if (isOnline == false)
                 {
-                    SharedData.isOffline = false;
-                    internet_error_shown = Visibility.Hidden;
-                    SwitchPage(ApplicationPage.MainLauncher);
+                    DisplayError("NO INTERNET", "An internet connection could not be made. You will not be able to download updates until you reconnect.", false, false);
                 }
-                else
-                {
-                    internet_error_shown = Visibility.Visible;
-                }
+
+                return isOnline;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                internet_error_shown = Visibility.Visible;
+                MessageBox.Show(ex.Message);
             }
+
+            return false;
+        }
+
+        private void Continue(bool offline)
+        {
+            LoadingScreenVisibility = Visibility.Visible;
+            SharedData.isOffline    = offline;
+
+            SwitchPage(ApplicationPage.MainLauncher);
         }
 
         // Switch page and start the launcher after all checks pass
@@ -105,43 +158,24 @@ namespace RiseofMordorLauncher
         #region Commands
         // Button clicks
 
-        private ICommand _SteamRetryCommand;
-        public ICommand SteamRetryCommand
+        private ICommand _retryCommand;
+        public ICommand RetryCommand
         {
             get
             {
-                return _SteamRetryCommand ?? (_SteamRetryCommand = new CommandHandler(() => CheckSteam(), () => true));
+                return _retryCommand ?? (_retryCommand = new CommandHandler(() => Load(), () => true));
             }
         }
 
-        private ICommand _AttilaRetryCommand;
-        public ICommand AttilaRetryCommand
-        {
-            get
-            {
-                return _AttilaRetryCommand ?? (_AttilaRetryCommand = new CommandHandler(() => CheckAttilaInstalled(), () => true));
-            }
-        }
-
-        private ICommand _InternetRetryCommand;
-        public ICommand InternetRetryCommand
-        {
-            get
-            {
-                return _InternetRetryCommand ?? (_InternetRetryCommand = new CommandHandler(() => CheckInternet(), () => true));
-            }
-        }
-
-        private ICommand _InternetOfflineCommand;
+        private ICommand _internetOfflineCommand;
         public ICommand InternetOfflineCommand
         {
             get
             {
-                return _InternetOfflineCommand ?? (_InternetOfflineCommand = new CommandHandler(() => { SharedData.isOffline = true; SwitchPage(ApplicationPage.MainLauncher); }, () => true));
+                return _internetOfflineCommand ?? (_internetOfflineCommand = new CommandHandler(() => Continue(offline: true), () => true));
             }
         }
 
         #endregion
-
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Input;
 using RiseofMordorLauncher.Directory.Pages;
 
@@ -18,7 +19,7 @@ namespace RiseofMordorLauncher
 
         private MainLauncher MainLauncherPage = new MainLauncher();
         private Login LoginPage = new Login();
-        public object CurrentPage { get; set; }
+        public Page CurrentPage { get; set; }
 
         // Load login page
         public WindowViewModel()

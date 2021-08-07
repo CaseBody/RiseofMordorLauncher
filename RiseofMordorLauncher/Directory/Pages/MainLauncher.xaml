@@ -4,8 +4,9 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages" xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
-      mc:Ignorable="d" 
-      d:DesignHeight="650" d:DesignWidth="1200"
+      mc:Ignorable="d"
+      d:DesignHeight="650"
+      d:DesignWidth="1200"
       Title="MainLauncher">
 
     <Grid>
@@ -21,10 +22,25 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid HorizontalAlignment="Right" Width="170" Margin="0 20 30 20" Grid.RowSpan="2">
-            <Border BorderBrush="Black" Background="Black" CornerRadius="10" Opacity="0.9" Grid.ColumnSpan="2"/>
+        <Grid HorizontalAlignment="Right"
+              Width="170"
+              Margin="0 20 30 20"
+              Grid.RowSpan="2">
+            
+            <Border Background="Black" 
+                    CornerRadius="10" 
+                    Opacity="0.9" 
+                    Grid.ColumnSpan="2"/>
 
-            <Image Source="{Binding SteamAvatarUrl}" Stretch="Fill"/>
+            <Border BorderThickness="2"
+                    BorderBrush="LightGreen"
+                    Width="45"
+                    Height="45">
+                
+                <Image Source="{Binding SteamAvatarUrl}"
+                       Stretch="Uniform"/>
+                
+            </Border>
 
             <StackPanel Grid.Column="1" Orientation="Vertical">
                 <TextBlock Text="{Binding SteamUserName}" Foreground="White" FontFamily="Arial" HorizontalAlignment="Center" Margin="0 10 0 0"/>
@@ -78,16 +94,20 @@
 
         <StackPanel Grid.Row="3" Orientation="Horizontal">
 
-            <Image Height="100" HorizontalAlignment="Left" Margin="20,26,0,27" Source="../Images/rom_logo.png"/>
+            <Image Height="100" 
+                   HorizontalAlignment="Left" 
+                   Margin="20,26,0,27" 
+                   Source="../Images/rom_logo.png"/>
 
-            <Grid Margin="500 30">
-                <Border BorderBrush="Black" Background="Black" CornerRadius="10" Opacity="0.9" Grid.RowSpan="2"/>
-
-                <StackPanel Orientation="Vertical" Grid.RowSpan="2">
-                    <TextBlock FontWeight="Bold" Padding="80 0" FontSize="40" Text="PLAY" Foreground="#fc9b00" FontFamily="Arial" HorizontalAlignment="Center" Margin="0 30 0 0"/>
-                </StackPanel>
-            </Grid>
-
+            <Button Margin="500 30"
+                    BorderThickness="0"
+                    Foreground="#fc9b00"
+                    Padding="80 0" 
+                    FontSize="40" 
+                    FontWeight="Bold" 
+                    Command="{Binding PlayCommand}"
+                    Style="{StaticResource DarkButton}"
+                    Content="PLAY"/>
 
             <StackPanel.Background>
                 <SolidColorBrush Opacity="0.35" Color="Black"/>

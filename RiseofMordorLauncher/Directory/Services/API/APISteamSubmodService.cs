@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
@@ -16,7 +17,7 @@ namespace RiseofMordorLauncher
         private string[] enabled_submods = { };
         private uint amount = 0;
         public List<SubmodModel> submodList;
-        private List<PublishedFileId_t> SubscribedSubmods;
+        private List<PublishedFileId_t> SubscribedSubmods;      
         public void GetSubmods(SharedData sharedData)
         {
             OnSteamUGCQueryCompletedCallResult = CallResult<SteamUGCQueryCompleted_t>.Create(OnSteamUGCQueryCompleted);
@@ -43,7 +44,6 @@ namespace RiseofMordorLauncher
             }
 
             // get subscribed submods
-            SteamAPI.Init();
             PublishedFileId_t[] SubscribedItems = new PublishedFileId_t[SteamUGC.GetNumSubscribedItems()];
             SubscribedSubmods = new List<PublishedFileId_t>();
             SteamUGC.GetSubscribedItems(SubscribedItems, SteamUGC.GetNumSubscribedItems());
@@ -60,11 +60,11 @@ namespace RiseofMordorLauncher
             var request = SteamUGC.SendQueryUGCRequest(details);
             OnSteamUGCQueryCompletedCallResult.Set(request);
 
+
         }
 
         void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
-            Console.WriteLine("hit");
             SteamUGCDetails_t detail;
             // Create SubmodModel list and populate.
             submodList = new List<SubmodModel>();

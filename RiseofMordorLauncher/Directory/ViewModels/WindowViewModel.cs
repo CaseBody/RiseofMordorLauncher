@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Steamworks;
 using RiseofMordorLauncher.Directory.Pages;
-
+using System.Threading;
 
 namespace RiseofMordorLauncher
 {
@@ -21,11 +22,12 @@ namespace RiseofMordorLauncher
         private MainLauncher MainLauncherPage = new MainLauncher();
         private readonly Login LoginPage     = new Login();
         private readonly SubmodsPage SubmodsPage   = new SubmodsPage();
+        private Thread UpdateThread;
         public Page CurrentPage { get; set; }
 
         // Load login page
         public WindowViewModel()
-        {
+        { 
             loginViewModel.SharedData = SharedData;
             loginViewModel.SwitchPageEvent += SwitchPage;
             loginViewModel.Load();
@@ -33,6 +35,10 @@ namespace RiseofMordorLauncher
             SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); ;
 
             CurrentPage = LoginPage;
+
+            UpdateThread = new Thread(Update);
+            UpdateThread.IsBackground = true;
+            UpdateThread.Start();
         }
 
         // switch page, can be fired by the page ViewModels
@@ -71,6 +77,15 @@ namespace RiseofMordorLauncher
                     break;
             }
 
+        }
+
+        private async void Update()
+        {
+            while (true)
+            {
+                await Task.Delay(10);
+                SteamAPI.RunCallbacks();
+            }
         }
 
     }

@@ -75,6 +75,7 @@ namespace RiseofMordorLauncher
             Version = await _modVersionService.GetModVersionInfo(SharedData);
 
             downloadThread = new Thread(PostUiLoad);
+            downloadThread.IsBackground = true;
             downloadThread.Start();
         }
 

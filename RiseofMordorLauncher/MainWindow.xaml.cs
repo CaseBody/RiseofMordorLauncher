@@ -29,8 +29,8 @@ namespace RiseofMordorLauncher
         {
             try
             {
-            //    SteamAPI.RestartAppIfNecessary((AppId_t)325610);
-               //   SteamAPI.Init();
+                //SteamAPI.RestartAppIfNecessary((AppId_t)325610);
+                //  SteamAPI.Init();
                 //    Process Attila = new Process();
                 //    Attila.StartInfo.FileName = @"D:\SteamLibrary\steamapps\common\Total War Attila\Attila.exe";
                 //    Attila.StartInfo.Arguments = "mod rise_of_mordor_alpha_pack1_main_0.5.0.pack; mod rise_of_mordor_alpha_pack2_models.pack; mod rise_of_mordor_alpha_pack3_buildings.pack; mod rise_of_mordor_alpha_pack4_weather.pack;";

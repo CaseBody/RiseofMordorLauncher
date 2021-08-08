@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace RiseofMordorLauncher
 {
-    interface IGoogleDriveService
+    interface ISteamSubmodsService
     {
-        Task DownloadFile(string file_name, string output_path, long file_size);
-        event EventHandler<int> DownloadUpdate;
+        void GetSubmods(SharedData sharedData);
+
+        event EventHandler<List<SubmodModel>> SubmodDataFinishedEvent;
     }
 }

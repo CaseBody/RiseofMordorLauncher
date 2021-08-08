@@ -35,7 +35,7 @@ namespace RiseofMordorLauncher
 
             if (!sharedData.isOffline)
             {
-                await drive_service.DownloadFile("current_mod_version.txt", $"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt");
+                await drive_service.DownloadFile("current_mod_version.txt", $"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", 1);
 
                 string[] current_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt");
                 bool is_reading_pack_files = false;
@@ -82,6 +82,10 @@ namespace RiseofMordorLauncher
                                     }
                                 }
                                 version.LatestVersionNumber = double.Parse(final);
+                            }
+                            else if (line.StartsWith("size"))
+                            {
+                            version.DownloadNumberOfBytes = long.Parse(line.Split('=').ElementAt(1));
                             }
                             else if (line == ("pack_files = {")) { is_reading_pack_files = true; }
                         }

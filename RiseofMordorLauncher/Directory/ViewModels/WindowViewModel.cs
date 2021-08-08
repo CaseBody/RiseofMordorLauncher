@@ -14,7 +14,7 @@ namespace RiseofMordorLauncher
     {
         private readonly SharedData SharedData = new SharedData();
 
-        private readonly MainLauncherViewModel mainLauncherViewModel = new MainLauncherViewModel();
+        private MainLauncherViewModel mainLauncherViewModel;
         private LoginViewModel loginViewModel = new LoginViewModel();
         private readonly SubmodsViewModel submodsViewModel = new SubmodsViewModel();
 
@@ -30,6 +30,7 @@ namespace RiseofMordorLauncher
             loginViewModel.SwitchPageEvent += SwitchPage;
             loginViewModel.Load();
             LoginPage.DataContext = loginViewModel;
+            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); ;
 
             CurrentPage = LoginPage;
         }
@@ -41,11 +42,13 @@ namespace RiseofMordorLauncher
             {
                 case ApplicationPage.MainLauncher:
                     MainLauncherPage = new MainLauncher();
+                    mainLauncherViewModel = new MainLauncherViewModel();
                     mainLauncherViewModel.SharedData = SharedData;
                     mainLauncherViewModel.SwitchPageEvent += SwitchPage;
                     await mainLauncherViewModel.Load();
                     MainLauncherPage.DataContext = mainLauncherViewModel;
                     CurrentPage = MainLauncherPage;
+            //        await mainLauncherViewModel.PostUiLoad();
                     break;
 
                 case ApplicationPage.Login:
@@ -60,7 +63,8 @@ namespace RiseofMordorLauncher
                     //submodsViewModel = new SubmodsViewModel();
                     //submodsViewModel.SharedData = SharedData;
                     //submodsViewModel.SwitchPageEvent += SwitchPage;
-                    //submodsViewModel.Load();
+                    submodsViewModel.sharedData = SharedData;
+                    submodsViewModel.Load();
                     
                     SubmodsPage.DataContext = submodsViewModel;
                     CurrentPage = SubmodsPage;

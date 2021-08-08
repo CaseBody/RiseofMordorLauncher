@@ -11,7 +11,7 @@
 
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="../Images/background_three.png" Stretch="UniformToFill"/>
+            <ImageBrush ImageSource="../Images/unknown.png" Stretch="UniformToFill"/>
         </Grid.Background>
 
         <Grid.RowDefinitions>
@@ -54,20 +54,14 @@
 
         </Grid>
 
-        <Grid HorizontalAlignment="Left" Width="170" Margin="30 20 0 20" Grid.RowSpan="2">
+        <Grid HorizontalAlignment="Left" Margin="30 20 0 20" Grid.RowSpan="2">
             <TextBlock Text="Version 0.5.0" FontSize="30" Foreground="#fc9b00"/>
         </Grid>
 
         <Grid Grid.Row="2">
 
             <StackPanel Margin="80 30">
-                <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" FontFamily="Arial" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
-            </StackPanel>
-
-            <!-- MouseEnter="Expander_MouseEnter"
-                 MouseLeave="Expander_MouseLeave" -->
-            
-            <Expander Margin="80 30">
+                <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
                 <RichTextBox BorderThickness="0" Height="220" Foreground="#fc9b00" Background="Black" Opacity="0.9" IsReadOnly="True">
                     <FlowDocument>
                         <Paragraph>
@@ -75,21 +69,15 @@
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
-            </Expander>
+            </StackPanel>
 
-            <Button Content="Submods"
-                    Foreground="OrangeRed"
-                    BorderThickness="0"
-                    FontSize="32"
-                    FontWeight="SemiBold"
-                    Height="80"
-                    Width="180"
-                    Command="{Binding SubmodsPageCmd}"
-                    Style="{StaticResource DarkButton}"/>
+            <!-- MouseEnter="Expander_MouseEnter"
+                 MouseLeave="Expander_MouseLeave" -->
+           
 
             <StackPanel Margin="80 30" Grid.Column="1" Visibility="{Binding ShowVideo}">
-                <Border BorderThickness="1" Width="113" BorderBrush="Black" HorizontalAlignment="Left">
-                    <TextBlock HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Latest Video" FontSize="18" FontFamily="Arial" Foreground="#fc9b00" FontWeight="Bold" Background="Black"/>
+                <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Left">
+                    <TextBlock HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Latest Video" FontSize="18" Foreground="#fc9b00" FontWeight="Bold" Background="Black"/>
                 </Border>
                 <Grid>
                     <Border Height="220" Background="Black" BorderBrush="Black" BorderThickness="1">
@@ -103,7 +91,7 @@
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
-                <ColumnDefinition/>
+                <ColumnDefinition Width="600"/>
             </Grid.ColumnDefinitions>
 
         </Grid>
@@ -115,20 +103,55 @@
                    Margin="20,26,0,27" 
                    Source="../Images/rom_logo.png"/>
 
-            <Button Margin="500 30"
+            <Button Margin="{Binding PlayButtonMargin, FallbackValue=450 30}"
                     BorderThickness="0"
                     Foreground="#fc9b00"
                     Padding="80 0" 
                     FontSize="40" 
                     FontWeight="Bold" 
+                    FontFamily="Ariel"
+                    IsEnabled="{Binding PlayButtonEnabled}"
                     Command="{Binding PlayCommand}"
                     Style="{StaticResource DarkButton}"
-                    Content="PLAY"/>
+                    Content="{Binding PlayButtonText}"/>
 
             <StackPanel.Background>
                 <SolidColorBrush Opacity="0.35" Color="Black"/>
             </StackPanel.Background>
         </StackPanel>
+
+        <Grid Grid.Row="5">
+            <Button Content="Submods"
+                    HorizontalAlignment="Left"
+                    Margin="30 0 0 0"
+                    Foreground="OrangeRed"
+                    BorderThickness="0"
+                    FontSize="20"
+                    FontWeight="SemiBold"
+                    Height="50"
+                    Width="150"
+                    Command="{Binding SubmodsPageCmd}"
+                    Style="{StaticResource DarkButton}"/>
+
+            <StackPanel  HorizontalAlignment="Center" Visibility="{Binding ShowProgressBar}">
+                <TextBlock Text="{Binding ProgressText, FallbackValue=DOWNLOADING...}"
+                Margin="0 3 0 0"
+                HorizontalAlignment="Center"
+                Foreground="#fc9b00"
+                FontSize="20"           
+                />
+                
+                <ProgressBar
+                Margin="0 0 0 0"
+                Width="600"
+                Height="30"
+                Background="Black"
+                BorderBrush="Black"
+                Foreground="#fc9b00"
+                Value="{Binding ProgressBarProgress}"                         
+                />
+            </StackPanel>
+        </Grid>
 
 
     </Grid>

@@ -6,11 +6,23 @@
     x:Class="RiseofMordorLauncher.App"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        
+
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Directory/Styles/Button.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="Directory/Fonts/Middleearth.ttf #MiddleEarth"/>
+            </Style>
+            
+            <Style TargetType="Button">
+                <Setter Property="FontFamily" Value="Directory/Fonts/Middleearth.ttf #MiddleEarth"/>
+            </Style>
+
+            <Style TargetType="RichTextBox">
+                <Setter Property="FontFamily" Value="Directory/Fonts/Middleearth.ttf #MiddleEarth"/>
+            </Style>
         </ResourceDictionary>
 
     </Application.Resources>

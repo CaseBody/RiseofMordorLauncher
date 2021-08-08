@@ -142,6 +142,12 @@ namespace RiseofMordorLauncher
 
         private void Continue(bool offline)
         {
+            AppId_t attila_appid = (AppId_t)325610;
+
+            string AttilaDir = "";
+            SteamApps.GetAppInstallDir(attila_appid, out AttilaDir, 10000);
+            SharedData.AttilaDir = AttilaDir;
+
             LoadingScreenVisibility = Visibility.Visible;
             SharedData.isOffline    = offline;
 

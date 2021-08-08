@@ -16,18 +16,26 @@
         </ResourceDictionary>
     </Page.Resources>
 
-    <ScrollViewer>
         <Grid>
             <Grid.Background>
-                <ImageBrush ImageSource="../Images/background_three.png" Stretch="UniformToFill"/>
+                <ImageBrush ImageSource="../Images/unknown.png" Stretch="UniformToFill"/>
             </Grid.Background>
 
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="Rise of Mordor Submods" Foreground="#fc9b00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="60"/>
+
+        <ScrollViewer Grid.Row="2" Margin="40 20" VerticalScrollBarVisibility="Hidden">
             <ItemsControl ItemsSource="{Binding SubmodsList}"
                           ItemTemplate="{StaticResource SubmodTemplate}">
-            
+
             </ItemsControl>
+        </ScrollViewer>
 
         </Grid>
-    </ScrollViewer>
+
 
 </Page>

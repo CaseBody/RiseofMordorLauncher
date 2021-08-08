@@ -18,7 +18,9 @@ namespace RiseofMordorLauncher
 {
     public class APIGoogleDriveService : IGoogleDriveService
     {
-        public Task DownloadFile(string file_name, string output_path)
+
+        public event EventHandler<int> DownloadUpdate;
+        public Task DownloadFile(string file_name, string output_path, long file_size)
         {
             string[] Scopes = { DriveService.Scope.DriveReadonly };
             string ApplicationName = "RiseofMordorLauncher";
@@ -65,26 +67,43 @@ namespace RiseofMordorLauncher
 
             var request = service.Files.Get(file_id);
             var stream = new MemoryStream();
+            using (var file_stream = new FileStream(output_path, FileMode.Create, FileAccess.Write))
+            {
+                request.MediaDownloader.ProgressChanged += (Google.Apis.Download.IDownloadProgress progress) =>
+                {
+                    switch (progress.Status)
+                    {
+                        case Google.Apis.Download.DownloadStatus.Completed:
+                            {
+                                //  using (var file = new FileStream(output_path, FileMode.Create, FileAccess.Write))
+                                // {
+                                //    stream.WriteTo(file);
+                                // }
+                                break;
+                            }
+                        case Google.Apis.Download.DownloadStatus.Downloading:
+                            {
+                                decimal percent = Math.Round((decimal)progress.BytesDownloaded / file_size * 100);
+
+                                DownloadUpdate?.Invoke(this, (int)percent);
+                                break;
+                            }
+                        case Google.Apis.Download.DownloadStatus.Failed:
+                            {
+                                request.Download(file_stream);
+                                Console.WriteLine("Download failed.");
+                                break;
+                            }
+                    }
+                };
+
+                request.Download(file_stream);
+            }
 
             // Add a handler which will be notified on progress changes.
             // It will notify on each chunk download and when the
             // download is completed or failed.
-            request.MediaDownloader.ProgressChanged += (Google.Apis.Download.IDownloadProgress progress) =>
-            {
-                switch (progress.Status)
-                {
-                    case Google.Apis.Download.DownloadStatus.Completed:
-                        {
-                            using (var file = new FileStream(output_path, FileMode.Create, FileAccess.Write))
-                            {
-                                stream.WriteTo(file);
-                            }
-                            break;
-                        }
-                }
-            };
 
-            request.Download(stream);
 
             return Task.CompletedTask;
         }

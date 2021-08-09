@@ -32,13 +32,19 @@ namespace RiseofMordorLauncher
             loginViewModel.SwitchPageEvent += SwitchPage;
             loginViewModel.Load();
             LoginPage.DataContext = loginViewModel;
-            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData); ;
+            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
             CurrentPage = LoginPage;
 
             UpdateThread = new Thread(Update);
             UpdateThread.IsBackground = true;
             UpdateThread.Start();
+            
+            var launcherAppDataPath = $@"{SharedData.AppData}\RiseofMordor\RiseofMordorLauncher\";
+            if (System.IO.Directory.Exists(launcherAppDataPath) == false)
+            {
+                System.IO.Directory.CreateDirectory(launcherAppDataPath);
+            }
         }
 
         // switch page, can be fired by the page ViewModels
@@ -81,6 +87,9 @@ namespace RiseofMordorLauncher
 
         private async void Update()
         {
+            if (SharedData.isOffline)
+                return;
+
             while (true)
             {
                 await Task.Delay(10);

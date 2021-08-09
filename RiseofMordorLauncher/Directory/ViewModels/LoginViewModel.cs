@@ -24,7 +24,6 @@ namespace RiseofMordorLauncher
         public string ErrorDescription  { get; private set; }
 
         private bool _isSteamAPIInit;
-
         #endregion
 
         #region Functionality

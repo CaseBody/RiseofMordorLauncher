@@ -17,11 +17,15 @@ namespace RiseofMordorLauncher
         private string[] enabled_submods = { };
         private uint amount = 0;
         public List<SubmodModel> submodList;
-        private List<PublishedFileId_t> SubscribedSubmods;      
-        public void GetSubmods(SharedData sharedData)
+        private List<PublishedFileId_t> SubscribedSubmods;  
+        
+        public APISteamSubmodService()
         {
             OnSteamUGCQueryCompletedCallResult = CallResult<SteamUGCQueryCompleted_t>.Create(OnSteamUGCQueryCompleted);
+        }
 
+        public void GetSubmods(SharedData sharedData)
+        {
             // get array of enabled submods
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
@@ -29,22 +33,24 @@ namespace RiseofMordorLauncher
             }
 
             // Get list of rom submods id's
-            IGoogleDriveService driveService = new APIGoogleDriveService();
+            var driveService = new APIGoogleDriveService();
        //     driveService.DownloadFile("approved_submods.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt", 1);
-            string[] ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
+            var ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
 
-            List<PublishedFileId_t> ApprovedSubmodsIdList = new List<PublishedFileId_t>();
+            var ApprovedSubmodsIdList = new List<PublishedFileId_t>();
             foreach (var item in ApprovedSubmodsIdString)
             {
-                PublishedFileId_t t = new PublishedFileId_t();
-                t.m_PublishedFileId = ulong.Parse(item);
-                ApprovedSubmodsIdList.Add(t);
+                var t = new PublishedFileId_t()
+                {
+                    m_PublishedFileId = ulong.Parse(item),
+                };
 
+                ApprovedSubmodsIdList.Add(t);
                 amount++;
             }
 
             // get subscribed submods
-            PublishedFileId_t[] SubscribedItems = new PublishedFileId_t[SteamUGC.GetNumSubscribedItems()];
+            var SubscribedItems = new PublishedFileId_t[SteamUGC.GetNumSubscribedItems()];
             SubscribedSubmods = new List<PublishedFileId_t>();
             SteamUGC.GetSubscribedItems(SubscribedItems, SteamUGC.GetNumSubscribedItems());
             foreach (var item in SubscribedItems)
@@ -60,19 +66,15 @@ namespace RiseofMordorLauncher
             SteamUGC.SetReturnLongDescription(details, true);
             var request = SteamUGC.SendQueryUGCRequest(details);
             OnSteamUGCQueryCompletedCallResult.Set(request);
-
-
         }
 
         void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
-            SteamUGCDetails_t detail;
             // Create SubmodModel list and populate.
             submodList = new List<SubmodModel>();
             for (uint i = 0; i < amount; i++)
             {
-                SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out detail);
-
+                SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out SteamUGCDetails_t detail);
                 SubmodModel submod = new SubmodModel();
 
                 if (enabled_submods.Count() >= 1)

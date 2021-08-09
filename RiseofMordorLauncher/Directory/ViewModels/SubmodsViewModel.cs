@@ -32,8 +32,5 @@ namespace RiseofMordorLauncher
             SubmodsList = submods;
         }
 
-
-
-
     }
 }

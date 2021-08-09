@@ -33,11 +33,11 @@ namespace RiseofMordorLauncher
             }
 
             // Get list of rom submods id's
-            IGoogleDriveService driveService = new APIGoogleDriveService();
+            var driveService = new APIGoogleDriveService();
        //     driveService.DownloadFile("approved_submods.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt", 1);
-            string[] ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
+            var ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
 
-            List<PublishedFileId_t> ApprovedSubmodsIdList = new List<PublishedFileId_t>();
+            var ApprovedSubmodsIdList = new List<PublishedFileId_t>();
             foreach (var item in ApprovedSubmodsIdString)
             {
                 PublishedFileId_t t = new PublishedFileId_t();

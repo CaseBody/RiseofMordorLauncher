@@ -17,11 +17,15 @@ namespace RiseofMordorLauncher
         private string[] enabled_submods = { };
         private uint amount = 0;
         public List<SubmodModel> submodList;
-        private List<PublishedFileId_t> SubscribedSubmods;      
-        public void GetSubmods(SharedData sharedData)
+        private List<PublishedFileId_t> SubscribedSubmods;  
+        
+        public APISteamSubmodService()
         {
             OnSteamUGCQueryCompletedCallResult = CallResult<SteamUGCQueryCompleted_t>.Create(OnSteamUGCQueryCompleted);
+        }
 
+        public void GetSubmods(SharedData sharedData)
+        {
             // get array of enabled submods
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {

@@ -24,7 +24,7 @@ namespace RiseofMordorLauncher
             SteamAPI.Init();
             AppId_t attila_appid = (AppId_t)325610;
             ModVersion version = new ModVersion();
-
+            
             string AttilaDir = "";
             SteamApps.GetAppInstallDir(attila_appid, out AttilaDir, 10000);
             string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);

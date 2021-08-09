@@ -93,6 +93,8 @@ namespace RiseofMordorLauncher
 
         private void DownloadUpdate()
         {
+            return;
+
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
             PlayButtonMargin = "350 30";

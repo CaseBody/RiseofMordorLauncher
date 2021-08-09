@@ -40,15 +40,17 @@ namespace RiseofMordorLauncher
             var ApprovedSubmodsIdList = new List<PublishedFileId_t>();
             foreach (var item in ApprovedSubmodsIdString)
             {
-                PublishedFileId_t t = new PublishedFileId_t();
-                t.m_PublishedFileId = ulong.Parse(item);
-                ApprovedSubmodsIdList.Add(t);
+                var t = new PublishedFileId_t()
+                {
+                    m_PublishedFileId = ulong.Parse(item),
+                };
 
+                ApprovedSubmodsIdList.Add(t);
                 amount++;
             }
 
             // get subscribed submods
-            PublishedFileId_t[] SubscribedItems = new PublishedFileId_t[SteamUGC.GetNumSubscribedItems()];
+            var SubscribedItems = new PublishedFileId_t[SteamUGC.GetNumSubscribedItems()];
             SubscribedSubmods = new List<PublishedFileId_t>();
             SteamUGC.GetSubscribedItems(SubscribedItems, SteamUGC.GetNumSubscribedItems());
             foreach (var item in SubscribedItems)
@@ -63,19 +65,15 @@ namespace RiseofMordorLauncher
             var details = SteamUGC.CreateQueryUGCDetailsRequest(ApprovedSubmodsIdList.ToArray(), amount);
             var request = SteamUGC.SendQueryUGCRequest(details);
             OnSteamUGCQueryCompletedCallResult.Set(request);
-
-
         }
 
         void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
-            SteamUGCDetails_t detail;
             // Create SubmodModel list and populate.
             submodList = new List<SubmodModel>();
             for (uint i = 0; i < amount; i++)
             {
-                SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out detail);
-
+                SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out SteamUGCDetails_t detail);
                 SubmodModel submod = new SubmodModel();
 
                 if (enabled_submods.Count() >= 1)

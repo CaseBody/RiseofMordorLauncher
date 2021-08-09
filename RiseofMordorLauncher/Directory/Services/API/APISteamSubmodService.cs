@@ -57,6 +57,7 @@ namespace RiseofMordorLauncher
 
             // send data request to steam
             var details = SteamUGC.CreateQueryUGCDetailsRequest(ApprovedSubmodsIdList.ToArray(), amount);
+            SteamUGC.SetReturnLongDescription(details, true);
             var request = SteamUGC.SendQueryUGCRequest(details);
             OnSteamUGCQueryCompletedCallResult.Set(request);
 

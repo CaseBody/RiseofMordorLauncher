@@ -130,6 +130,7 @@
                     FontWeight="SemiBold"
                     Height="50"
                     Width="150"
+                    IsEnabled="{Binding SubmodButtonEnabled}"
                     Command="{Binding SubmodsPageCmd}"
                     Style="{StaticResource DarkButton}"/>
 

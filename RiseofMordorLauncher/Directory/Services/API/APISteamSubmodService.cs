@@ -34,7 +34,7 @@ namespace RiseofMordorLauncher
 
             // Get list of rom submods id's
             var driveService = new APIGoogleDriveService();
-       //     driveService.DownloadFile("approved_submods.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt", 1);
+            driveService.DownloadFile("approved_submods.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt", 1);
             var ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
 
             var ApprovedSubmodsIdList = new List<PublishedFileId_t>();
@@ -117,10 +117,11 @@ namespace RiseofMordorLauncher
 
                 submod.SubmodName = detail.m_rgchTitle;
                 submod.SubmodSteamId = detail.m_nPublishedFileId.m_PublishedFileId.ToString();
-                submod.ThumbnailPath = detail.m_rgchURL;
                 submod.SubmodDesc = detail.m_rgchDescription;
-                Console.WriteLine(submod.SubmodDesc.Length);
 
+                string thumbUrl = "";
+                SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out thumbUrl, 1000);
+                submod.ThumbnailPath = thumbUrl;
                 submodList.Add(submod);
             }
 

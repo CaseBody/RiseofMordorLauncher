@@ -2,8 +2,10 @@
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Common;
+using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -39,6 +41,8 @@ namespace RiseofMordorLauncher
         public int ProgressBarProgress { get; set; }
         private ModVersion Version { get; set; }
         
+        private ICommand _PlayCommand;
+
         private ICommand _submodsPageCmd;
         public ICommand SubmodsPageCmd
         {
@@ -47,7 +51,15 @@ namespace RiseofMordorLauncher
                 return _submodsPageCmd ?? (_submodsPageCmd = new CommandHandler(() => SwitchPage(ApplicationPage.Submods), () => true));
             }
         }
-        
+
+        public ICommand PlayCommand
+        {
+            get
+            {
+                return _PlayCommand ?? (_PlayCommand = new CommandHandler(() => LaunchGame(), () => true));
+            }
+        }
+
         public async Task Load()
         {
 
@@ -74,12 +86,12 @@ namespace RiseofMordorLauncher
             _modVersionService = new APIModVersionService();
             Version = await _modVersionService.GetModVersionInfo(SharedData);
 
-            downloadThread = new Thread(PostUiLoad);
+            downloadThread = new Thread(PostUiLoadAsync);
             downloadThread.IsBackground = true;
             downloadThread.Start();
         }
 
-        private void PostUiLoad()
+        private async void PostUiLoadAsync()
         {
             if (SharedData.isOffline && Version.InstalledVersionNumber == 0)
             {
@@ -88,6 +100,7 @@ namespace RiseofMordorLauncher
             else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.isOffline)
             {
                 DownloadUpdate();
+                Version = await _modVersionService.GetModVersionInfo(SharedData);
             }
         }
 
@@ -127,6 +140,33 @@ namespace RiseofMordorLauncher
             PlayButtonMargin = "450 30";
             SubmodButtonEnabled = true;
             ShowProgressBar = Visibility.Hidden;
+        }
+
+        private void LaunchGame()
+        {
+            string Arguments = "";
+
+            foreach (string pack in Version.InstalledPackFiles)
+            {
+                if (Arguments == "")
+                {
+                    Arguments = $"mod {pack};";
+                }
+                else
+                {
+                    Arguments = Arguments + $" mod {pack};";
+                }
+            }
+
+            SteamAPI.RestartAppIfNecessary((AppId_t)325610);
+
+            Process Attila = new Process();
+            Attila.StartInfo.FileName = $@"{SharedData.AttilaDir}\Attila.exe";
+            Attila.StartInfo.Arguments = Arguments;
+            Attila.StartInfo.WorkingDirectory = SharedData.AttilaDir;
+            Attila.Start();
+            Attila.WaitForInputIdle();
+            
         }
 
         private async void DownloadProgressUpdate(object sender, int percent_finished)

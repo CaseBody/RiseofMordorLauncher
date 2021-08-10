@@ -19,8 +19,8 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Image Source="{Binding ThumbnailPath}" Width="180" Stretch="Fill" Margin="10 0 10 10"/>
-                    <ScrollViewer Width="450" Height="100">
+                    <Image Source="{Binding ThumbnailPath}" Width="180" MaxWidth="180" MaxHeight="130" Stretch="Fill" Margin="10 0 10 10"/>
+                    <ScrollViewer Width="450" Height="120">
                         <TextBlock Text="{Binding SubmodDesc}" TextWrapping="WrapWithOverflow" Foreground="#fc9b00" FontSize="15"/>
                     </ScrollViewer>
                 </StackPanel>

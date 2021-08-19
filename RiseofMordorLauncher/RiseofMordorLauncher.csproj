@@ -328,6 +328,11 @@
   <ItemGroup>
     <Resource Include="Directory\Images\unknown.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\downvote.png" />
+    <Resource Include="Directory\Images\steam_icon.png" />
+    <Resource Include="Directory\Images\upvote.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -350,8 +355,7 @@
 xcopy $(ProjectDir)libs\steam_api.dll $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\steam_appid.txt $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\credentials.json $(ProjectDir)$(OutDir) /f/y
-xcopy $(ProjectDir)libs\Google.Apis.Auth.OAuth2.Responses.TokenResponse-user $(ProjectDir)$(OutDir)token.json\ /f/y
-xcopy $(ProjectDir)libs\Google.Apis.Auth.OAuth2.Responses.TokenResponse $(ProjectDir)$(OutDir)token.json\ /f/y</PostBuildEvent>
+xcopy $(ProjectDir)libs\Google.Apis.Auth.OAuth2.Responses.TokenResponse-user $(ProjectDir)$(OutDir)token.json\ /f/y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\Fody.6.5.2\build\Fody.targets" Condition="Exists('..\packages\Fody.6.5.2\build\Fody.targets')" />
 </Project>

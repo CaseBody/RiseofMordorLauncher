@@ -29,10 +29,18 @@
             <TextBlock Text="Rise of Mordor Submods" Foreground="#fc9b00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="60"/>
 
         <ScrollViewer Grid.Row="2" Margin="40 20" VerticalScrollBarVisibility="Hidden">
-            <ItemsControl ItemsSource="{Binding SubmodsList}"
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <ItemsControl ItemsSource="{Binding SubmodsList}"
                           ItemTemplate="{StaticResource SubmodTemplate}">
 
-            </ItemsControl>
+                </ItemsControl>
+            </Grid>
         </ScrollViewer>
 
         </Grid>

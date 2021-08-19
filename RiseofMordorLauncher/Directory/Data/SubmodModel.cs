@@ -22,6 +22,8 @@ namespace RiseofMordorLauncher
         public string EnableButtonText           { get; set; }
         public Brush EnableButtonBackground      { get; set; }
         public Brush SubscribeButtonBackground   { get; set; }
+        public short UpvoteCount                 { get; set; }
+        public short DownvoteCount               { get; set; }
 
     }
 }

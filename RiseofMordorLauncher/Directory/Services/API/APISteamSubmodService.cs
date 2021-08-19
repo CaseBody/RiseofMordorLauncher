@@ -118,10 +118,19 @@ namespace RiseofMordorLauncher
                 submod.SubmodName = detail.m_rgchTitle;
                 submod.SubmodSteamId = detail.m_nPublishedFileId.m_PublishedFileId.ToString();
                 submod.SubmodDesc = detail.m_rgchDescription;
+                submod.UpvoteCount = (short)detail.m_unVotesUp;
+                submod.DownvoteCount = (short)detail.m_unVotesDown;
 
                 string thumbUrl = "";
                 SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out thumbUrl, 1000);
                 submod.ThumbnailPath = thumbUrl;
+
+                if (submod.SubmodName.Length > 34)
+                {
+                    submod.SubmodName = submod.SubmodName.Substring(0, 32);
+                    submod.SubmodName = submod.SubmodName + "...";
+                }
+
                 submodList.Add(submod);
             }
 

@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <DataTemplate x:Key="SubmodTemplate">
-        <Border CornerRadius="10"  Margin="0 15 0 0" Height="275" BorderBrush="Brown" BorderThickness="5">
+        <Border CornerRadius="10"  Margin="5 15 0 0" Height="275" BorderBrush="DarkRed" BorderThickness="5">
             <Border.Background>
                 <SolidColorBrush Color="Black" Opacity="0.7"/>
             </Border.Background>
@@ -18,8 +18,8 @@
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ThumbnailPath}"
                         Margin="6 6 10 0"       
-                        Width="230"
-                        Stretch="Fill"   
+                        Width="230"                      
+                        Stretch="Uniform"   
                            />
 
                     <Grid>
@@ -29,23 +29,35 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="../Images/upvote.png" Width="50"/>
+                            <Image Source="../Images/upvote.png" Width="50" Cursor="Hand">
+                                <Image.InputBindings>
+                                    <MouseBinding Command="{Binding UpvoteButtonCommand}" MouseAction="LeftClick"/>
+                                </Image.InputBindings>
+                            </Image>
                             <Label Content="{Binding UpvoteCount}" FontSize="20" Foreground="LightGreen" Margin="0 15 0 0"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Grid.Row="1">
-                            <Image Source="../Images/downvote.png" Width="50"/>
+                            <Image Source="../Images/downvote.png" Width="50" Cursor="Hand">
+                                <Image.InputBindings>
+                                    <MouseBinding Command="{Binding DownvoteButtonCommand}" MouseAction="LeftClick"/>
+                                </Image.InputBindings>
+                            </Image>
                             <Label Content="{Binding DownvoteCount}" FontSize="20" Foreground="Red" Margin="0 15 0 0"/>
                         </StackPanel>
 
                     </Grid>
                 </StackPanel>
 
-                <TextBlock Grid.Row="1" Foreground="#fc9b00" Text="{Binding SubmodName}" FontSize="18" Margin="6 0 0 0"/>
+                <TextBlock Grid.Row="1" Foreground="#fc9b00" Text="{Binding SubmodName}" HorizontalAlignment="Center" FontSize="18" Margin="6 0 0 0"/>
                 
                 <StackPanel Orientation="Horizontal" Grid.Row="2">
                     <Image Source="../Images/steam_icon.png" HorizontalAlignment="Left" Margin="6 0 0 0"/>
-                    <TextBlock Foreground="#fc9b00" Text="Visit submod steam page" FontSize="20" Margin="10 10 0 0" TextDecorations="underline" Cursor="Hand"/>
+                    <TextBlock Foreground="#fc9b00" Text="Visit submod steam page" FontSize="20" Margin="10 10 0 0" TextDecorations="underline" Cursor="Hand">
+                        <TextBlock.InputBindings>
+                            <MouseBinding Command="{Binding VisitSteamPageCommand}" MouseAction="LeftClick"/>
+                        </TextBlock.InputBindings>
+                    </TextBlock>
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal" Grid.Row="3">
@@ -60,13 +72,14 @@
                     <Button 
                         BorderThickness="0"
                         Width="170"
-                        Margin="11 0 0 5"
+                        Margin="7.5 0 0 5"
                         Background="{Binding EnableButtonBackground}"
                         Content="{Binding EnableButtonText}"
                         Command="{Binding EnableButtonCommand}"
                         Visibility="{Binding EnableButtonVisibility}"
                     />
                 </StackPanel>
+                <ProgressBar Grid.Row="3" Visibility="{Binding ProgressBarVisibility}" Value="{Binding ProgressBarValue}"/>
 
             </Grid>
         </Border>

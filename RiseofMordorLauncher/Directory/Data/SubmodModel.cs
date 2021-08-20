@@ -1,16 +1,19 @@
-﻿using System;
+﻿using RiseofMordorLauncher.Directory.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace RiseofMordorLauncher
 {
-    public class SubmodModel
+    public class SubmodModel : BaseViewModel
     {
         public string ThumbnailPath              { get; set; }
+        public string FileName                   { get; set; }
         public string SubmodSteamId              { get; set; }
         public string SubmodName                 { get; set; }
         public string InstallDir                 { get; set; }
@@ -24,6 +27,65 @@ namespace RiseofMordorLauncher
         public Brush SubscribeButtonBackground   { get; set; }
         public short UpvoteCount                 { get; set; }
         public short DownvoteCount               { get; set; }
+        public string SteamId                    { get; set; }
+        public Visibility ProgressBarVisibility  { get; set; }
+        public decimal ProgressBarValue          { get; set; }
+        public bool has_voted                    { get; set; } = false;
+        public bool up_voted                     { get; set; } = false;
+        public bool down_voted                   { get; set; } = false;
+
+        #region Commands
+        public event EventHandler VisitSteamPressed;
+        public event EventHandler SubscribeButtonPressed;
+        public event EventHandler EnableButtonPressed;
+        public event EventHandler UpvoteButtonPressed;
+        public event EventHandler DownvoteButtonPressed;
+
+        private ICommand _VisitSteamPageCommand;
+        public ICommand VisitSteamPageCommand
+        {
+            get
+            {
+                return _VisitSteamPageCommand ?? (_VisitSteamPageCommand = new CommandHandler(() => VisitSteamPressed?.Invoke(this, null), () => true));
+            }
+        }
+
+        private ICommand _SubscribeButtonCommand;
+        public ICommand SubscribeButtonCommand
+        {
+            get
+            {
+                return _SubscribeButtonCommand ?? (_SubscribeButtonCommand = new CommandHandler(() => SubscribeButtonPressed?.Invoke(this, null), () => true));
+            }
+        }
+
+        private ICommand _EnableButtonCommand;
+        public ICommand EnableButtonCommand
+        {
+            get
+            {
+                return _EnableButtonCommand ?? (_EnableButtonCommand = new CommandHandler(() => EnableButtonPressed?.Invoke(this, null), () => true));
+            }
+        }
+
+        private ICommand _UpvoteButtonCommand;
+        public ICommand UpvoteButtonCommand
+        {
+            get
+            {
+                return _UpvoteButtonCommand ?? (_UpvoteButtonCommand = new CommandHandler(() => UpvoteButtonPressed?.Invoke(this, null), () => true));
+            }
+        }
+
+        private ICommand _DownvoteButtonCommand;
+        public ICommand DownvoteButtonCommand
+        {
+            get
+            {
+                return _DownvoteButtonCommand ?? (_DownvoteButtonCommand = new CommandHandler(() => DownvoteButtonPressed?.Invoke(this, null), () => true));
+            }
+        }
+        #endregion
 
     }
 }

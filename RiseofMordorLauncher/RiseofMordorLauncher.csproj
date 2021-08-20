@@ -256,6 +256,7 @@
     <Compile Include="Directory\Services\ISteamSubmodsService.cs" />
     <Compile Include="Directory\Services\IYouTubeDataService.cs" />
     <Compile Include="Directory\Services\ISteamUserService.cs" />
+    <Compile Include="Directory\Services\RelayCommand.cs" />
     <Compile Include="Directory\ValueConverters\ApplicationPageValueConverter.cs" />
     <Compile Include="Directory\ValueConverters\BaseValueConverter.cs" />
     <Compile Include="Directory\ViewModels\BaseViewModel.cs" />

@@ -13,6 +13,7 @@ namespace RiseofMordorLauncher
     class APISteamSubmodService : ISteamSubmodsService
     {
         public event EventHandler<List<SubmodModel>> SubmodDataFinishedEvent;
+        public SharedData sharedData;
         private CallResult<SteamUGCQueryCompleted_t> OnSteamUGCQueryCompletedCallResult;
         private string[] enabled_submods = { };
         private uint amount = 0;
@@ -24,12 +25,14 @@ namespace RiseofMordorLauncher
             OnSteamUGCQueryCompletedCallResult = CallResult<SteamUGCQueryCompleted_t>.Create(OnSteamUGCQueryCompleted);
         }
 
-        public void GetSubmods(SharedData sharedData)
+        public void GetSubmods(SharedData sharedDataInput)
         {
+            sharedData = sharedDataInput;
+
             // get array of enabled submods
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
-                enabled_submods = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
+                enabled_submods = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");          
             }
 
             // Get list of rom submods id's
@@ -66,6 +69,7 @@ namespace RiseofMordorLauncher
             SteamUGC.SetReturnLongDescription(details, true);
             var request = SteamUGC.SendQueryUGCRequest(details);
             OnSteamUGCQueryCompletedCallResult.Set(request);
+            
         }
 
         void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
@@ -89,10 +93,17 @@ namespace RiseofMordorLauncher
                     else
                     {
                         submod.IsEnabled = false;
-                        submod.EnableButtonBackground = Brushes.Green;
+                        submod.EnableButtonBackground = sharedData.NiceGreen;
                         submod.EnableButtonText = "ENABLE";
                         submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
                     }
+                }
+                else
+                {
+                    submod.IsEnabled = false;
+                    submod.EnableButtonBackground = sharedData.NiceGreen;
+                    submod.EnableButtonText = "ENABLE";
+                    submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
                 }
                 if (SubscribedSubmods.Contains(detail.m_nPublishedFileId))
                 {
@@ -110,7 +121,7 @@ namespace RiseofMordorLauncher
                 else
                 {
                     submod.IsInstalled = false;
-                    submod.SubscribeButtonBackground = Brushes.Green;
+                    submod.SubscribeButtonBackground = sharedData.NiceGreen;
                     submod.SubscribeButtonText = "SUBSCRIBE";
                     submod.EnableButtonVisibility = System.Windows.Visibility.Hidden;
                 }
@@ -120,6 +131,8 @@ namespace RiseofMordorLauncher
                 submod.SubmodDesc = detail.m_rgchDescription;
                 submod.UpvoteCount = (short)detail.m_unVotesUp;
                 submod.DownvoteCount = (short)detail.m_unVotesDown;
+                submod.SteamId = detail.m_nPublishedFileId.ToString();
+                submod.ProgressBarVisibility = System.Windows.Visibility.Hidden;
 
                 string thumbUrl = "";
                 SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out thumbUrl, 1000);

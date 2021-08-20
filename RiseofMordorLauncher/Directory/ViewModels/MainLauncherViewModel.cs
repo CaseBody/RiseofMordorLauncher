@@ -106,7 +106,6 @@ namespace RiseofMordorLauncher
 
         private void DownloadUpdate()
         {
-            return;
 
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
@@ -169,7 +168,7 @@ namespace RiseofMordorLauncher
             
         }
 
-        private async void DownloadProgressUpdate(object sender, int percent_finished)
+        private void DownloadProgressUpdate(object sender, int percent_finished)
         {
             ProgressBarProgress = percent_finished;
         }

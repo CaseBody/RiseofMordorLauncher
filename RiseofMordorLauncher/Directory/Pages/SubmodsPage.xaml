@@ -15,8 +15,9 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
+   
 
-        <Grid>
+    <Grid>
             <Grid.Background>
                 <ImageBrush ImageSource="../Images/unknown.png" Stretch="UniformToFill"/>
             </Grid.Background>
@@ -36,7 +37,15 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl ItemsSource="{Binding SubmodsList}"
+                <ItemsControl ItemsSource="{Binding SubmodsList1}"
+                          ItemTemplate="{StaticResource SubmodTemplate}">
+
+                </ItemsControl>
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding SubmodsList2}"
+                          ItemTemplate="{StaticResource SubmodTemplate}">
+
+                </ItemsControl>
+                <ItemsControl Grid.Column="2" ItemsSource="{Binding SubmodsList3}"
                           ItemTemplate="{StaticResource SubmodTemplate}">
 
                 </ItemsControl>

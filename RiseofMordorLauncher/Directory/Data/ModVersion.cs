@@ -14,6 +14,5 @@ namespace RiseofMordorLauncher
         public string ChangeLog { get; set; }
         public List<string> InstalledPackFiles { get; set; }
         public List<string> LatestPackFiles { get; set; }
-
     }
 }

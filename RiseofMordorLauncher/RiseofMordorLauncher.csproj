@@ -1,9 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.props" Condition="Exists('..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.props')" />
-  <Import Project="..\packages\cef.redist.x86.91.1.23\build\cef.redist.x86.props" Condition="Exists('..\packages\cef.redist.x86.91.1.23\build\cef.redist.x86.props')" />
-  <Import Project="..\packages\cef.redist.x64.91.1.23\build\cef.redist.x64.props" Condition="Exists('..\packages\cef.redist.x64.91.1.23\build\cef.redist.x64.props')" />
-  <Import Project="..\packages\PropertyChanged.Fody.3.4.0\build\PropertyChanged.Fody.props" Condition="Exists('..\packages\PropertyChanged.Fody.3.4.0\build\PropertyChanged.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -67,103 +63,16 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AngleSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=e83494dcdc6d31ea, processorArchitecture=MSIL">
-      <HintPath>..\packages\AngleSharp.1.0.0-alpha-844\lib\net472\AngleSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.10.1.1\lib\net461\AutoMapper.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp, Version=91.1.230.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
-      <HintPath>..\packages\CefSharp.Common.91.1.230\lib\net452\CefSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp.Core, Version=91.1.230.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
-      <HintPath>..\packages\CefSharp.Common.91.1.230\lib\net452\CefSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="CefSharp.Wpf, Version=91.1.230.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
-      <HintPath>..\packages\CefSharp.Wpf.91.1.230\lib\net452\CefSharp.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis, Version=1.53.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.1.53.0\lib\net45\Google.Apis.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Auth, Version=1.53.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Auth.1.53.0\lib\net461\Google.Apis.Auth.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Auth.PlatformServices, Version=1.53.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Auth.1.53.0\lib\net461\Google.Apis.Auth.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Core, Version=1.53.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Core.1.53.0\lib\net45\Google.Apis.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.Drive.v3, Version=1.53.0.2397, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.Drive.v3.1.53.0.2397\lib\net45\Google.Apis.Drive.v3.dll</HintPath>
-    </Reference>
-    <Reference Include="Google.Apis.PlatformServices, Version=1.53.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
-      <HintPath>..\packages\Google.Apis.1.53.0\lib\net45\Google.Apis.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.6.0.0-preview.6.21352.12\lib\net461\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.DependencyInjection.Abstractions.6.0.0-preview.6.21352.12\lib\net461\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Options, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Options.6.0.0-preview.6.21352.12\lib\net461\Microsoft.Extensions.Options.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Extensions.Primitives, Version=6.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.Primitives.6.0.0-preview.6.21352.12\lib\net461\Microsoft.Extensions.Primitives.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="PresentationFramework.Aero2" />
-    <Reference Include="PropertyChanged, Version=3.4.0.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
-      <HintPath>..\packages\PropertyChanged.Fody.3.4.0\lib\net40\PropertyChanged.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpCompress, Version=0.28.3.0, Culture=neutral, PublicKeyToken=afb0a02973931d96, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpCompress.0.28.3\lib\netstandard2.0\SharpCompress.dll</HintPath>
-    </Reference>
-    <Reference Include="Steam.Models, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SteamWebAPI2.4.3.1\lib\netstandard2.0\Steam.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="SteamWebAPI2, Version=4.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\SteamWebAPI2.4.3.1\lib\netstandard2.0\SteamWebAPI2.dll</HintPath>
-    </Reference>
     <Reference Include="Steamworks.NET">
       <HintPath>libs\Steamworks.NET.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression.FileSystem" />
-    <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
-    </Reference>
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0-preview.6.21352.12\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encoding.CodePages, Version=5.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encoding.CodePages.5.0.0\lib\net461\System.Text.Encoding.CodePages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Encodings.Web, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Encodings.Web.6.0.0-preview.2.21154.6\lib\net461\System.Text.Encodings.Web.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Text.Json, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Text.Json.5.0.2\lib\net461\System.Text.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -173,21 +82,9 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="Vlc.DotNet.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=84529da31f4eb963, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vlc.DotNet.Core.3.1.0\lib\net45\Vlc.DotNet.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="Vlc.DotNet.Core.Interops, Version=3.1.0.0, Culture=neutral, PublicKeyToken=84529da31f4eb963, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vlc.DotNet.Core.Interops.3.1.0\lib\net45\Vlc.DotNet.Core.Interops.dll</HintPath>
-    </Reference>
-    <Reference Include="Vlc.DotNet.Wpf, Version=3.1.0.0, Culture=neutral, PublicKeyToken=84529da31f4eb963, processorArchitecture=MSIL">
-      <HintPath>..\packages\Vlc.DotNet.Wpf.3.1.0\lib\net45\Vlc.DotNet.Wpf.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="YoutubeExplode, Version=6.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YoutubeExplode.6.0.5\lib\net461\YoutubeExplode.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -289,7 +186,6 @@
     </EmbeddedResource>
     <None Include="credentials.json" />
     <Resource Include="Directory\Fonts\Middleearth.ttf" />
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -334,19 +230,53 @@
     <Resource Include="Directory\Images\steam_icon.png" />
     <Resource Include="Directory\Images\upvote.png" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AngleSharp">
+      <Version>1.0.0-alpha-844</Version>
+    </PackageReference>
+    <PackageReference Include="AutoMapper">
+      <Version>10.1.1</Version>
+    </PackageReference>
+    <PackageReference Include="CefSharp.Wpf">
+      <Version>91.1.230</Version>
+    </PackageReference>
+    <PackageReference Include="Fody">
+      <Version>6.5.2</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Google.Apis.Drive.v3">
+      <Version>1.53.0.2397</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Options">
+      <Version>6.0.0-preview.6.21352.12</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>13.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="PropertyChanged.Fody">
+      <Version>3.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="SharpCompress">
+      <Version>0.28.3</Version>
+    </PackageReference>
+    <PackageReference Include="SteamWebAPI2">
+      <Version>4.3.1</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Encodings.Web">
+      <Version>6.0.0-preview.2.21154.6</Version>
+    </PackageReference>
+    <PackageReference Include="System.Text.Json">
+      <Version>5.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="Vlc.DotNet.Wpf">
+      <Version>3.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="YoutubeExplode">
+      <Version>6.0.5</Version>
+    </PackageReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\PropertyChanged.Fody.3.4.0\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PropertyChanged.Fody.3.4.0\build\PropertyChanged.Fody.props'))" />
-    <Error Condition="!Exists('..\packages\cef.redist.x64.91.1.23\build\cef.redist.x64.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x64.91.1.23\build\cef.redist.x64.props'))" />
-    <Error Condition="!Exists('..\packages\cef.redist.x86.91.1.23\build\cef.redist.x86.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\cef.redist.x86.91.1.23\build\cef.redist.x86.props'))" />
-    <Error Condition="!Exists('..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.props'))" />
-    <Error Condition="!Exists('..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.targets'))" />
-    <Error Condition="!Exists('..\packages\Fody.6.5.2\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.6.5.2\build\Fody.targets'))" />
-  </Target>
-  <Import Project="..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.91.1.230\build\CefSharp.Common.targets')" />
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
@@ -358,5 +288,4 @@ xcopy $(ProjectDir)libs\steam_appid.txt $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\credentials.json $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\Google.Apis.Auth.OAuth2.Responses.TokenResponse-user $(ProjectDir)$(OutDir)token.json\ /f/y</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Fody.6.5.2\build\Fody.targets" Condition="Exists('..\packages\Fody.6.5.2\build\Fody.targets')" />
 </Project>

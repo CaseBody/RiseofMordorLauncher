@@ -118,8 +118,8 @@ namespace RiseofMordorLauncher
                 DisableSubmod(submod);
                 submod.EnableButtonVisibility = Visibility.Hidden;
                 submod.EnableButtonText = "ENABLE";
-                submod.EnableButtonBackground = sharedData.NiceGreen;
-                submod.SubscribeButtonBackground = sharedData.NiceGreen;
+                submod.EnableButtonBackground = SharedData.NiceGreen;
+                submod.SubscribeButtonBackground = SharedData.NiceGreen;
                 submod.SubscribeButtonText = "SUBSCRIBE";
                 submod.IsInstalled = false;
                 submod.IsEnabled = false;
@@ -141,7 +141,7 @@ namespace RiseofMordorLauncher
             {               
                 DisableSubmod(submod);
                 submod.IsEnabled = false;
-                submod.EnableButtonBackground = sharedData.NiceGreen;
+                submod.EnableButtonBackground = SharedData.NiceGreen;
                 submod.EnableButtonText = "ENABLE";
             }
         }
@@ -237,7 +237,7 @@ namespace RiseofMordorLauncher
                                 submod.SubscribeButtonText = "UNSUBSCRIBE";
                                 submod.EnableButtonVisibility = Visibility.Visible;
                                 submod.EnableButtonText = "ENABLE";
-                                submod.EnableButtonBackground = sharedData.NiceGreen;
+                                submod.EnableButtonBackground = SharedData.NiceGreen;
 
                                 DownloadingSubmods.RemoveAt(i);
                             }
@@ -255,7 +255,7 @@ namespace RiseofMordorLauncher
                             submod.SubscribeButtonText = "UNSUBSCRIBE";
                             submod.EnableButtonVisibility = Visibility.Visible;
                             submod.EnableButtonText = "ENABLE";
-                            submod.EnableButtonBackground = sharedData.NiceGreen;
+                            submod.EnableButtonBackground = SharedData.NiceGreen;
                             DownloadingSubmods.RemoveAt(i);
 
                         }
@@ -270,7 +270,7 @@ namespace RiseofMordorLauncher
                         submod.SubscribeButtonText = "UNSUBSCRIBE";
                         submod.EnableButtonVisibility = Visibility.Visible;
                         submod.EnableButtonText = "ENABLE";
-                        submod.EnableButtonBackground = sharedData.NiceGreen;
+                        submod.EnableButtonBackground = SharedData.NiceGreen;
                         DownloadingSubmods.RemoveAt(i);
                     }
                 }

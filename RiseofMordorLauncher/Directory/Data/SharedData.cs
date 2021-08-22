@@ -9,10 +9,11 @@ namespace RiseofMordorLauncher
 {
     public class SharedData
     {
+        public static Brush NiceGreen = (SolidColorBrush)new BrushConverter().ConvertFrom("#0ba302");
+
         public bool IsOffline { get; set; } = true;
         public string AttilaDir { get; set;  }
         public string AttilaWorkshopDir { get; set; }
         public string AppData { get; set; }
-        public Brush NiceGreen { get; set; } = (SolidColorBrush)new BrushConverter().ConvertFrom("#0ba302");
     }
 }

@@ -93,7 +93,7 @@ namespace RiseofMordorLauncher
                     else
                     {
                         submod.IsEnabled = false;
-                        submod.EnableButtonBackground = sharedData.NiceGreen;
+                        submod.EnableButtonBackground = SharedData.NiceGreen;
                         submod.EnableButtonText = "ENABLE";
                         submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
                     }
@@ -101,7 +101,7 @@ namespace RiseofMordorLauncher
                 else
                 {
                     submod.IsEnabled = false;
-                    submod.EnableButtonBackground = sharedData.NiceGreen;
+                    submod.EnableButtonBackground = SharedData.NiceGreen;
                     submod.EnableButtonText = "ENABLE";
                     submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
                 }
@@ -121,7 +121,7 @@ namespace RiseofMordorLauncher
                 else
                 {
                     submod.IsInstalled = false;
-                    submod.SubscribeButtonBackground = sharedData.NiceGreen;
+                    submod.SubscribeButtonBackground = SharedData.NiceGreen;
                     submod.SubscribeButtonText = "SUBSCRIBE";
                     submod.EnableButtonVisibility = System.Windows.Visibility.Hidden;
                 }

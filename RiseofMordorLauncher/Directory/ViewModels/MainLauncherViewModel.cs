@@ -70,7 +70,7 @@ namespace RiseofMordorLauncher
             SteamAvatarUrl = user.AvatarUrl;
 
             // get YoutTube video data (if offline hide player)
-            if (!SharedData.isOffline)
+            if (!SharedData.IsOffline)
             {
                 _youTubeDataService = new APIYouTubeDataService();
                 YouTubeData data = new YouTubeData();
@@ -93,11 +93,11 @@ namespace RiseofMordorLauncher
 
         private async void PostUiLoadAsync()
         {
-            if (SharedData.isOffline && Version.InstalledVersionNumber == 0)
+            if (SharedData.IsOffline && Version.InstalledVersionNumber == 0)
             {
                 MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: Rise of Mordor");
             }
-            else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.isOffline)
+            else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
             {
                 DownloadUpdate();
                 Version = await _modVersionService.GetModVersionInfo(SharedData);

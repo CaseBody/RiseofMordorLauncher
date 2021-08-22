@@ -33,7 +33,7 @@ namespace RiseofMordorLauncher
 
             // check if online, if not latest downloadable mod version will be turned as 0 otherwise get latest info.
 
-            if (!sharedData.isOffline)
+            if (!sharedData.IsOffline)
             {
                 await drive_service.DownloadFile("current_mod_version.txt", $"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", 1);
 

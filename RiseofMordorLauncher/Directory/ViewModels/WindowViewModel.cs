@@ -87,7 +87,7 @@ namespace RiseofMordorLauncher
 
         private async void Update()
         {
-            if (SharedData.isOffline)
+            if (SharedData.IsOffline)
                 return;
 
             while (true)

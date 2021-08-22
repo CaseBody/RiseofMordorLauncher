@@ -9,7 +9,7 @@ namespace RiseofMordorLauncher
 {
     public class SharedData
     {
-        public bool isOffline { get; set; } = false;
+        public bool IsOffline { get; set; } = true;
         public string AttilaDir { get; set;  }
         public string AttilaWorkshopDir { get; set; }
         public string AppData { get; set; }

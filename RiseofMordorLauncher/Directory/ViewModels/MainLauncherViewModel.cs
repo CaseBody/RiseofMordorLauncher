@@ -62,10 +62,9 @@ namespace RiseofMordorLauncher
 
         public async Task Load()
         {
-
             // get steam user data
             _steamUserService = new APISteamUserService();
-            SteamUser user = await _steamUserService.GetSteamUser();
+            var user = await _steamUserService.GetSteamUser();
             SteamUserName = user.UserName;
             SteamAvatarUrl = user.AvatarUrl;
 
@@ -73,8 +72,7 @@ namespace RiseofMordorLauncher
             if (!SharedData.IsOffline)
             {
                 _youTubeDataService = new APIYouTubeDataService();
-                YouTubeData data = new YouTubeData();
-                data = await _youTubeDataService.GetYouTubeData();
+                var data = await _youTubeDataService.GetYouTubeData();
                 YouTubeVideoURL = data.VideoUrl;
             }
             else

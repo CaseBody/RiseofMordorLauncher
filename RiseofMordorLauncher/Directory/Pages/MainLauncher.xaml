@@ -65,12 +65,14 @@
             
             <TextBlock Grid.Column="0"
                        Text="{Binding VersionText, FallbackValue=Version 1.0.0}"
-                       FontSize="14"
+                       FontSize="12"
+                       FontWeight="SemiBold"
                        VerticalAlignment="Center"
                        Foreground="White"/>
 
             <Button Grid.Column="1"
                     FontSize="12"
+                    FontWeight="SemiBold"
                     Padding="15 0"
                     Margin="10 0"
                     Style="{StaticResource DarkButton}"
@@ -79,6 +81,11 @@
         </Grid>
 
         <Grid Grid.Row="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
             <!--<StackPanel Margin="80 30">
                 <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
@@ -94,24 +101,68 @@
             <!-- MouseEnter="Expander_MouseEnter"
                  MouseLeave="Expander_MouseLeave" -->
 
-            <StackPanel Margin="80 30" Grid.Column="1" Visibility="{Binding ShowVideo}">
-                <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Left">
-                    <TextBlock HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Latest Video" FontSize="18" Foreground="#fc9b00" FontWeight="Bold" Background="Black"/>
+            <StackPanel Margin="80 30"
+                        Grid.Column="0">
+
+                <Border BorderThickness="1"
+                        BorderBrush="Black"
+                        HorizontalAlignment="Left">
+
+                    <TextBlock HorizontalAlignment="Left"
+                               Opacity="0.9"
+                               TextAlignment="Center"
+                               Padding="5"
+                               Text="Latest Preview"
+                               FontSize="18"
+                               Foreground="#fc9b00"
+                               FontWeight="Bold"
+                               Background="Black"/>
+
                 </Border>
+
                 <Grid>
-                    <Border Height="220" Background="Black" BorderBrush="Black" BorderThickness="1">
+                    <Border Height="220"
+                            Background="Black"
+                            BorderBrush="Black"
+                            BorderThickness="1">
+
                         <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}" Height="220" />
+
                     </Border>
                 </Grid>
-                <StackPanel Orientation="Horizontal">
-                    <Image/>
-                </StackPanel>
             </StackPanel>
 
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="600"/>
-            </Grid.ColumnDefinitions>
+            <StackPanel Margin="80 30"
+                        Grid.Column="1"
+                        Visibility="{Binding ShowVideo}">
+                
+                <Border BorderThickness="1"
+                        BorderBrush="Black"
+                        HorizontalAlignment="Left">
+                    
+                    <TextBlock HorizontalAlignment="Left"
+                               Opacity="0.9"
+                               TextAlignment="Center"
+                               Padding="5"
+                               Text="Featured Video"
+                               FontSize="18"
+                               Foreground="#fc9b00"
+                               FontWeight="Bold"
+                               Background="Black"/>
+                    
+                </Border>
+                
+                <Grid>
+                    <Border Height="220"
+                            Background="Black"
+                            BorderBrush="Black"
+                            BorderThickness="1">
+                        
+                        <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}" Height="220" />
+                        
+                    </Border>
+                </Grid>
+            </StackPanel>
 
         </Grid>
 

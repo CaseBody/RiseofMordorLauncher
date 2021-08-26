@@ -54,13 +54,33 @@
 
         </Grid>
 
-        <Grid HorizontalAlignment="Left" Margin="30 20 0 20" Grid.RowSpan="2">
-            <TextBlock Text="{Binding VersionText, FallbackValue=Version 1.0.0}" FontSize="14" Foreground="White"/>
+        <Grid HorizontalAlignment="Left"
+              Margin="20"
+              Grid.RowSpan="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <TextBlock Grid.Column="0"
+                       Text="{Binding VersionText, FallbackValue=Version 1.0.0}"
+                       FontSize="14"
+                       VerticalAlignment="Center"
+                       Foreground="White"/>
+
+            <Button Grid.Column="1"
+                    FontSize="12"
+                    Padding="15 0"
+                    Margin="10 0"
+                    Style="{StaticResource DarkButton}"
+                    Content="Changelog" />
+
         </Grid>
 
         <Grid Grid.Row="2">
 
-            <StackPanel Margin="80 30">
+            <!--<StackPanel Margin="80 30">
                 <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
                 <RichTextBox BorderThickness="0" Height="220" Foreground="#fc9b00" Background="Black" Opacity="0.9" IsReadOnly="True">
                     <FlowDocument>
@@ -69,11 +89,10 @@
                         </Paragraph>
                     </FlowDocument>
                 </RichTextBox>
-            </StackPanel>
+            </StackPanel>-->
 
             <!-- MouseEnter="Expander_MouseEnter"
                  MouseLeave="Expander_MouseLeave" -->
-           
 
             <StackPanel Margin="80 30" Grid.Column="1" Visibility="{Binding ShowVideo}">
                 <Border BorderThickness="1" BorderBrush="Black" HorizontalAlignment="Left">
@@ -140,8 +159,7 @@
                 Margin="0 3 0 0"
                 HorizontalAlignment="Center"
                 Foreground="#fc9b00"
-                FontSize="20"           
-                />
+                FontSize="20" />
                 
                 <ProgressBar
                 Margin="0 0 0 0"

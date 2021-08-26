@@ -100,7 +100,8 @@
 
             <Image Height="100" 
                    HorizontalAlignment="Left" 
-                   Margin="20,26,0,27" 
+                   Margin="20,26,0,27"
+                   RenderOptions.BitmapScalingMode="Fant"
                    Source="../Images/rom_logo.png"/>
 
             <Button Margin="{Binding PlayButtonMargin, FallbackValue=450 30}"

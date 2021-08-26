@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages" xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+      xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
+      xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
       mc:Ignorable="d"
       d:DesignHeight="650"
       d:DesignWidth="1200"
@@ -87,20 +88,6 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!--<StackPanel Margin="80 30">
-                <TextBlock Margin="0 1 0 0" HorizontalAlignment="Left" Opacity="0.9" TextAlignment="Center" Padding="2" Text="Changelog" FontSize="18" Foreground="#fc9b00 " FontWeight="Bold" Background="Black"/>
-                <RichTextBox BorderThickness="0" Height="220" Foreground="#fc9b00" Background="Black" Opacity="0.9" IsReadOnly="True">
-                    <FlowDocument>
-                        <Paragraph>
-                            Lorum Ipsum
-                        </Paragraph>
-                    </FlowDocument>
-                </RichTextBox>
-            </StackPanel>-->
-
-            <!-- MouseEnter="Expander_MouseEnter"
-                 MouseLeave="Expander_MouseLeave" -->
-
             <StackPanel Margin="80 30"
                         Grid.Column="0">
 
@@ -114,7 +101,7 @@
                                Padding="5"
                                Text="Latest Preview"
                                FontSize="18"
-                               Foreground="#fc9b00"
+                               Foreground="White"
                                FontWeight="Bold"
                                Background="Black"/>
 
@@ -126,7 +113,7 @@
                             BorderBrush="Black"
                             BorderThickness="1">
 
-                        <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}" Height="220" />
+                        <!--Image Source="" /-->
 
                     </Border>
                 </Grid>
@@ -146,7 +133,7 @@
                                Padding="5"
                                Text="Featured Video"
                                FontSize="18"
-                               Foreground="#fc9b00"
+                               Foreground="White"
                                FontWeight="Bold"
                                Background="Black"/>
                     
@@ -166,7 +153,8 @@
 
         </Grid>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal">
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal">
 
             <Image Height="100" 
                    HorizontalAlignment="Left" 
@@ -176,19 +164,21 @@
 
             <Button Margin="{Binding PlayButtonMargin, FallbackValue=450 30}"
                     BorderThickness="0"
-                    Foreground="#fc9b00"
+                    Foreground="White"
                     Padding="80 0" 
                     FontSize="40" 
-                    FontWeight="Bold" 
+                    FontWeight="Bold"
                     FontFamily="Ariel"
                     IsEnabled="{Binding PlayButtonEnabled}"
                     Command="{Binding PlayCommand}"
                     Style="{StaticResource DarkButton}"
-                    Content="{Binding PlayButtonText}"/>
+                    Content="{Binding PlayButtonText, FallbackValue=PLAY}"/>
 
             <StackPanel.Background>
-                <SolidColorBrush Opacity="0.35" Color="Black"/>
+                <SolidColorBrush Opacity="0.35"
+                                 Color="Black"/>
             </StackPanel.Background>
+            
         </StackPanel>
 
         <Grid Grid.Row="5">
@@ -209,7 +199,7 @@
                 <TextBlock Text="{Binding ProgressText, FallbackValue=DOWNLOADING...}"
                 Margin="0 3 0 0"
                 HorizontalAlignment="Center"
-                Foreground="#fc9b00"
+                Foreground="White"
                 FontSize="20" />
                 
                 <ProgressBar
@@ -218,7 +208,7 @@
                 Height="30"
                 Background="Black"
                 BorderBrush="Black"
-                Foreground="#fc9b00"
+                Foreground="White"
                 Value="{Binding ProgressBarProgress}"                         
                 />
             </StackPanel>

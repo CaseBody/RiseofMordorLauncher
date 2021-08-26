@@ -1,0 +1,55 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="BorderlessWindow" TargetType="{x:Type Window}">
+        <Setter Property="Background" Value="Black" />
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Window}">
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="1 34 1 1" >
+                            
+                            <AdornerDecorator>
+                                <ContentPresenter />
+                            </AdornerDecorator>
+                            
+                        </Border>
+
+                        <DockPanel x:Name="PART_WindowHeader"
+                                   Height="34"
+                                   VerticalAlignment="Top"
+                                   LastChildFill="False">
+
+                            <!-- Control Buttons -->
+                            <StackPanel DockPanel.Dock="Right"
+                                        Orientation="Horizontal"
+                                        Margin="0 0 5 0" >
+                                
+                                <!-- Minimise Button -->
+                                <Button Margin="0 0 0 10"
+                                        Content="▁"
+                                        MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                                
+                                <!-- Maximise Button -->
+                                <Button Margin="0 0 0 10"
+                                        Content="❐"
+                                        MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                                
+                                <!-- Close Button -->
+                                <Button Margin="0 0 0 10"
+                                        Content="✕"
+                                        MinWidth="{Binding ActualHeight, RelativeSource={RelativeSource Self}}"/>
+                                
+                            </StackPanel>
+                            
+                        </DockPanel>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

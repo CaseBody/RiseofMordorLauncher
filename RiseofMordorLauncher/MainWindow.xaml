@@ -8,6 +8,7 @@
         WindowStyle="None"
         ResizeMode="NoResize"
         Content="{Binding CurrentPage}"
+        Style="{StaticResource BorderlessWindow}"
         MouseDown="Window_MouseDown"
         Title="RoM Launcher"
         Height="650"

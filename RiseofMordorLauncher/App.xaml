@@ -3,16 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:RiseofMordorLauncher"
              xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero2"
-    x:Class="RiseofMordorLauncher.App"
+             x:Class="RiseofMordorLauncher.App"
              StartupUri="MainWindow.xaml">
+    
     <Application.Resources>
 
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Directory/Styles/Button.xaml"/>
+                <ResourceDictionary Source="Directory/Styles/Window.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="TextBlock">
+            <!--<Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="Directory/Fonts/Middleearth.ttf #MiddleEarth"/>
             </Style>
             
@@ -22,7 +24,7 @@
 
             <Style TargetType="RichTextBox">
                 <Setter Property="FontFamily" Value="Directory/Fonts/Middleearth.ttf #MiddleEarth"/>
-            </Style>
+            </Style>-->
         </ResourceDictionary>
 
     </Application.Resources>

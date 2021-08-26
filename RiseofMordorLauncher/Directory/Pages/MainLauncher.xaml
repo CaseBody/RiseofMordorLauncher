@@ -55,7 +55,7 @@
         </Grid>
 
         <Grid HorizontalAlignment="Left" Margin="30 20 0 20" Grid.RowSpan="2">
-            <TextBlock Text="Version 0.5.0" FontSize="30" Foreground="#fc9b00"/>
+            <TextBlock Text="{Binding VersionText, FallbackValue=Version 1.0.0}" FontSize="14" Foreground="White"/>
         </Grid>
 
         <Grid Grid.Row="2">

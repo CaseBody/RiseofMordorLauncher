@@ -28,7 +28,7 @@
               Width="170"
               Margin="0 20 30 20"
               Grid.RowSpan="2">
-            
+
             <Border Background="Black" 
                     CornerRadius="10" 
                     Opacity="0.9" 
@@ -57,6 +57,7 @@
         </Grid>
 
         <Grid HorizontalAlignment="Left"
+              VerticalAlignment="Center"
               Margin="20"
               Grid.RowSpan="2">
 
@@ -64,6 +65,7 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
+            
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
             </Grid.RowDefinitions>
@@ -80,8 +82,34 @@
                     FontWeight="SemiBold"
                     Padding="5 0"
                     Margin="10 0"
-                    Style="{StaticResource DarkButtonSmallCorner}"
-                    Content="Changelog" />
+                    Style="{StaticResource HoverlessCorner}"
+                    Content="Changelog" >
+                
+                <Button.ToolTip>
+                    <ToolTip Background="Black">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <Image Grid.Row="0"
+                                   Height="100"
+                                   HorizontalAlignment="Center" 
+                                   RenderOptions.BitmapScalingMode="Fant"
+                                   Source="../Images/rom_logo.png"/>
+
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding ChangelogText, FallbackValue=Lorem Ipsum is simply dummy text of the printing and typesetting industry Lorem Ipsum has been the industrys standard dummy text ever since the when an unknown printer took a galley of type and scrambled it to make a type specimen book It has survived not only five centuries but also the leap into electronic typesetting remaining essentially unchanged It was popularised in the with the release of Letraset sheets containing Lorem Ipsum passages and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.}"
+                                       TextWrapping="WrapWithOverflow"
+                                       Background="Black"
+                                       MaxWidth="400"
+                                       Foreground="#fc9b00"/>
+                        </Grid>
+                    </ToolTip>
+                </Button.ToolTip>
+                
+            </Button>
 
         </Grid>
 
@@ -161,7 +189,7 @@
                     Orientation="Horizontal">
 
             <Image Height="100"
-                   Margin="35"
+                   Margin="35 0"
                    HorizontalAlignment="Left" 
                    RenderOptions.BitmapScalingMode="Fant"
                    Source="../Images/rom_logo.png"/>
@@ -169,12 +197,11 @@
             <Button Margin="{Binding PlayButtonMargin, FallbackValue=450 30}"
                     BorderThickness="3"
                     Padding="80 0"
-                    Background="OrangeRed"
                     FontSize="40" 
                     FontWeight="Bold"
                     IsEnabled="{Binding PlayButtonEnabled}"
                     Command="{Binding PlayCommand}"
-                    Style="{StaticResource BrightButton}"
+                    Style="{StaticResource OrangeButton}"
                     Content="{Binding PlayButtonText, FallbackValue=PLAY}"/>
 
             <StackPanel.Background>
@@ -185,7 +212,7 @@
         </StackPanel>
 
         <Grid Grid.Row="5">
-            <Button Content="Submods"
+            <Button Content="SUBMODS"
                     HorizontalAlignment="Left"
                     Margin="30 0 0 0"
                     Foreground="OrangeRed"

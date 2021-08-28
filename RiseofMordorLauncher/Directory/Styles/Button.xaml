@@ -9,7 +9,8 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border Padding="{TemplateBinding Padding}" Background="{TemplateBinding Background}">
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -30,7 +31,8 @@
                             Padding="{TemplateBinding Padding}"
                             CornerRadius="15">
                         
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
@@ -50,8 +52,8 @@
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="BrightButton" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
-        <Setter Property="Background" Value="White" />
+    <Style x:Key="OrangeButton" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
+        <Setter Property="Background" Value="OrangeRed" />
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template" >
@@ -61,29 +63,46 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Background="{TemplateBinding Background}"
                             Padding="{TemplateBinding Padding}"
-                            CornerRadius="10">
+                            CornerRadius="15">
 
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="DarkGray" />
+                <Setter Property="Background" Value="Orange" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="LightGray" />
-                <Setter Property="Foreground" Value="Black" />
+                <Setter Property="Background" Value="White" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Background" Value="Gray" />
-                <Setter Property="Foreground" Value="Black" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
-    <Style x:Key="DarkButtonSmallCorner" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
+    <Style x:Key="SquareOrangeButton" TargetType="{x:Type Button}" BasedOn="{StaticResource OrangeButton}" >
+        <Setter Property="Template" >
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border BorderBrush="{TemplateBinding Foreground}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="0">
+
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <Style x:Key="HoverlessCorner" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
         <Setter Property="Background" Value="Black" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderBrush" Value="DarkGray" />
@@ -97,24 +116,12 @@
                             Padding="{TemplateBinding Padding}"
                             CornerRadius="5">
 
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <ContentPresenter VerticalAlignment="Center"
+                                          HorizontalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="DarkGray" />
-            </Trigger>
-            <Trigger Property="IsPressed" Value="True">
-                <Setter Property="Background" Value="LightGray" />
-                <Setter Property="Foreground" Value="Black" />
-            </Trigger>
-            <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Background" Value="Gray" />
-                <Setter Property="Foreground" Value="Black" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
 
 </ResourceDictionary>

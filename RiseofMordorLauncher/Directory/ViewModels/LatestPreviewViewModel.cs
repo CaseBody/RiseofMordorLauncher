@@ -58,7 +58,6 @@ namespace RiseofMordorLauncher
             _previewChannel = _client.GetChannel(PREVIEWS_CHANNEL_ID) as ISocketMessageChannel;
             var lastMessageAsync = _previewChannel.GetMessagesAsync(1);
             var lastMsgArr = AsyncEnumerableExtensions.FlattenAsync(lastMessageAsync);
-            lastMsgArr.Wait();
             var lastMsg = lastMsgArr.Result.First();
             var attachment = lastMsg.Attachments.FirstOrDefault();
             _latestPreviewURL = attachment.Url;

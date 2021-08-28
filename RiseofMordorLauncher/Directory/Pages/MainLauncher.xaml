@@ -17,17 +17,16 @@
         </Grid.Background>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="54"/>
-            <RowDefinition Height="31"/>
-            <RowDefinition Height="4*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Grid HorizontalAlignment="Right"
+        <Grid Grid.Row="0"
+              HorizontalAlignment="Right"
               Width="170"
-              Margin="0 20 30 20"
-              Grid.RowSpan="2">
+              Margin="0 20 30 20">
 
             <Border Background="Black" 
                     CornerRadius="10" 
@@ -38,8 +37,9 @@
                     BorderBrush="LightGreen"
                     Width="45"
                     Height="45">
-                
+
                 <Image Source="{Binding SteamAvatarUrl}"
+                       RenderOptions.BitmapScalingMode="Fant"
                        Stretch="Uniform"/>
                 
             </Border>
@@ -56,10 +56,10 @@
 
         </Grid>
 
-        <Grid HorizontalAlignment="Left"
+        <Grid Grid.Row="0"
+              HorizontalAlignment="Left"
               VerticalAlignment="Center"
-              Margin="20"
-              Grid.RowSpan="2">
+              Margin="20">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
@@ -113,14 +113,15 @@
 
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="1"
+              MinHeight="275">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <StackPanel Margin="80 30"
+            <StackPanel Margin="80 0"
                         Grid.Column="0">
 
                 <Border BorderThickness="1"
@@ -146,13 +147,14 @@
                             BorderThickness="1">
 
                         <Image Source="{Binding PreviewImage}"
+                               RenderOptions.BitmapScalingMode="Fant"
                                Stretch="UniformToFill"/>
 
                     </Border>
                 </Grid>
             </StackPanel>
 
-            <StackPanel Margin="80 30"
+            <StackPanel Margin="80 0"
                         Grid.Column="1"
                         Visibility="{Binding ShowVideo}">
                 
@@ -186,18 +188,29 @@
 
         </Grid>
 
-        <StackPanel Grid.Row="3"
-                    Orientation="Horizontal">
+        <Grid Grid.Row="2"
+              MinHeight="150"
+              MaxHeight="150">
+            
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <Image Height="100"
-                   Margin="35 0"
+            <Image Grid.Column="0"
+                   Height="100"
+                   Margin="80 0 0 0"
                    HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"
                    RenderOptions.BitmapScalingMode="Fant"
                    Source="../Images/rom_logo.png"/>
 
-            <Button Margin="{Binding PlayButtonMargin, FallbackValue=450 30}"
+            <Button Grid.Column="1"
                     BorderThickness="3"
-                    Padding="80 0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Padding="60 15"
+                    Margin="0 0 80 0"
                     FontSize="40" 
                     FontWeight="Bold"
                     IsEnabled="{Binding PlayButtonEnabled}"
@@ -205,17 +218,31 @@
                     Style="{StaticResource OrangeButton}"
                     Content="{Binding PlayButtonText, FallbackValue=PLAY}"/>
 
-            <StackPanel.Background>
+            <Grid.Background>
                 <SolidColorBrush Opacity="0.5"
                                  Color="Black"/>
-            </StackPanel.Background>
+            </Grid.Background>
             
-        </StackPanel>
+        </Grid>
 
-        <Grid Grid.Row="5">
-            <Button Content="SUBMODS"
-                    HorizontalAlignment="Left"
-                    Margin="30 0 0 0"
+        <Grid Grid.Row="3">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="0.6*"/>
+            </Grid.RowDefinitions>
+            
+            <Button Grid.Row="1"
+                    Content="SUBMODS"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
                     Foreground="OrangeRed"
                     BorderThickness="0"
                     FontSize="20"
@@ -226,27 +253,26 @@
                     Command="{Binding SubmodsPageCmd}"
                     Style="{StaticResource DarkButton}"/>
 
-            <StackPanel HorizontalAlignment="Center"
-                        Visibility="{Binding ShowProgressBar}">
-                
-                <TextBlock Text="{Binding ProgressText, FallbackValue=DOWNLOADING...}"
-                           Margin="0 3 0 0"
-                           HorizontalAlignment="Center"
-                           Foreground="White"
-                           FontWeight="SemiBold"
-                           FontSize="20" />
-                
-                <ProgressBar Margin="0 0 0 0"
-                             Width="600"
-                             Height="30"
-                             Background="Black"
-                             BorderBrush="Black"
-                             Foreground="OrangeRed"
-                             Value="{Binding ProgressBarProgress, FallbackValue=50}"/>
-                
-            </StackPanel>
+            <TextBlock Grid.Row="0"
+                       Grid.Column="1"
+                       Visibility="{Binding ShowProgressBar}"
+                       Text="{Binding ProgressText, FallbackValue=DOWNLOADING...}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Bottom"
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       FontSize="20" />
+
+            <ProgressBar Grid.Row="1"
+                         Grid.Column="1"
+                         Width="600"
+                         Height="30"
+                         Background="Black"
+                         BorderBrush="Black"
+                         Foreground="OrangeRed"
+                         Visibility="{Binding ShowProgressBar}"
+                         Value="{Binding ProgressBarProgress, FallbackValue=50}"/>
+            
         </Grid>
-
-
     </Grid>
 </Page>

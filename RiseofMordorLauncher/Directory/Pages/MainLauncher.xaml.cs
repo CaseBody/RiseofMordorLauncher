@@ -25,6 +25,7 @@ namespace RiseofMordorLauncher.Directory.Pages
         public MainLauncher()
         {
             InitializeComponent();
+            LatestPreviewFrame.DataContext = new LatestPreviewViewModel();
         }
 
         //private void Expander_MouseEnter(object sender, MouseEventArgs e)

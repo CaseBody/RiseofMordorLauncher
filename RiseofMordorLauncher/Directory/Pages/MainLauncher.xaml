@@ -139,13 +139,14 @@
 
                 </Border>
 
-                <Grid>
+                <Grid x:Name="LatestPreviewFrame">
                     <Border Height="220"
                             Background="Black"
                             BorderBrush="Black"
                             BorderThickness="1">
 
-                        <!--Image Source="" /-->
+                        <Image Source="{Binding PreviewImage}"
+                               Stretch="UniformToFill"/>
 
                     </Border>
                 </Grid>

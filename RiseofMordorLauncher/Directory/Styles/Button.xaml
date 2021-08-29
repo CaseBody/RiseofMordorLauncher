@@ -18,7 +18,7 @@
     </Style>
 
     <Style x:Key="DarkButton" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
-        <Setter Property="Background" Value="Black" />
+        <Setter Property="Background" Value="#080808" />
         <Setter Property="Foreground" Value="White" />
         <Setter Property="BorderBrush" Value="DarkGray" />
         <Setter Property="BorderThickness" Value="1" />
@@ -39,7 +39,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="DarkGray" />
+                <Setter Property="Background" Value="#0b1114" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="LightGray" />
@@ -53,7 +53,7 @@
     </Style>
 
     <Style x:Key="OrangeButton" TargetType="{x:Type Button}" BasedOn="{StaticResource Hoverless}" >
-        <Setter Property="Background" Value="OrangeRed" />
+        <Setter Property="Background" Value="#a9261f" />
         <Setter Property="Foreground" Value="Black" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Template" >
@@ -73,7 +73,7 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
-                <Setter Property="Background" Value="Orange" />
+                <Setter Property="Foreground" Value="#de9343" />
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Background" Value="White" />

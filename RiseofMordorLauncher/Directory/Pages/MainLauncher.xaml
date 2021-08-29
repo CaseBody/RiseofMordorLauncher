@@ -125,25 +125,27 @@
                         Grid.Column="0">
 
                 <Border BorderThickness="1"
-                        BorderBrush="Black"
+                        BorderBrush="#080808"
                         HorizontalAlignment="Left">
 
                     <TextBlock HorizontalAlignment="Left"
-                               Opacity="0.9"
-                               TextAlignment="Center"
+                               Opacity="0.8"
+                               TextAlignment="Left"
                                Padding="5"
                                Text="Latest Preview"
                                FontSize="12"
                                Foreground="White"
                                FontWeight="Bold"
-                               Background="Black"/>
+                               Background="#080808"
+                               Width="439"
+                               />
 
                 </Border>
 
                 <Grid x:Name="LatestPreviewFrame">
                     <Border Height="220"
-                            Background="Black"
-                            BorderBrush="Black"
+                            Background="#080808"
+                            BorderBrush="#080808"
                             BorderThickness="1">
 
                         <Image Source="{Binding PreviewImage}"
@@ -159,25 +161,27 @@
                         Visibility="{Binding ShowVideo}">
                 
                 <Border BorderThickness="1"
-                        BorderBrush="Black"
+                        BorderBrush="#080808"
                         HorizontalAlignment="Left">
                     
                     <TextBlock HorizontalAlignment="Left"
-                               Opacity="0.9"
-                               TextAlignment="Center"
+                               Opacity="0.8"
+                               TextAlignment="Left"
                                Padding="5"
                                Text="Featured Video"
                                FontSize="12"
                                Foreground="White"
                                FontWeight="Bold"
-                               Background="Black"/>
+                               Background="#080808"
+                               Width="439"
+                               />
                     
                 </Border>
                 
                 <Grid>
                     <Border Height="220"
-                            Background="Black"
-                            BorderBrush="Black"
+                            Background="#080808"
+                            BorderBrush="#080808"
                             BorderThickness="1">
                         
                         <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}" Height="220" />
@@ -206,7 +210,7 @@
                    Source="../Images/rom_logo.png"/>
 
             <Button Grid.Column="1"
-                    BorderThickness="3"
+                    BorderThickness="4"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"
                     Padding="60 15"
@@ -243,7 +247,7 @@
                     Content="SUBMODS"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Foreground="OrangeRed"
+                    Foreground="#a82c26"
                     BorderThickness="0"
                     FontSize="20"
                     FontWeight="SemiBold"

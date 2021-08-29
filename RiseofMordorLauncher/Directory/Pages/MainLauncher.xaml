@@ -273,7 +273,7 @@
                          Height="30"
                          Background="Black"
                          BorderBrush="Black"
-                         Foreground="OrangeRed"
+                         Foreground="#a82c26"
                          Visibility="{Binding ShowProgressBar}"
                          Value="{Binding ProgressBarProgress, FallbackValue=50}"/>
             

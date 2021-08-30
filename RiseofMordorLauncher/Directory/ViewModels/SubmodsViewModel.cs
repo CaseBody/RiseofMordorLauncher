@@ -34,7 +34,7 @@ namespace RiseofMordorLauncher
 
         public async void Load()
         {
-            Application.Current.Dispatcher.BeginInvoke(
+            await Application.Current.Dispatcher.BeginInvoke(
                 new ThreadStart(() =>
                 {
                     steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;

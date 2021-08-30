@@ -64,20 +64,27 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             
             <Grid.RowDefinitions>
                 <RowDefinition Height="25"/>
             </Grid.RowDefinitions>
-            
-            <TextBlock Grid.Column="0"
+
+            <Image Source="../Images/settings_icon.png" HorizontalAlignment="Center" Margin="0 0 10 0" Cursor="Hand">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding SettingsCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+
+            <TextBlock Grid.Column="1"
                        Text="{Binding VersionText, FallbackValue=Version 1.0.0}"
                        FontSize="10"
                        FontWeight="SemiBold"
                        VerticalAlignment="Center"
                        Foreground="White"/>
 
-            <Button Grid.Column="1"
+            <Button Grid.Column="2"
                     FontSize="10"
                     FontWeight="SemiBold"
                     Padding="5 0"

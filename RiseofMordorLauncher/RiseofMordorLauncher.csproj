@@ -107,6 +107,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Directory\Pages\Settings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Directory\Pages\SubmodsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -142,6 +146,9 @@
     </Compile>
     <Compile Include="Directory\Pages\Page1.xaml.cs">
       <DependentUpon>Page1.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Directory\Pages\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Directory\Pages\SubmodsPage.xaml.cs">
       <DependentUpon>SubmodsPage.xaml</DependentUpon>
@@ -286,6 +293,14 @@
     <PackageReference Include="YoutubeExplode">
       <Version>6.0.5</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\discord_icon.png" />
+    <Resource Include="Directory\Images\instagram_icon.png" />
+    <Resource Include="Directory\Images\moddb_icon.png" />
+    <Resource Include="Directory\Images\reddit_icon.png" />
+    <Resource Include="Directory\Images\settings_icon.png" />
+    <Resource Include="Directory\Images\youtube_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

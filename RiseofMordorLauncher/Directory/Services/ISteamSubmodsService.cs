@@ -10,6 +10,8 @@ namespace RiseofMordorLauncher
     {
         void GetSubmods(SharedData sharedData);
 
+        SubmodInstallation GetSubmodInstallInfo(ulong id);
+
         event EventHandler<List<SubmodModel>> SubmodDataFinishedEvent;
     }
 }

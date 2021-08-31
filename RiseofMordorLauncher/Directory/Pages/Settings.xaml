@@ -10,7 +10,7 @@
 
     <StackPanel Background="Black" Orientation="Vertical">
         <StackPanel Margin="3 3 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <CheckBox Background="Black" BorderBrush="#fc9b00" Foreground="#fc9b00"/>
+            <CheckBox Background="Black" BorderBrush="#fc9b00" Foreground="#fc9b00" IsChecked="{Binding AutoInstall}"/>
             <TextBlock Text="Auto install updates" Foreground="#fc9b00" Margin="3 0 0 0"/>
         </StackPanel>
 
@@ -22,13 +22,7 @@
 
         <Border BorderBrush="#fc9b00" BorderThickness="1">
             <ScrollViewer Height="190" Margin="1,0,-1,0" Background="Black">
-                <ListBox Background="Black" BorderBrush="Black">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" Background="Black" Foreground="#fc9b00" HorizontalAlignment="Center"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}"/>
             </ScrollViewer>
         </Border>
 

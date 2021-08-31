@@ -61,17 +61,32 @@ namespace RiseofMordorLauncher
             {
                 if (current_list == 1)
                 {
-                    SubmodsList1.Add(submod);
+                    await Application.Current.Dispatcher.BeginInvoke(
+                    new ThreadStart(() =>
+                    {
+                        SubmodsList1.Add(submod);
+                     })
+                    );
                     current_list = 2;
                 }
                 else if (current_list == 2)
                 {
-                    SubmodsList2.Add(submod);
+                    await Application.Current.Dispatcher.BeginInvoke(
+                    new ThreadStart(() =>
+                    {
+                        SubmodsList2.Add(submod);
+                    })
+                    );
                     current_list = 3;
                 }
                 else
                 {
-                    SubmodsList3.Add(submod);
+                    await Application.Current.Dispatcher.BeginInvoke(
+                    new ThreadStart(() =>
+                    {
+                        SubmodsList3.Add(submod);
+                    })
+                    );
                     current_list = 1;
                 }
 

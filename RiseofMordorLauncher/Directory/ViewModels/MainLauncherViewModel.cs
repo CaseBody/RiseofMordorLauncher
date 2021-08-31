@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using RiseofMordorLauncher.Directory.Pages;
 
 
 namespace RiseofMordorLauncher
@@ -27,22 +28,25 @@ namespace RiseofMordorLauncher
         private Thread downloadThread;
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
-        public string SteamUserName { get; set; } 
-        public string SteamAvatarUrl { get; set; }      
+        public string SteamUserName { get; set; }
+        public string SteamAvatarUrl { get; set; }
         public string YouTubeVideoURL { get; set; }
         public SharedData SharedData { get; set; }
         public Visibility ShowVideo { get; set; } = Visibility.Visible;
         public Visibility ShowProgressBar { get; set; } = Visibility.Hidden;
         public string PlayButtonText { get; set; } = "PLAY";
-        public string PlayButtonMargin{ get; set; } = "450 30";
+        public string PlayButtonMargin { get; set; } = "450 30";
         public string ProgressText { get; set; } = "DOWNLOADING...";
         public bool PlayButtonEnabled { get; set; } = true;
         public bool SubmodButtonEnabled { get; set; } = true;
         public int ProgressBarProgress { get; set; }
         private ModVersion Version { get; set; }
+        public Visibility SettingsVisibility { get; set; } = Visibility.Hidden;
+        public Settings SettingsPage { get; set; } = new Settings();
+        private SettingsViewModel SettingsPageViewModel { get; set; }
         
         private ICommand _PlayCommand;
-
+        private ICommand _SettingsCommand;
         private ICommand _submodsPageCmd;
         public ICommand SubmodsPageCmd
         {
@@ -59,6 +63,14 @@ namespace RiseofMordorLauncher
                 return _PlayCommand ?? (_PlayCommand = new CommandHandler(() => LaunchGame(), () => true));
             }
         }
+        public ICommand SettingsCommand
+        {
+            get
+            {
+                return _SettingsCommand ?? (_SettingsCommand = new CommandHandler(() => SettingsButtonClick(), () => true));
+            }
+        }
+
 
         public async Task Load()
         {
@@ -130,7 +142,13 @@ namespace RiseofMordorLauncher
             }
 
             File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+
+            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            {
+                x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+            }
 
             PlayButtonText = "PLAY";
             PlayButtonEnabled = true;
@@ -164,6 +182,20 @@ namespace RiseofMordorLauncher
             Attila.Start();
             Attila.WaitForInputIdle();
             
+        }
+
+        private void SettingsButtonClick()
+        {
+            if (SettingsVisibility == Visibility.Hidden)
+            {
+                SettingsPageViewModel = new SettingsViewModel(SharedData);
+                SettingsPage.DataContext = SettingsPageViewModel;
+                SettingsVisibility = Visibility.Visible;
+            }
+            else
+            {
+                SettingsVisibility = Visibility.Hidden;
+            }
         }
 
         private void DownloadProgressUpdate(object sender, int percent_finished)

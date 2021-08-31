@@ -199,6 +199,8 @@
 
         </Grid>
 
+        <Frame Grid.Row="0" Grid.RowSpan="2" Margin="0 60 0 0" HorizontalAlignment="Left" Width="200" Visibility="{Binding SettingsVisibility}" Content="{Binding SettingsPage}"/>
+
         <Grid Grid.Row="2"
               MinHeight="150"
               MaxHeight="150">

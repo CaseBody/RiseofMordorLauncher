@@ -1,7 +1,7 @@
 ﻿using Steamworks;
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -148,6 +148,47 @@ namespace RiseofMordorLauncher
             }
 
             SubmodDataFinishedEvent?.Invoke(this, submodList);
+        }
+
+        public SubmodInstallation GetSubmodInstallInfo(ulong id)
+        {
+            SubmodInstallation submod_installation = new SubmodInstallation();
+            PublishedFileId_t submod;
+            string folder = "";
+
+            try { submod = new PublishedFileId_t(id); } catch { submod_installation.IsInstalled = false; return submod_installation; }
+
+            bool success = SteamUGC.GetItemInstallInfo(submod, out _, out folder, 100, out _);
+
+            if (success)
+            {
+                submod_installation.IsInstalled = true;
+                submod_installation.InstallFolder = folder;
+                FileInfo[] files = new DirectoryInfo(folder).GetFiles();
+                bool pack_found = false;
+
+                foreach (FileInfo file in files)
+                {
+                    if (file.Extension == ".pack")
+                    {
+                        submod_installation.FileName = file.Name;
+                        pack_found = true;
+                    }
+                }
+
+                if (pack_found)
+                {
+                    return submod_installation;
+                }
+                else
+                {
+                    submod_installation.IsInstalled = false; return submod_installation;
+                }
+            }
+            else
+            {
+                submod_installation.IsInstalled = false; return submod_installation;
+            }
         }
     }
 

@@ -136,7 +136,9 @@
     <Compile Include="Directory\Data\ModVersion.cs" />
     <Compile Include="Directory\Data\SharedData.cs" />
     <Compile Include="Directory\Data\SteamUser.cs" />
+    <Compile Include="Directory\Data\SubmodInstallation.cs" />
     <Compile Include="Directory\Data\SubmodModel.cs" />
+    <Compile Include="Directory\Data\UserPreferences.cs" />
     <Compile Include="Directory\Data\YouTubeData.cs" />
     <Compile Include="Directory\Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
@@ -157,10 +159,12 @@
     <Compile Include="Directory\Services\API\APISteamSubmodService.cs" />
     <Compile Include="Directory\Services\API\APISteamUserService.cs" />
     <Compile Include="Directory\Services\API\APIModVersionService.cs" />
+    <Compile Include="Directory\Services\API\APIUserPreferencesService.cs" />
     <Compile Include="Directory\Services\API\APIYouTubeDataService.cs" />
     <Compile Include="Directory\Services\CommandHandler.cs" />
     <Compile Include="Directory\Services\IGoogleDriveService.cs" />
     <Compile Include="Directory\Services\IModVersionService.cs" />
+    <Compile Include="Directory\Services\IUserPreferencesService.cs" />
     <Compile Include="Directory\Services\ISteamSubmodsService.cs" />
     <Compile Include="Directory\Services\IYouTubeDataService.cs" />
     <Compile Include="Directory\Services\ISteamUserService.cs" />
@@ -171,6 +175,7 @@
     <Compile Include="Directory\ViewModels\LatestPreviewViewModel.cs" />
     <Compile Include="Directory\ViewModels\LoginViewModel.cs" />
     <Compile Include="Directory\ViewModels\MainLauncherViewModel.cs" />
+    <Compile Include="Directory\ViewModels\SettingsViewModel.cs" />
     <Compile Include="Directory\ViewModels\SubmodsViewModel.cs" />
     <Compile Include="Directory\ViewModels\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">

@@ -13,5 +13,7 @@ namespace RiseofMordorLauncher
        public string FileName { get; set; }
 
        public string InstallFolder { get; set; }
+
+       public ulong ID { get; set; }
     }
 }

@@ -15,14 +15,22 @@
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 15 0 0">
-            <Image Source="../images/upvote.png" Width="20" Margin="0 -2.8 5 0"/>
+            <Image Source="../images/upvote.png" Width="20" Margin="0 -2.8 5 0">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding UpCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
             <TextBlock Text="Load Order" Foreground="#fc9b00" Margin="0 0 0 0" TextDecorations="underline"/>
-            <Image Source="../images/downvote.png" Width="20" Margin="5 -2.8 0 0"/>
+            <Image Source="../images/downvote.png" Width="20" Margin="5 -2.8 0 0">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding DownCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
         </StackPanel>
 
         <Border BorderBrush="#fc9b00" BorderThickness="1">
             <ScrollViewer Height="190" Margin="1,0,-1,0" Background="Black">
-                <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}"/>
+                <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}" SelectedIndex="{Binding SelectedItem}"/>
             </ScrollViewer>
         </Border>
 

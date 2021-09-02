@@ -39,7 +39,7 @@ namespace RiseofMordorLauncher
                         {
                             pref.AutoUpdate = bool.Parse(line.Split('=').ElementAt(1));
                         }
-                        else if (line == "{")
+                        else if (line == "load_order = {")
                         {
                             is_reading_packs = true;
                         }
@@ -61,9 +61,12 @@ namespace RiseofMordorLauncher
             }
             else
             {
-                File.Create($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt");
-                File.WriteAllText($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt", $"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                using (var x = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+                {
+                    x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                }
                 pref.AutoUpdate = true;
+                pref.LoadOrder = new List<string>();
                 pref.LoadOrder.Add("rom_base");
                 return pref;
             }

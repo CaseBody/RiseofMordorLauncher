@@ -164,6 +164,7 @@ namespace RiseofMordorLauncher
             {
                 submod_installation.IsInstalled = true;
                 submod_installation.InstallFolder = folder;
+                submod_installation.ID = id;
                 FileInfo[] files = new DirectoryInfo(folder).GetFiles();
                 bool pack_found = false;
 

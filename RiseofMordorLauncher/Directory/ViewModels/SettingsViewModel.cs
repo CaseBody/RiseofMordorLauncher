@@ -1,10 +1,12 @@
-﻿using System;
+﻿using RiseofMordorLauncher.Directory.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace RiseofMordorLauncher
 {
@@ -12,8 +14,20 @@ namespace RiseofMordorLauncher
     {
         public ObservableCollection<String> SubmodLoadOrder { get; set; }
         public bool AutoInstall { get; set; }
+
+        private int _SelectedItem = -1;
+        public int SelectedItem
+        {
+            get { return _SelectedItem; }
+            set
+            {
+                // Some logic here
+                _SelectedItem = value;
+            }
+        }
+
         UserPreferences prefs;
-        private List<String> EnabledSubmods;
+        private List<SubmodInstallation> EnabledSubmods;
         private List<String> EnabledSubmodsRaw;
         ISteamSubmodsService SubmodService;
         IUserPreferencesService UserPreferencesService;
@@ -31,7 +45,7 @@ namespace RiseofMordorLauncher
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
                 EnabledSubmodsRaw = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
-                EnabledSubmods = new List<string>();
+                EnabledSubmods = new List<SubmodInstallation>();
 
                 for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
                 {
@@ -40,7 +54,7 @@ namespace RiseofMordorLauncher
 
                     if (installation.IsInstalled)
                     {
-                        EnabledSubmods.Add(installation.FileName);
+                        EnabledSubmods.Add(installation);
                     }
                     else
                     {
@@ -50,29 +64,54 @@ namespace RiseofMordorLauncher
 
                 if (prefs.LoadOrder.Count > 1)
                 {
-                    for (int i = 0; i <= prefs.LoadOrder.Count; i++)
+                    for (int i = 0; i < prefs.LoadOrder.Count; i++)
                     {
-                        if (!(EnabledSubmods.Contains(prefs.LoadOrder.ElementAt(i))))
+                        try
                         {
-                            prefs.LoadOrder.RemoveAt(i);
+                            if (!EnabledSubmods.Any(s => s.ID == ulong.Parse(prefs.LoadOrder.ElementAt(i))))
+                            {
+                                prefs.LoadOrder.RemoveAt(i);
+                            }
+                        }
+                        catch
+                        {
+
                         }
                     }
                 }
 
                 for (int i = 0; i < EnabledSubmods.Count; i++)
                 {
-                    if (!(prefs.LoadOrder.Contains(EnabledSubmods.ElementAt(i))))
+                    if (!(prefs.LoadOrder.Contains(EnabledSubmods.ElementAt(i).ID.ToString())))
                     {
-                        prefs.LoadOrder.Add(EnabledSubmods.ElementAt(i));
+                        prefs.LoadOrder.Add(EnabledSubmods.ElementAt(i).ID.ToString());
                     }
                 }
 
                 SubmodLoadOrder = new ObservableCollection<string>();
+
+                for (var i = 0; i < prefs.LoadOrder.Count; i++)
+                {
+                    ulong id = 0;
+                    bool success = ulong.TryParse(prefs.LoadOrder.ElementAt(i), out id);
+                    
+                    if (success)
+                    {
+                        var install = SubmodService.GetSubmodInstallInfo(id);
+                        prefs.LoadOrder.RemoveAt(i);
+                        prefs.LoadOrder.Insert(i, install.FileName);
+                    }
+
+                }
+
                 foreach (var item in prefs.LoadOrder)
                 {
                     SubmodLoadOrder.Add(item);
                 }
+
+                WritePrefs(prefs);
             }
+
         }
 
         private async void DisableSubmod(string id)
@@ -137,6 +176,61 @@ namespace RiseofMordorLauncher
             using (StreamWriter writer = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
                 writer.Write(output);
+            }
+        }
+
+        private void WritePrefs(UserPreferences prefs)
+        {
+
+        }
+
+        private void MoveUp()
+        {
+            if (_SelectedItem != -1 && _SelectedItem != 0)
+            {
+                var index = _SelectedItem;
+                string id = prefs.LoadOrder.ElementAt(index);
+                string text = SubmodLoadOrder.ElementAt(index);
+
+                SubmodLoadOrder.RemoveAt(index);
+                SubmodLoadOrder.Insert(index - 1, text);
+
+                prefs.LoadOrder.RemoveAt(index);
+                prefs.LoadOrder.Insert(index + 1, id);
+            }
+        }
+        private void MoveDown()
+        {
+            if (_SelectedItem != -1 && _SelectedItem != SubmodLoadOrder.Count - 1)
+            {
+                var index = _SelectedItem;
+                string text = SubmodLoadOrder.ElementAt(index);
+                string id = prefs.LoadOrder.ElementAt(index);
+
+                SubmodLoadOrder.RemoveAt(index);
+                SubmodLoadOrder.Insert(index + 1, text);
+
+                prefs.LoadOrder.RemoveAt(index);
+                prefs.LoadOrder.Insert(index + 1, id);
+            }
+        }
+
+ 
+        private ICommand _UpCommand;
+        private ICommand _DownCommand;
+        public ICommand UpCommand
+        {
+            get
+            {
+                return _UpCommand ?? (_UpCommand = new CommandHandler(() => MoveUp(), () => true));
+            }
+        }
+
+        public ICommand DownCommand
+        {
+            get
+            {
+                return _DownCommand ?? (_DownCommand = new CommandHandler(() => MoveDown(), () => true));
             }
         }
 

@@ -29,11 +29,9 @@
         </StackPanel>
 
         <Border BorderBrush="#fc9b00" BorderThickness="1">
-            <ScrollViewer Height="190" Margin="1,0,-1,0" Background="Black">
+            <ScrollViewer Height="247" Margin="1,0,-1,0" Background="Black">
                 <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}" SelectedIndex="{Binding SelectedItem}"/>
             </ScrollViewer>
         </Border>
-
-        <Button Style="{StaticResource DarkButton}" Content="Apply" Background="LightGreen" BorderThickness="0" Margin="0 8 0 0" Padding="8" Width="100" FontSize="20" Foreground="Black"/>
     </StackPanel>
 </Page>

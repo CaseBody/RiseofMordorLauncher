@@ -113,7 +113,9 @@ namespace RiseofMordorLauncher
                 SteamUGC.SubscribeItem(item);
                 SteamUGC.DownloadItem(item, true);
                 submod.ProgressBarVisibility = Visibility.Visible;
-                submod.ProgressBarValue = 0;
+
+                if (submod.ProgressBarValue != 2)
+                    submod.ProgressBarValue = 0;
 
                 if (DownloadingSubmods.Count > 0)
                 {
@@ -144,6 +146,7 @@ namespace RiseofMordorLauncher
                 submod.SubscribeButtonText = "SUBSCRIBE";
                 submod.IsInstalled = false;
                 submod.IsEnabled = false;
+                submod.ProgressBarValue = 2;
             }
         }
         private async void EnableButtonPressed(object sender, EventArgs e)
@@ -228,28 +231,50 @@ namespace RiseofMordorLauncher
         }
         private void CheckDownloads(object source, ElapsedEventArgs e)
         {
-            if (DownloadingSubmods.Count > 0)
+            try
             {
-                int i = -1;
-
-                foreach (SubmodModel submod in DownloadingSubmods)
+                if (DownloadingSubmods.Count > 0)
                 {
-                    i++;
-                    PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
+                    int i = -1;
 
-                    ulong downloaded_bytes = 0;
-                    ulong total_bytes = 0;
-                    bool success = false;
-
-                    try { 
-                        success = SteamUGC.GetItemDownloadInfo(item, out downloaded_bytes, out total_bytes); 
-                    } catch { }
-
-                    if (success)
+                    foreach (SubmodModel submod in DownloadingSubmods)
                     {
-                        if (!(total_bytes == 0))
+                        i++;
+                        PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
+
+                        ulong downloaded_bytes = 0;
+                        ulong total_bytes = 0;
+                        bool success = false;
+
+                        try
                         {
-                            if (downloaded_bytes >= total_bytes)
+                            success = SteamUGC.GetItemDownloadInfo(item, out downloaded_bytes, out total_bytes);
+                        }
+                        catch { }
+
+                        if (success)
+                        {
+                            if (!(total_bytes == 0))
+                            {
+                                if (downloaded_bytes >= total_bytes)
+                                {
+                                    submod.IsInstalled = true;
+                                    submod.ProgressBarVisibility = Visibility.Hidden;
+                                    submod.ProgressBarValue = 0;
+                                    submod.SubscribeButtonBackground = Brushes.Red;
+                                    submod.SubscribeButtonText = "UNSUBSCRIBE";
+                                    submod.EnableButtonVisibility = Visibility.Visible;
+                                    submod.EnableButtonText = "ENABLE";
+                                    submod.EnableButtonBackground = SharedData.NiceGreen;
+
+                                    DownloadingSubmods.RemoveAt(i);
+                                }
+                                else
+                                {
+                                    submod.ProgressBarValue = Math.Round((decimal)downloaded_bytes / total_bytes * 100);
+                                }
+                            }
+                            else if (total_bytes == 0 && submod.ProgressBarValue > 1)
                             {
                                 submod.IsInstalled = true;
                                 submod.ProgressBarVisibility = Visibility.Hidden;
@@ -259,15 +284,12 @@ namespace RiseofMordorLauncher
                                 submod.EnableButtonVisibility = Visibility.Visible;
                                 submod.EnableButtonText = "ENABLE";
                                 submod.EnableButtonBackground = SharedData.NiceGreen;
-
                                 DownloadingSubmods.RemoveAt(i);
+
                             }
-                            else
-                            {
-                                submod.ProgressBarValue = Math.Round((decimal)downloaded_bytes / total_bytes * 100);
-                            }
+
                         }
-                        else if (total_bytes == 0 && submod.ProgressBarValue > 1)
+                        else
                         {
                             submod.IsInstalled = true;
                             submod.ProgressBarVisibility = Visibility.Hidden;
@@ -278,24 +300,12 @@ namespace RiseofMordorLauncher
                             submod.EnableButtonText = "ENABLE";
                             submod.EnableButtonBackground = SharedData.NiceGreen;
                             DownloadingSubmods.RemoveAt(i);
-
                         }
-
-                    }
-                    else
-                    {
-                        submod.IsInstalled = true;
-                        submod.ProgressBarVisibility = Visibility.Hidden;
-                        submod.ProgressBarValue = 0;
-                        submod.SubscribeButtonBackground = Brushes.Red;
-                        submod.SubscribeButtonText = "UNSUBSCRIBE";
-                        submod.EnableButtonVisibility = Visibility.Visible;
-                        submod.EnableButtonText = "ENABLE";
-                        submod.EnableButtonBackground = SharedData.NiceGreen;
-                        DownloadingSubmods.RemoveAt(i);
                     }
                 }
+
             }
+            catch { }
         }
         private async void EnableSubmod(SubmodModel submod)
         {
@@ -390,6 +400,7 @@ namespace RiseofMordorLauncher
             {
                 writer.Write(output);
             }
+
         }
 
 

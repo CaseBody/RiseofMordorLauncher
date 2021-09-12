@@ -63,11 +63,11 @@
                 Content="CONTINUE OFFLINE"/>
 
         <Image Grid.RowSpan="5"
-               Stretch="Uniform"
+               Stretch="Fill"
                MaxHeight="650"
                MaxWidth="1200"
                Visibility="{Binding LoadingScreenVisibility, FallbackValue=Hidden}"
-               Source="../Images/Placeholder.png"/>
+               Source="../Images/loading_screen.png"/>
 
     </Grid>
 </Page>

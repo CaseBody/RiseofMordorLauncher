@@ -19,7 +19,9 @@
                     <Image Source="{Binding ThumbnailPath}"
                         Margin="6 6 10 0"       
                         Width="230"                      
-                        Stretch="Uniform"   
+                        Stretch="Uniform" 
+                        RenderOptions.BitmapScalingMode="Fant"
+
                            />
 
                     <Grid>

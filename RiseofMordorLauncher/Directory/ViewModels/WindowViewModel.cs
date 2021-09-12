@@ -8,18 +8,22 @@ using System.Windows.Input;
 using Steamworks;
 using RiseofMordorLauncher.Directory.Pages;
 using System.Threading;
+using RiseofMordorLauncher.Directory.Services;
 
 namespace RiseofMordorLauncher
 {
     class WindowViewModel : BaseViewModel
     {
+        public event EventHandler MinimizeEvent;
+        public event EventHandler CloseEvent;
+
         private readonly SharedData SharedData = new SharedData();
 
         private MainLauncherViewModel mainLauncherViewModel;
         private LoginViewModel loginViewModel = new LoginViewModel();
         private readonly SubmodsViewModel submodsViewModel = new SubmodsViewModel();
 
-        private MainLauncher MainLauncherPage = new MainLauncher();
+        private MainLauncher MainLauncherPage;
         private readonly Login LoginPage     = new Login();
         private readonly SubmodsPage SubmodsPage   = new SubmodsPage();
         private Thread UpdateThread;
@@ -53,7 +57,7 @@ namespace RiseofMordorLauncher
             switch (page)
             {
                 case ApplicationPage.MainLauncher:
-                    MainLauncherPage = new MainLauncher();
+                    MainLauncherPage = new MainLauncher(SharedData);
                     mainLauncherViewModel = new MainLauncherViewModel();
                     mainLauncherViewModel.SharedData = SharedData;
                     mainLauncherViewModel.SwitchPageEvent += SwitchPage;
@@ -72,9 +76,7 @@ namespace RiseofMordorLauncher
                     break;
 
                 case ApplicationPage.Submods:
-                    //submodsViewModel = new SubmodsViewModel();
-                    //submodsViewModel.SharedData = SharedData;
-                    //submodsViewModel.SwitchPageEvent += SwitchPage;
+                    submodsViewModel.SwitchPageEvent += SwitchPage;
                     submodsViewModel.sharedData = SharedData;
                     submodsViewModel.Load();
                     
@@ -94,6 +96,24 @@ namespace RiseofMordorLauncher
             {
                 await Task.Delay(10);
                 SteamAPI.RunCallbacks();
+            }
+        }
+
+        private ICommand _MinimizeCommand;
+        private ICommand _CloseCommand;
+        public ICommand MinimizeCommand
+        {
+            get
+            {
+                return _MinimizeCommand ?? (_MinimizeCommand = new CommandHandler(() => MinimizeEvent?.Invoke(this, new EventArgs()), () => true));
+            }
+        }
+
+        public ICommand CloseCommand
+        {
+            get
+            {
+                return _CloseCommand ?? (_CloseCommand = new CommandHandler(() => CloseEvent?.Invoke(this, new EventArgs()), () => true));
             }
         }
 

@@ -21,15 +21,19 @@ namespace RiseofMordorLauncher
 {
     class MainLauncherViewModel : BaseViewModel
     {
-        public ISteamUserService _steamUserService;
-        public IYouTubeDataService _youTubeDataService;
-        public IModVersionService _modVersionService;
+        private ISteamUserService _steamUserService;
+        private IYouTubeDataService _youTubeDataService;
+        private IModVersionService _modVersionService;
+        private IUserPreferencesService UserPreferencesService;
+        private ISteamSubmodsService SubmodService;
 
         private Thread downloadThread;
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
         public string SteamUserName { get; set; }
         public string SteamAvatarUrl { get; set; }
+        public string VersionText { get; set; }
+        public string ChangelogText { get; set; }
         public string YouTubeVideoURL { get; set; }
         public SharedData SharedData { get; set; }
         public Visibility ShowVideo { get; set; } = Visibility.Visible;
@@ -95,6 +99,8 @@ namespace RiseofMordorLauncher
             // get version data
             _modVersionService = new APIModVersionService();
             Version = await _modVersionService.GetModVersionInfo(SharedData);
+            VersionText = "Version " + Version.VersionText;
+            ChangelogText = Version.ChangeLog;
 
             downloadThread = new Thread(PostUiLoadAsync);
             downloadThread.IsBackground = true;
@@ -114,7 +120,7 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private void DownloadUpdate()
+        private async void DownloadUpdate()
         {
 
             PlayButtonText = "UPDATING";
@@ -125,7 +131,7 @@ namespace RiseofMordorLauncher
 
             IGoogleDriveService googleDriveService = new APIGoogleDriveService();
             googleDriveService.DownloadUpdate += DownloadProgressUpdate;
-            googleDriveService.DownloadFile("rom_pack_files.rar", $"{SharedData.AttilaDir}/data/rom_pack_files.rar", Version.DownloadNumberOfBytes);
+            await googleDriveService.DownloadFile("rom_pack_files.rar", $"{SharedData.AttilaDir}/data/rom_pack_files.rar", Version.DownloadNumberOfBytes);
             ProgressBarProgress = 100;
 
             ProgressText = "EXTRACTING...";
@@ -156,21 +162,140 @@ namespace RiseofMordorLauncher
             PlayButtonMargin = "450 30";
             SubmodButtonEnabled = true;
             ShowProgressBar = Visibility.Hidden;
+
+            Version = await _modVersionService.GetModVersionInfo(SharedData);
+            VersionText = "Version " + Version.VersionText;
+            ChangelogText = Version.ChangeLog;
         }
 
         private void LaunchGame()
         {
+            UserPreferences prefs = new UserPreferences();
+            SubmodService = new APISteamSubmodService();
+            UserPreferencesService = new APIUserPreferencesService();
+
+            prefs = UserPreferencesService.GetUserPreferences(SharedData);
+
             string Arguments = "";
 
-            foreach (string pack in Version.InstalledPackFiles)
+            if (File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
-                if (Arguments == "")
+                var EnabledSubmodsRaw = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
+                var EnabledSubmods = new List<SubmodInstallation>();
+
+                for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
                 {
-                    Arguments = $"mod {pack};";
+                    SubmodInstallation installation = new SubmodInstallation();
+                    installation = SubmodService.GetSubmodInstallInfo(ulong.Parse(EnabledSubmodsRaw.ElementAt(i)));
+
+                    if (installation.IsInstalled)
+                    {
+                        EnabledSubmods.Add(installation);
+                    }
+                    else
+                    {
+                        DisableSubmod(EnabledSubmodsRaw.ElementAt(i));
+                    }
                 }
-                else
+
+                if (prefs.LoadOrder.Count > 1)
                 {
-                    Arguments = Arguments + $" mod {pack};";
+                    for (int i = 0; i < prefs.LoadOrder.Count; i++)
+                    {
+                        try
+                        {
+                            if (!EnabledSubmods.Any(s => s.ID == ulong.Parse(prefs.LoadOrder.ElementAt(i))))
+                            {
+                                prefs.LoadOrder.RemoveAt(i);
+                            }
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+
+                for (int i = 0; i < EnabledSubmods.Count; i++)
+                {
+                    if (!(prefs.LoadOrder.Contains(EnabledSubmods.ElementAt(i).ID.ToString())))
+                    {
+                        prefs.LoadOrder.Add(EnabledSubmods.ElementAt(i).ID.ToString());
+                    }
+                }
+
+                var SubmodLoadOrder = new List<string>();
+
+                for (var i = 0; i < prefs.LoadOrder.Count; i++)
+                {
+                    ulong id = 0;
+                    bool success = ulong.TryParse(prefs.LoadOrder.ElementAt(i), out id);
+
+                    if (success)
+                    {
+                        var install = SubmodService.GetSubmodInstallInfo(id);
+                        prefs.LoadOrder.RemoveAt(i);
+                        prefs.LoadOrder.Insert(i, install.FileName);
+                    }
+
+                }
+
+                foreach (var item in prefs.LoadOrder)
+                {
+                    SubmodLoadOrder.Add(item);
+                }
+
+                WritePrefs(prefs);
+
+                foreach (var mod in prefs.LoadOrder)
+                {
+                    if (mod == "rom_base")
+                    {
+                        foreach (string pack in Version.InstalledPackFiles)
+                        {
+                            if (Arguments == "")
+                            {
+                                Arguments = $"mod {pack};";
+                            }
+                            else
+                            {
+                                Arguments = Arguments + $" mod {pack};";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        SubmodService = new APISteamSubmodService();
+                        var submod = SubmodService.GetSubmodInstallInfo(ulong.Parse(mod));
+
+                        if (submod.IsInstalled)
+                        {
+                            if (Arguments == "")
+                            {
+                                Arguments = @"add_working_directory """ + submod.InstallFolder + @""";";
+                                Arguments = Arguments + @" mod """ + submod.FileName + @""";";
+                            }
+                            else
+                            {
+                                Arguments = Arguments + @" add_working_directory """ + submod.InstallFolder + @""";";
+                                Arguments = Arguments + @" mod """ + submod.FileName + @""";";
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                foreach (string pack in Version.InstalledPackFiles)
+                {
+                    if (Arguments == "")
+                    {
+                        Arguments = $"mod {pack};";
+                    }
+                    else
+                    {
+                        Arguments = Arguments + $" mod {pack};";
+                    }
                 }
             }
 
@@ -202,6 +327,134 @@ namespace RiseofMordorLauncher
         private void DownloadProgressUpdate(object sender, int percent_finished)
         {
             ProgressBarProgress = percent_finished;
+        }
+
+        private async void DisableSubmod(string id)
+        {
+            string output = "";
+
+            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            {
+                return;
+            }
+
+            string[] lines = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
+            if (lines.Count() == 0)
+            {
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                return;
+            }
+            else
+            {
+                if (lines.Contains(id))
+                {
+                    if (lines.ToString() == id)
+                    {
+                        try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                        return;
+                    }
+                    else
+                    {
+                        foreach (var line in lines)
+                        {
+                            if (output == "")
+                            {
+                                if (line == id)
+                                {
+
+                                }
+                                else
+                                {
+                                    output = line;
+                                }
+                            }
+                            else
+                            {
+                                if (line == id)
+                                {
+
+                                }
+                                else
+                                {
+                                    output = output + Environment.NewLine + line;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    output = string.Join(Environment.NewLine, lines);
+                }
+            }
+
+            using (StreamWriter writer = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            {
+                writer.Write(output);
+            }
+        }
+
+
+        private void WritePrefs(UserPreferences prefs2)
+        {
+            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+                File.CreateText($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt");
+
+            if (File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            {
+
+                var EnabledSubmodsRaw = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
+                List<SubmodInstallation> EnabledSubmods2 = new List<SubmodInstallation>();
+
+                for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
+                {
+                    SubmodInstallation installation = new SubmodInstallation();
+                    installation = SubmodService.GetSubmodInstallInfo(ulong.Parse(EnabledSubmodsRaw.ElementAt(i)));
+
+                    if (installation.IsInstalled)
+                    {
+                        EnabledSubmods2.Add(installation);
+                    }
+                    else
+                    {
+                        DisableSubmod(EnabledSubmodsRaw.ElementAt(i));
+                    }
+                }
+
+                for (int i = 0; i < prefs2.LoadOrder.Count; i++)
+                {
+                    if (!EnabledSubmods2.Any(s => s.FileName == prefs2.LoadOrder.ElementAt(i)) && prefs2.LoadOrder.ElementAt(i) != "rom_base")
+                    {
+                        prefs2.LoadOrder.RemoveAt(i);
+                    }
+                    else
+                    {
+                        foreach (var submod in EnabledSubmods2)
+                        {
+                            if (submod.FileName == prefs2.LoadOrder.ElementAt(i))
+                            {
+                                prefs2.LoadOrder.RemoveAt(i);
+                                prefs2.LoadOrder.Insert(i, submod.ID.ToString());
+                            }
+                        }
+                    }
+                }
+            }
+
+            string output = $"auto_update={prefs2.AutoUpdate}{Environment.NewLine}load_order = {{";
+
+            foreach (string pack in prefs2.LoadOrder)
+            {
+                output = output + Environment.NewLine + pack;
+            }
+
+            output = output + Environment.NewLine + "}";
+
+            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            {
+                x.Write(output);
+            }
+
         }
         protected virtual void SwitchPage(ApplicationPage page)
         {

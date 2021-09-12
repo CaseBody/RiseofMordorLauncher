@@ -27,7 +27,34 @@
                 <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
 
-            <TextBlock Text="Rise of Mordor Submods" Foreground="#fc9b00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="60"/>
+        <Button
+        Style="{StaticResource DarkButton}"
+        Width="140"
+        Height="40"
+        Margin="20 0 0 0"
+        HorizontalAlignment="Left"
+        Foreground="#a82c26"
+        BorderThickness="0"
+        FontSize="20"
+        FontWeight="SemiBold"
+        Content="Back"
+        Command="{Binding BackCommand}"
+        />
+
+        <Button
+        Style="{StaticResource DarkButton}"
+        Width="140"
+        Height="40"
+        Margin="0 0 20 0"
+        HorizontalAlignment="Right"
+        Foreground="#a82c26"
+        BorderThickness="0"
+        FontSize="20"
+        FontWeight="SemiBold"
+        Content="Submit Mod"
+        Command="{Binding SubmitCommand}"
+        />
+        <Image Source="../Images/submods_title.png" Height="200" Width="480" Margin="0 -30 0 0" RenderOptions.BitmapScalingMode="Fant"/>
 
         <ScrollViewer Grid.Row="2" Margin="40 20" VerticalScrollBarVisibility="Hidden">
             <Grid>

@@ -22,11 +22,19 @@ namespace RiseofMordorLauncher
         private string                  _latestPreviewURL;
 
         public BitmapImage PreviewImage { get; private set; }
+        public Visibility ShowPreview { get; private set; } = Visibility.Visible;
 
-        public LatestPreviewViewModel()
+        public LatestPreviewViewModel(SharedData sharedData)
         {
-            PreviewImage = new BitmapImage();
-            MainAsync();
+            if (sharedData.IsOffline)
+            {
+                ShowPreview = Visibility.Hidden;
+            }
+            else
+            {
+                PreviewImage = new BitmapImage();
+                MainAsync();
+            }
         }
 
         public async Task MainAsync()

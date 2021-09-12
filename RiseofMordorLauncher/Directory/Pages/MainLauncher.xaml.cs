@@ -22,10 +22,10 @@ namespace RiseofMordorLauncher.Directory.Pages
     /// </summary>
     public partial class MainLauncher : Page
     {
-        public MainLauncher()
+        public MainLauncher(SharedData sharedData)
         {
             InitializeComponent();
-            LatestPreviewFrame.DataContext = new LatestPreviewViewModel();
+            LatestPreviewFrame.DataContext = new LatestPreviewViewModel(sharedData);
         }
 
         //private void Expander_MouseEnter(object sender, MouseEventArgs e)

@@ -23,6 +23,9 @@ namespace RiseofMordorLauncher
         public ObservableCollection<SubmodModel> SubmodsList2 { get; private set; }
         public ObservableCollection<SubmodModel> SubmodsList3 { get; private set; }
         public List<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
+
+        public event EventHandler<ApplicationPage> SwitchPageEvent;
+
         private System.Timers.Timer SubmodDownloadTimer;
 
         ISteamSubmodsService steamSubmodsService = new APISteamSubmodService();
@@ -402,7 +405,28 @@ namespace RiseofMordorLauncher
             }
 
         }
+        protected virtual void SwitchPage(ApplicationPage page)
+        {
+            SwitchPageEvent?.Invoke(this, page);
+        }
 
+        private ICommand _BackCommand;
+        private ICommand _SubmitCommand;
+        public ICommand BackCommand
+        {
+            get
+            {
+                return _BackCommand ?? (_BackCommand = new CommandHandler(() => SwitchPage(ApplicationPage.MainLauncher), () => true));
+            }
+        }
+
+        public ICommand SubmitCommand
+        {
+            get
+            {
+                return _SubmitCommand ?? (_SubmitCommand = new CommandHandler(() => { MessageBox.Show("Creator of a Rise of Mordor submod? Contact Case#9810 on Discord to get your submod approved and added to the list.", "Submit a Submod"); }, () => true));
+            }
+        }
 
     }
 }

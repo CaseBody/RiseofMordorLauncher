@@ -78,7 +78,7 @@ namespace RiseofMordorLauncher
             bool didInit = SteamAPI.Init();
             if (didInit == false)
             {
-                DisplayError("STEAM ERROR", "The Steam API failed to initiliase.", false, false);
+                DisplayError("STEAM ERROR", "The Steam client was not detected. Please ensure you have Steam opened.", false, false);
             }
 
             return didInit;
@@ -126,14 +126,15 @@ namespace RiseofMordorLauncher
                 bool isOnline = reply.Status == IPStatus.Success;
                 if (isOnline == false)
                 {
-                    DisplayError("NO INTERNET", "An internet connection could not be made. You will not be able to download updates until you reconnect.", false, false);
+                    DisplayError("NO INTERNET", "An internet connection could not be made. You will not be able to download updates until you reconnect.", true, false);
                 }
 
                 return isOnline;
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                DisplayError("NO INTERNET", "An internet connection could not be made. You will not be able to download updates until you reconnect.", true, false);
+                return false;
             }
 
             return false;

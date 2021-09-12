@@ -58,6 +58,7 @@ namespace RiseofMordorLauncher
                             if (line.StartsWith("version"))
                             {
                                 string raw_version = line.Split('=').ElementAt(1);
+                                version.VersionText = raw_version;
                                 char[] char_array = raw_version.ToCharArray();
                                 string final = "";
                                 bool has_hit_first_dot = false;

@@ -39,6 +39,8 @@ namespace RiseofMordorLauncher
                 //    Attila.WaitForInputIdle();
 
                 DataContext = viewModel;
+                viewModel.MinimizeEvent += Minimize;
+                viewModel.CloseEvent += Close;
 
             }
             catch (Exception ex)
@@ -51,6 +53,16 @@ namespace RiseofMordorLauncher
         {
             if (e.ChangedButton == MouseButton.Left)
                 DragMove();
+        }
+
+        private void Minimize(object sender, EventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void Close(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

@@ -43,9 +43,10 @@ namespace RiseofMordorLauncher
             steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
             steamSubmodsService.GetSubmods(sharedData);
 
-            Thread DownloadUpdateThread = new Thread(SetupTimer);
-            DownloadUpdateThread.IsBackground = true;
-            DownloadUpdateThread.Start();
+            SubmodDownloadTimer = new System.Timers.Timer(300);
+            SubmodDownloadTimer.Elapsed += (o, s) => Task.Factory.StartNew(() => CheckDownloads(o, s));
+            SubmodDownloadTimer.AutoReset = true;
+            SubmodDownloadTimer.Start();
         }
 
         private void LoadSubmodData(object sender, List<SubmodModel> submods)
@@ -207,13 +208,6 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private void SetupTimer()
-        {
-            SubmodDownloadTimer = new System.Timers.Timer(300);
-            SubmodDownloadTimer.Elapsed += CheckDownloads;
-            SubmodDownloadTimer.AutoReset = true;
-            SubmodDownloadTimer.Start();
-        }
         private void CheckDownloads(object source, ElapsedEventArgs e)
         {
             try

@@ -19,10 +19,10 @@ namespace RiseofMordorLauncher
 {
     class SubmodsViewModel : BaseViewModel
     {
-        public ObservableCollection<SubmodModel> SubmodsList1 { get; private set; }
-        public ObservableCollection<SubmodModel> SubmodsList2 { get; private set; }
-        public ObservableCollection<SubmodModel> SubmodsList3 { get; private set; }
-        public List<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
+        public IList<SubmodModel> SubmodsList1 { get; private set; }
+        public IList<SubmodModel> SubmodsList2 { get; private set; }
+        public IList<SubmodModel> SubmodsList3 { get; private set; }
+        public IList<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
 

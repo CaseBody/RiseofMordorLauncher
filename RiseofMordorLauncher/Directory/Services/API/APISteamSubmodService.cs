@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using System.Windows;
 
 namespace RiseofMordorLauncher
 {
@@ -146,8 +147,10 @@ namespace RiseofMordorLauncher
 
                 submodList.Add(submod);
             }
-
-            SubmodDataFinishedEvent?.Invoke(this, submodList);
+            
+            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+                SubmodDataFinishedEvent?.Invoke(this, submodList);
+            }));
         }
 
         public SubmodInstallation GetSubmodInstallInfo(ulong id)

@@ -33,23 +33,22 @@ namespace RiseofMordorLauncher
 
         public SubmodsViewModel()
         {
-        }
-
-        public async void Load()
-        {
-            steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
-            steamSubmodsService.GetSubmods(sharedData);
-
             SubmodsList1 = new ObservableCollection<SubmodModel>();
             SubmodsList2 = new ObservableCollection<SubmodModel>();
             SubmodsList3 = new ObservableCollection<SubmodModel>();
+        }
+
+        public void Load()
+        {
+            steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
+            steamSubmodsService.GetSubmods(sharedData);
 
             Thread DownloadUpdateThread = new Thread(SetupTimer);
             DownloadUpdateThread.IsBackground = true;
             DownloadUpdateThread.Start();
         }
 
-        private async void LoadSubmodData(object sender, List<SubmodModel> submods)
+        private void LoadSubmodData(object sender, List<SubmodModel> submods)
         {
             submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
 
@@ -59,40 +58,35 @@ namespace RiseofMordorLauncher
             {
                 if (current_list == 1)
                 {
-
-                        SubmodsList1.Add(submod);
-
+                    SubmodsList1.Add(submod);
                     current_list = 2;
                 }
                 else if (current_list == 2)
                 {
-
-                        SubmodsList2.Add(submod);
-
+                    SubmodsList2.Add(submod);
                     current_list = 3;
                 }
                 else
                 {
-
-                       SubmodsList3.Add(submod);
-
+                    SubmodsList3.Add(submod);
                     current_list = 1;
                 }
 
-                submod.VisitSteamPressed += VisitSteamPressed;
-                submod.SubscribeButtonPressed += SubscribeButtonPressed;
-                submod.EnableButtonPressed += EnableButtonPressed;
-                submod.UpvoteButtonPressed += UpvoteButtonPressed;
-                submod.DownvoteButtonPressed += DownvoteButtonPressed;
+                submod.VisitSteamPressed        += VisitSteamPressed;
+                submod.SubscribeButtonPressed   += SubscribeButtonPressed;
+                submod.EnableButtonPressed      += EnableButtonPressed;
+                submod.UpvoteButtonPressed      += UpvoteButtonPressed;
+                submod.DownvoteButtonPressed    += DownvoteButtonPressed;
             }
         }
-        private async void VisitSteamPressed(object sender, EventArgs e)
-        {
-            SubmodModel submod = (SubmodModel)sender;
 
+        private void VisitSteamPressed(object sender, EventArgs e)
+        {
+            var submod = sender as SubmodModel;
             Process.Start($"https://steamcommunity.com/sharedfiles/filedetails/?id={submod.SubmodSteamId}");
         }
-        private async void SubscribeButtonPressed(object sender, EventArgs e)
+
+        private void SubscribeButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
             PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
@@ -138,7 +132,8 @@ namespace RiseofMordorLauncher
                 submod.ProgressBarValue = 2;
             }
         }
-        private async void EnableButtonPressed(object sender, EventArgs e)
+
+        private void EnableButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
             PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
@@ -158,7 +153,8 @@ namespace RiseofMordorLauncher
                 submod.EnableButtonText = "ENABLE";
             }
         }
-        private async void UpvoteButtonPressed(object sender, EventArgs e)
+
+        private void UpvoteButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
 
@@ -184,7 +180,7 @@ namespace RiseofMordorLauncher
                 SteamUGC.SetUserItemVote(item, true);
             }
         }
-        private async void DownvoteButtonPressed(object sender, EventArgs e)
+        private void DownvoteButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
 
@@ -296,7 +292,8 @@ namespace RiseofMordorLauncher
             }
             catch { }
         }
-        private async void EnableSubmod(SubmodModel submod)
+
+        private void EnableSubmod(SubmodModel submod)
         {
             string output = "";
 
@@ -326,7 +323,8 @@ namespace RiseofMordorLauncher
                 writer.Write(output);
             }
         }
-        private async void DisableSubmod(SubmodModel submod)
+
+        private void DisableSubmod(SubmodModel submod)
         {
             string output = "";
 

@@ -112,6 +112,8 @@ namespace RiseofMordorLauncher
             if (SharedData.IsOffline && Version.InstalledVersionNumber == 0)
             {
                 MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: Rise of Mordor");
+                PlayButtonText = "UPDATING";
+                PlayButtonEnabled = false;
             }
             else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
             {

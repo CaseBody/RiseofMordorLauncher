@@ -37,14 +37,12 @@ namespace RiseofMordorLauncher
 
         public async void Load()
         {
-            await Application.Current.Dispatcher.BeginInvoke(
-                new ThreadStart(() =>
-                {
-                    steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
-
-                })
-            );
+            steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
             steamSubmodsService.GetSubmods(sharedData);
+
+            SubmodsList1 = new ObservableCollection<SubmodModel>();
+            SubmodsList2 = new ObservableCollection<SubmodModel>();
+            SubmodsList3 = new ObservableCollection<SubmodModel>();
 
             Thread DownloadUpdateThread = new Thread(SetupTimer);
             DownloadUpdateThread.IsBackground = true;
@@ -56,40 +54,28 @@ namespace RiseofMordorLauncher
             submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
 
             int current_list = 1;
-            SubmodsList1 = new ObservableCollection<SubmodModel>();
-            SubmodsList2 = new ObservableCollection<SubmodModel>();
-            SubmodsList3 = new ObservableCollection<SubmodModel>();
 
             foreach (var submod in submods)
             {
                 if (current_list == 1)
                 {
-                    await Application.Current.Dispatcher.BeginInvoke(
-                    new ThreadStart(() =>
-                    {
+
                         SubmodsList1.Add(submod);
-                     })
-                    );
+
                     current_list = 2;
                 }
                 else if (current_list == 2)
                 {
-                    await Application.Current.Dispatcher.BeginInvoke(
-                    new ThreadStart(() =>
-                    {
+
                         SubmodsList2.Add(submod);
-                    })
-                    );
+
                     current_list = 3;
                 }
                 else
                 {
-                    await Application.Current.Dispatcher.BeginInvoke(
-                    new ThreadStart(() =>
-                    {
-                        SubmodsList3.Add(submod);
-                    })
-                    );
+
+                       SubmodsList3.Add(submod);
+
                     current_list = 1;
                 }
 

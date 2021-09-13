@@ -29,6 +29,7 @@ namespace RiseofMordorLauncher
             if (sharedData.IsOffline)
             {
                 ShowPreview = Visibility.Hidden;
+                OnPropertyChanged(nameof(ShowPreview));
             }
             else
             {
@@ -63,23 +64,34 @@ namespace RiseofMordorLauncher
 
         private Task OnDiscordClientConnected()
         {
-            _previewChannel = _client.GetChannel(PREVIEWS_CHANNEL_ID) as ISocketMessageChannel;
-            var lastMessageAsync = _previewChannel.GetMessagesAsync(1);
-            var lastMsgArr = AsyncEnumerableExtensions.FlattenAsync(lastMessageAsync);
-            var lastMsg = lastMsgArr.Result.First();
-            var attachment = lastMsg.Attachments.FirstOrDefault();
-            _latestPreviewURL = attachment.Url;
+            try
+            {
+                _previewChannel = _client.GetChannel(PREVIEWS_CHANNEL_ID) as ISocketMessageChannel;
+                var lastMessageAsync = _previewChannel.GetMessagesAsync(1);
+                var lastMsgArr = AsyncEnumerableExtensions.FlattenAsync(lastMessageAsync);
+                var lastMsg = lastMsgArr.Result.First();
+                var attachment = lastMsg.Attachments.FirstOrDefault();
 
-            Application.Current.Dispatcher.BeginInvoke(
-                new ThreadStart(() =>
+                if (lastMsg.Attachments.Count > 0)
                 {
-                    PreviewImage.BeginInit();
-                    PreviewImage.UriSource = new Uri(_latestPreviewURL, UriKind.Absolute);
-                    PreviewImage.EndInit();
+                    _latestPreviewURL = attachment.Url;
 
-                    OnPropertyChanged(nameof(PreviewImage));
-                })
-            );
+                    Application.Current.Dispatcher.BeginInvoke(
+                        new ThreadStart(() =>
+                        {
+                            PreviewImage.BeginInit();
+                            PreviewImage.UriSource = new Uri(_latestPreviewURL, UriKind.Absolute);
+                            PreviewImage.EndInit();
+
+                            OnPropertyChanged(nameof(PreviewImage));
+                        })
+                    );
+                }
+            }
+            catch
+            {
+                ShowPreview = Visibility.Hidden;
+            }
 
             return Task.CompletedTask;
         }

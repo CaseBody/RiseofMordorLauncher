@@ -115,8 +115,22 @@ namespace RiseofMordorLauncher
             }
             else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
             {
-                DownloadUpdate();
-                Version = await _modVersionService.GetModVersionInfo(SharedData);
+                UserPreferencesService = new APIUserPreferencesService();
+                var prefs = UserPreferencesService.GetUserPreferences(SharedData);
+
+                if (prefs.AutoUpdate)
+                {
+                    DownloadUpdate();
+                    Version = await _modVersionService.GetModVersionInfo(SharedData);
+                }
+                else
+                {
+                    if (MessageBox.Show($"A new update is available for download, would you like to download it?", "Update Available", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        DownloadUpdate();
+                        Version = await _modVersionService.GetModVersionInfo(SharedData);
+                    }
+                }
             }
         }
 

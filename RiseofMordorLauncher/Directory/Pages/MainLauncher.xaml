@@ -176,7 +176,7 @@
                                Opacity="0.8"
                                TextAlignment="Left"
                                Padding="5"
-                               Text="Featured Video"
+                               Text="Latest Video"
                                FontSize="12"
                                Foreground="White"
                                FontWeight="Bold"

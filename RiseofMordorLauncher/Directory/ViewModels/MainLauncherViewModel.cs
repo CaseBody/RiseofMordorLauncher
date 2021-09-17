@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using RiseofMordorLauncher.Directory.Pages;
-
+using DiscordRPC;
 
 namespace RiseofMordorLauncher
 {
@@ -26,6 +26,7 @@ namespace RiseofMordorLauncher
         private IModVersionService _modVersionService;
         private IUserPreferencesService UserPreferencesService;
         private ISteamSubmodsService SubmodService;
+        private ILauncherVersionService launcherVersionService;
 
         private Thread downloadThread;
 
@@ -45,6 +46,8 @@ namespace RiseofMordorLauncher
         public bool SubmodButtonEnabled { get; set; } = true;
         public int ProgressBarProgress { get; set; }
         private ModVersion Version { get; set; }
+        private LauncherVersion LauncherVersion { get; set; }
+
         public Visibility SettingsVisibility { get; set; } = Visibility.Hidden;
         public Settings SettingsPage { get; set; } = new Settings();
         private SettingsViewModel SettingsPageViewModel { get; set; }
@@ -101,6 +104,9 @@ namespace RiseofMordorLauncher
             Version = await _modVersionService.GetModVersionInfo(SharedData);
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
+
+            launcherVersionService = new APILauncherVersionInfo();
+            LauncherVersion = await launcherVersionService.GetLauncherVersionInfo(SharedData);
 
             downloadThread = new Thread(PostUiLoadAsync);
             downloadThread.IsBackground = true;
@@ -182,6 +188,45 @@ namespace RiseofMordorLauncher
             Version = await _modVersionService.GetModVersionInfo(SharedData);
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
+        }
+
+        private async void DownloadLauncherUpdate()
+        {
+            PlayButtonText = "UPDATING LAUNCHER";
+            PlayButtonEnabled = false;
+            PlayButtonMargin = "350 30";
+            SubmodButtonEnabled = false;
+            ShowProgressBar = Visibility.Visible;
+
+            IGoogleDriveService googleDriveService = new APIGoogleDriveService();
+            googleDriveService.DownloadUpdate += DownloadProgressUpdate;
+            await googleDriveService.DownloadFile("launcher.rar", $"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar", LauncherVersion.DownloadNumberOfBytes);
+            ProgressBarProgress = 100;
+
+            System.IO.Directory.CreateDirectory($"{System.IO.Directory.GetCurrentDirectory()}/temp/");
+            ProgressText = "APPLYING LAUNCHER UPDATE";
+            using (var archive = RarArchive.Open($"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar"))
+            {
+                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                {
+                    entry.WriteToDirectory(System.IO.Directory.GetCurrentDirectory() + "/temp/", new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+                }
+            }
+
+            File.Delete($"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar");
+            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_launcher_version.txt"); } catch { }
+            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_launcher_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_launcher_version.txt");
+
+            Process Launcher = new Process();
+            Launcher.StartInfo.FileName = $"{System.IO.Directory.GetCurrentDirectory()}/temp/RiseofMordorLauncher.exe";
+            Launcher.StartInfo.Arguments = "update_1";
+            Launcher.Start();
+
+            Process.GetCurrentProcess().Kill();
         }
 
         private void LaunchGame()
@@ -333,10 +378,32 @@ namespace RiseofMordorLauncher
                 SettingsPageViewModel = new SettingsViewModel(SharedData);
                 SettingsPage.DataContext = SettingsPageViewModel;
                 SettingsVisibility = Visibility.Visible;
+
+                SharedData.RPCClient.SetPresence(new RichPresence()
+                {
+                    Details = "Rise of Mordor Launcher",
+                    State = "Tweaking Settings",
+                    Assets = new Assets()
+                    {
+                        LargeImageKey = "large_image",
+                        LargeImageText = "discord.com/riseofmordor",
+                    }
+                });
             }
             else
             {
                 SettingsVisibility = Visibility.Hidden;
+
+                SharedData.RPCClient.SetPresence(new RichPresence()
+                {
+                    Details = "Rise of Mordor Launcher",
+                    State = "On the main page",
+                    Assets = new Assets()
+                    {
+                        LargeImageKey = "large_image",
+                        LargeImageText = "discord.com/riseofmordor",
+                    }
+                });
             }
         }
 

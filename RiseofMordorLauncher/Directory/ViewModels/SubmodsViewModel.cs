@@ -36,6 +36,7 @@ namespace RiseofMordorLauncher
             SubmodsList1 = new ObservableCollection<SubmodModel>();
             SubmodsList2 = new ObservableCollection<SubmodModel>();
             SubmodsList3 = new ObservableCollection<SubmodModel>();
+
         }
 
         public void Load()
@@ -51,34 +52,42 @@ namespace RiseofMordorLauncher
 
         private void LoadSubmodData(object sender, List<SubmodModel> submods)
         {
-            submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
+            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+                LoadSubmodData2(this, submods);
+            }));
+        }
 
-            int current_list = 1;
+        private void LoadSubmodData2(object sender, List<SubmodModel> submods)
+        {
+            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+                submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
+                int current_list = 1;
 
-            foreach (var submod in submods)
-            {
-                if (current_list == 1)
+                foreach (var submod in submods)
                 {
-                    SubmodsList1.Add(submod);
-                    current_list = 2;
-                }
-                else if (current_list == 2)
-                {
-                    SubmodsList2.Add(submod);
-                    current_list = 3;
-                }
-                else
-                {
-                    SubmodsList3.Add(submod);
-                    current_list = 1;
-                }
+                    if (current_list == 1)
+                    {
+                        SubmodsList1.Add(submod);
+                        current_list = 2;
+                    }
+                    else if (current_list == 2)
+                    {
+                        SubmodsList2.Add(submod);
+                        current_list = 3;
+                    }
+                    else
+                    {
+                        SubmodsList3.Add(submod);
+                        current_list = 1;
+                    }
 
-                submod.VisitSteamPressed        += VisitSteamPressed;
-                submod.SubscribeButtonPressed   += SubscribeButtonPressed;
-                submod.EnableButtonPressed      += EnableButtonPressed;
-                submod.UpvoteButtonPressed      += UpvoteButtonPressed;
-                submod.DownvoteButtonPressed    += DownvoteButtonPressed;
-            }
+                    submod.VisitSteamPressed += VisitSteamPressed;
+                    submod.SubscribeButtonPressed += SubscribeButtonPressed;
+                    submod.EnableButtonPressed += EnableButtonPressed;
+                    submod.UpvoteButtonPressed += UpvoteButtonPressed;
+                    submod.DownvoteButtonPressed += DownvoteButtonPressed;
+                }
+            }));
         }
 
         private void VisitSteamPressed(object sender, EventArgs e)
@@ -405,6 +414,5 @@ namespace RiseofMordorLauncher
                 return _SubmitCommand ?? (_SubmitCommand = new CommandHandler(() => { MessageBox.Show("Creator of a Rise of Mordor submod? Contact Case#9810 on Discord to get your submod approved and added to the list.", "Submit a Submod"); }, () => true));
             }
         }
-
     }
 }

@@ -75,21 +75,30 @@ namespace RiseofMordorLauncher
 
         void OnSteamUGCQueryCompleted(SteamUGCQueryCompleted_t pCallback, bool bIOFailure)
         {
-            // Create SubmodModel list and populate.
-            submodList = new List<SubmodModel>();
-            for (uint i = 0; i < amount; i++)
-            {
-                SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out SteamUGCDetails_t detail);
-                SubmodModel submod = new SubmodModel();
-
-                if (enabled_submods.Count() >= 1)
+            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+                // Create SubmodModel list and populate.
+                submodList = new List<SubmodModel>();
+                for (uint i = 0; i < amount; i++)
                 {
-                    if (enabled_submods.Contains(detail.m_nPublishedFileId.m_PublishedFileId.ToString()))
+                    SteamUGC.GetQueryUGCResult(pCallback.m_handle, i, out SteamUGCDetails_t detail);
+                    SubmodModel submod = new SubmodModel();
+
+                    if (enabled_submods.Count() >= 1)
                     {
-                        submod.IsEnabled = true;
-                        submod.EnableButtonBackground = Brushes.Red;
-                        submod.EnableButtonText = "DISABLE";
-                        submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
+                        if (enabled_submods.Contains(detail.m_nPublishedFileId.m_PublishedFileId.ToString()))
+                        {
+                            submod.IsEnabled = true;
+                            submod.EnableButtonBackground = Brushes.Red;
+                            submod.EnableButtonText = "DISABLE";
+                            submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
+                        }
+                        else
+                        {
+                            submod.IsEnabled = false;
+                            submod.EnableButtonBackground = SharedData.NiceGreen;
+                            submod.EnableButtonText = "ENABLE";
+                            submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
+                        }
                     }
                     else
                     {
@@ -98,59 +107,54 @@ namespace RiseofMordorLauncher
                         submod.EnableButtonText = "ENABLE";
                         submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
                     }
-                }
-                else
-                {
-                    submod.IsEnabled = false;
-                    submod.EnableButtonBackground = SharedData.NiceGreen;
-                    submod.EnableButtonText = "ENABLE";
-                    submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
-                }
-                if (SubscribedSubmods.Contains(detail.m_nPublishedFileId))
-                {
-                    submod.IsInstalled = true;
-                    submod.SubscribeButtonBackground = Brushes.Red;
-                    submod.SubscribeButtonText = "UNSUBSCRIBE";
-                    submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
-
-                    string install_dir = "";
-                    if (SteamUGC.GetItemInstallInfo(detail.m_nPublishedFileId, out _, out install_dir, (uint)install_dir.ToCharArray().Count(), out _))
+                    if (SubscribedSubmods.Contains(detail.m_nPublishedFileId))
                     {
-                        submod.InstallDir = install_dir;
+                        submod.IsInstalled = true;
+                        submod.SubscribeButtonBackground = Brushes.Red;
+                        submod.SubscribeButtonText = "UNSUBSCRIBE";
+                        submod.EnableButtonVisibility = System.Windows.Visibility.Visible;
+
+                        string install_dir = "";
+                        if (SteamUGC.GetItemInstallInfo(detail.m_nPublishedFileId, out _, out install_dir, (uint)install_dir.ToCharArray().Count(), out _))
+                        {
+                            submod.InstallDir = install_dir;
+                        }
                     }
+                    else
+                    {
+                        submod.IsInstalled = false;
+                        submod.SubscribeButtonBackground = SharedData.NiceGreen;
+                        submod.SubscribeButtonText = "SUBSCRIBE";
+                        submod.EnableButtonVisibility = System.Windows.Visibility.Hidden;
+                    }
+
+                    submod.SubmodName = detail.m_rgchTitle;
+                    submod.SubmodSteamId = detail.m_nPublishedFileId.m_PublishedFileId.ToString();
+                    submod.SubmodDesc = detail.m_rgchDescription;
+                    submod.UpvoteCount = (short)detail.m_unVotesUp;
+                    submod.DownvoteCount = (short)detail.m_unVotesDown;
+                    submod.SteamId = detail.m_nPublishedFileId.ToString();
+                    submod.ProgressBarVisibility = System.Windows.Visibility.Hidden;
+
+                    string thumbUrl = "";
+                    SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out thumbUrl, 1000);
+                    submod.ThumbnailPath = thumbUrl;
+
+                    if (submod.SubmodName.Length > 34)
+                    {
+                        submod.SubmodName = submod.SubmodName.Substring(0, 32);
+                        submod.SubmodName = submod.SubmodName + "...";
+                    }
+
+                    submodList.Add(submod);
                 }
-                else
-                {
-                    submod.IsInstalled = false;
-                    submod.SubscribeButtonBackground = SharedData.NiceGreen;
-                    submod.SubscribeButtonText = "SUBSCRIBE";
-                    submod.EnableButtonVisibility = System.Windows.Visibility.Hidden;
-                }
 
-                submod.SubmodName = detail.m_rgchTitle;
-                submod.SubmodSteamId = detail.m_nPublishedFileId.m_PublishedFileId.ToString();
-                submod.SubmodDesc = detail.m_rgchDescription;
-                submod.UpvoteCount = (short)detail.m_unVotesUp;
-                submod.DownvoteCount = (short)detail.m_unVotesDown;
-                submod.SteamId = detail.m_nPublishedFileId.ToString();
-                submod.ProgressBarVisibility = System.Windows.Visibility.Hidden;
-
-                string thumbUrl = "";
-                SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out thumbUrl, 1000);
-                submod.ThumbnailPath = thumbUrl;
-
-                if (submod.SubmodName.Length > 34)
-                {
-                    submod.SubmodName = submod.SubmodName.Substring(0, 32);
-                    submod.SubmodName = submod.SubmodName + "...";
-                }
-
-                submodList.Add(submod);
-            }
-            
-            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
-                SubmodDataFinishedEvent?.Invoke(this, submodList);
+                Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+                    SubmodDataFinishedEvent?.Invoke(this, submodList);
+                }));
             }));
+
+            
         }
 
         public SubmodInstallation GetSubmodInstallInfo(ulong id)

@@ -231,9 +231,6 @@
     <Resource Include="Directory\Images\rom_logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Directory\Images\thumbnail.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Directory\Images\play_button.png" />
   </ItemGroup>
   <ItemGroup>

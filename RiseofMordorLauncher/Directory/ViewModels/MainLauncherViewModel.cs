@@ -78,7 +78,6 @@ namespace RiseofMordorLauncher
             }
         }
 
-
         public async Task Load()
         {
             // get steam user data
@@ -545,7 +544,7 @@ namespace RiseofMordorLauncher
         }
         protected virtual void SwitchPage(ApplicationPage page)
         {
-            SwitchPageEvent.Invoke(this, page);
+            SwitchPageEvent?.Invoke(this, page);
         }
 
     }

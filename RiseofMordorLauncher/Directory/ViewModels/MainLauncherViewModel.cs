@@ -26,7 +26,7 @@ namespace RiseofMordorLauncher
         private IModVersionService _modVersionService;
         private IUserPreferencesService UserPreferencesService;
         private ISteamSubmodsService SubmodService;
-        private ILauncherVersionService launcherVersionService;
+        //private ILauncherVersionService launcherVersionService;
 
         private Thread downloadThread;
 
@@ -52,6 +52,8 @@ namespace RiseofMordorLauncher
         public Settings SettingsPage { get; set; } = new Settings();
         private SettingsViewModel SettingsPageViewModel { get; set; }
         
+        public LatestPreviewViewModel LatestPreviewVM { get; private set; }
+
         private ICommand _PlayCommand;
         private ICommand _SettingsCommand;
         private ICommand _submodsPageCmd;
@@ -78,7 +80,7 @@ namespace RiseofMordorLauncher
             }
         }
 
-        public async Task Load()
+        public async void Load()
         {
             // get steam user data
             _steamUserService = new APISteamUserService();
@@ -107,6 +109,10 @@ namespace RiseofMordorLauncher
             downloadThread = new Thread(PostUiLoadAsync);
             downloadThread.IsBackground = true;
             downloadThread.Start();
+
+            LatestPreviewVM = new LatestPreviewViewModel(SharedData);
+
+            SwitchPage(ApplicationPage.MainLauncher);
         }
 
         private async void PostUiLoadAsync()
@@ -140,7 +146,6 @@ namespace RiseofMordorLauncher
 
         private async void DownloadUpdate()
         {
-
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
             PlayButtonMargin = "350 30";
@@ -415,7 +420,7 @@ namespace RiseofMordorLauncher
             ProgressBarProgress = percent_finished;
         }
 
-        private async void DisableSubmod(string id)
+        private void DisableSubmod(string id)
         {
             string output = "";
 

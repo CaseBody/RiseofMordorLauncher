@@ -50,16 +50,18 @@ namespace RiseofMordorLauncher
             SubmodDownloadTimer.Start();
         }
 
+        //private void LoadSubmodData(object sender, List<SubmodModel> submods)
+        //{
+        //    Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() =>
+        //    {
+        //        LoadSubmodData2(this, submods);
+        //    }));
+        //}
+
         private void LoadSubmodData(object sender, List<SubmodModel> submods)
         {
-            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
-                LoadSubmodData2(this, submods);
-            }));
-        }
-
-        private void LoadSubmodData2(object sender, List<SubmodModel> submods)
-        {
-            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() => {
+            Application.Current.Dispatcher.BeginInvoke(new ThreadStart(() =>
+            {
                 submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
                 int current_list = 1;
 
@@ -81,11 +83,11 @@ namespace RiseofMordorLauncher
                         current_list = 1;
                     }
 
-                    submod.VisitSteamPressed += VisitSteamPressed;
-                    submod.SubscribeButtonPressed += SubscribeButtonPressed;
-                    submod.EnableButtonPressed += EnableButtonPressed;
-                    submod.UpvoteButtonPressed += UpvoteButtonPressed;
-                    submod.DownvoteButtonPressed += DownvoteButtonPressed;
+                    submod.VisitSteamPressed        += VisitSteamPressed;
+                    submod.SubscribeButtonPressed   += SubscribeButtonPressed;
+                    submod.EnableButtonPressed      += EnableButtonPressed;
+                    submod.UpvoteButtonPressed      += UpvoteButtonPressed;
+                    submod.DownvoteButtonPressed    += DownvoteButtonPressed;
                 }
             }));
         }

@@ -25,7 +25,6 @@ namespace RiseofMordorLauncher.Directory.Pages
         public MainLauncher(SharedData sharedData)
         {
             InitializeComponent();
-            LatestPreviewFrame.DataContext = new LatestPreviewViewModel(sharedData);
         }
 
         //private void Expander_MouseEnter(object sender, MouseEventArgs e)

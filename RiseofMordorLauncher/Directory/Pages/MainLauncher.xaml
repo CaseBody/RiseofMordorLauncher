@@ -150,7 +150,7 @@
 
                 </Border>
 
-                <Grid x:Name="LatestPreviewFrame">
+                <Grid DataContext="{Binding LatestPreviewVM}">
                     <Border Height="220"
                             Background="#080808"
                             BorderBrush="#080808"

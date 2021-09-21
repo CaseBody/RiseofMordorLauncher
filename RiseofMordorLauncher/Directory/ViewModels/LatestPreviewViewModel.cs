@@ -38,20 +38,20 @@ namespace RiseofMordorLauncher
             }
         }
 
-        public async Task MainAsync()
+        public async void MainAsync()
         {
             var discord = new DiscordClient(new DiscordConfiguration()
             {
-                Token       = DISCORD_BOT_TOKEN,
-                TokenType   = DSharpPlus.TokenType.Bot,
-                Intents     = DiscordIntents.All
+                Token           = DISCORD_BOT_TOKEN,
+                TokenType       = DSharpPlus.TokenType.Bot,
+                Intents         = DiscordIntents.All
             });
 
             await discord.ConnectAsync();
 
-            _client                     = new DiscordSocketClient();
-            _client.Ready               += OnDiscordClientConnected;
-            _client.LoggedOut           += () =>
+            _client             = new DiscordSocketClient();
+            _client.Ready       += OnDiscordClientConnected;
+            _client.LoggedOut   += () =>
             {
                 _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
                 return Task.CompletedTask;

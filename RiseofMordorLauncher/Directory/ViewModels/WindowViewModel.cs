@@ -22,15 +22,15 @@ namespace RiseofMordorLauncher
         public event EventHandler MinimizeEvent;
         public event EventHandler CloseEvent;
 
-        private readonly SharedData SharedData = new SharedData();
+        private readonly SharedData SharedData;
 
         private MainLauncherViewModel mainLauncherViewModel;
         private LoginViewModel loginViewModel = new LoginViewModel();
         private SubmodsViewModel submodsViewModel = new SubmodsViewModel();
 
         private MainLauncher MainLauncherPage;
-        private readonly Login LoginPage     = new Login();
-        private readonly SubmodsPage SubmodsPage   = new SubmodsPage();
+        private readonly Login LoginPage;
+        private readonly SubmodsPage SubmodsPage;
         private Thread UpdateThread;
         public Page CurrentPage { get; set; }
 
@@ -41,93 +41,113 @@ namespace RiseofMordorLauncher
             {
                 RpcClient = new DiscordRpcClient("748940888494833754");
                 RpcClient.Initialize();
-            } catch { }
+            }
+            catch
+            {}
 
-            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            #region Create Shared Data
+            SharedData = new SharedData
+            {
+                AppData     = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                RPCClient   = RpcClient
+            };
+            #endregion
+
+            #region Setup AppData
             var launcherAppDataPath = $@"{SharedData.AppData}\RiseofMordor\RiseofMordorLauncher\";
             if (System.IO.Directory.Exists(launcherAppDataPath) == false)
             {
                 System.IO.Directory.CreateDirectory(launcherAppDataPath);
             }
+            #endregion
 
-            loginViewModel.SharedData = SharedData;
+            #region Main Page Setup
+            mainLauncherViewModel = new MainLauncherViewModel();
+            mainLauncherViewModel.SharedData       = SharedData;
+            mainLauncherViewModel.SwitchPageEvent += SwitchPage;
+            mainLauncherViewModel.Load();
+
+            MainLauncherPage = new MainLauncher(SharedData)
+            {
+                DataContext = mainLauncherViewModel
+            };
+            #endregion
+
+            #region Login Page Setup
+            loginViewModel = new LoginViewModel();
+            loginViewModel.SharedData       = SharedData;
             loginViewModel.SwitchPageEvent += SwitchPage;
             loginViewModel.Load();
-            LoginPage.DataContext = loginViewModel;
-            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            SharedData.RPCClient = RpcClient;
 
-            CurrentPage = LoginPage;
+            LoginPage = new Login
+            {
+                DataContext = loginViewModel
+            };
+            #endregion
 
+            #region Setup Update Thread
             UpdateThread = new Thread(Update);
             UpdateThread.IsBackground = true;
             UpdateThread.Start();
-            
+            #endregion
+
+            #region Submods Page Setup
+            submodsViewModel = new SubmodsViewModel();
+            submodsViewModel.sharedData       = SharedData;
+            submodsViewModel.SwitchPageEvent += SwitchPage;
+            submodsViewModel.Load();
+
+            SubmodsPage = new SubmodsPage
+            {
+                DataContext = submodsViewModel
+            };
+            #endregion
+
+            // Initial page is Login Page
+            CurrentPage = LoginPage;
         }
 
         // switch page, can be fired by the page ViewModels
-        private async void SwitchPage(object sender, ApplicationPage page)
+        private void SwitchPage(object sender, ApplicationPage page)
         {
+            string discordStateText;
             switch (page)
             {
                 case ApplicationPage.MainLauncher:
-                    MainLauncherPage = new MainLauncher(SharedData);
-                    mainLauncherViewModel = new MainLauncherViewModel();
-                    mainLauncherViewModel.SharedData = SharedData;
-                    mainLauncherViewModel.SwitchPageEvent += SwitchPage;
-                    await mainLauncherViewModel.Load();
-                    MainLauncherPage.DataContext = mainLauncherViewModel;
+                    discordStateText = "On Main Page";
                     CurrentPage = MainLauncherPage;
-
-                    try
-                    {
-                        RpcClient.SetPresence(new RichPresence()
-                        {
-                            Details = "Rise of Mordor Launcher",
-                            State = "On the main page",
-                            Assets = new Assets()
-                            {
-                                LargeImageKey = "large_image",
-                                LargeImageText = "discord.com/riseofmordor",
-                            }
-                        });
-                    } catch { }
                     break;
 
                 case ApplicationPage.Login:
-                    loginViewModel = new LoginViewModel();
-                    loginViewModel.SharedData = SharedData;
-                    loginViewModel.SwitchPageEvent += SwitchPage;
-                    loginViewModel.Load();
+                    discordStateText = "Initialisising launcher...";
                     CurrentPage = LoginPage;
                     break;
 
                 case ApplicationPage.Submods:
-                    submodsViewModel = new SubmodsViewModel();
-                    submodsViewModel.SwitchPageEvent += SwitchPage;
-                    submodsViewModel.sharedData = SharedData;
-                    submodsViewModel.Load();
-                    
-                    SubmodsPage.DataContext = submodsViewModel;
+                    discordStateText = "Browsing Submods";
                     CurrentPage = SubmodsPage;
+                    break;
 
-                    try
-                    {
-                        RpcClient.SetPresence(new RichPresence()
-                        {
-                            Details = "Rise of Mordor Launcher",
-                            State = "Browsing Submods",
-                            Assets = new Assets()
-                            {
-                                LargeImageKey = "large_image",
-                                LargeImageText = "discord.com/riseofmordor",
-                            }
-                        });
-                    }
-                    catch { }
+                default:
+                    discordStateText = "";
                     break;
             }
-
+            
+            try
+            {
+                RpcClient.SetPresence(new RichPresence()
+                {
+                    Details = "Rise of Mordor Launcher",
+                    State = discordStateText,
+                    Assets = new Assets()
+                    {
+                        LargeImageKey = "large_image",
+                        LargeImageText = "discord.com/riseofmordor",
+                    }
+                });
+            }
+            catch
+            {}
         }
 
         private async void Update()

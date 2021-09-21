@@ -37,21 +37,21 @@
         BorderThickness="0"
         FontSize="20"
         FontWeight="SemiBold"
-        Content="Back"
+        Content="BACK"
         Command="{Binding BackCommand}"
         />
 
         <Button
         Style="{StaticResource DarkButton}"
-        Width="140"
         Height="40"
+        Padding="7"
         Margin="0 0 20 0"
         HorizontalAlignment="Right"
         Foreground="#a82c26"
         BorderThickness="0"
         FontSize="20"
         FontWeight="SemiBold"
-        Content="Submit Mod"
+        Content="SUBMIT MOD"
         Command="{Binding SubmitCommand}"
         />
         <Image Source="../Images/submods_title.png" Height="200" Width="480" Margin="0 -30 0 0" RenderOptions.BitmapScalingMode="Fant"/>

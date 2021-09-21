@@ -37,8 +37,6 @@ namespace RiseofMordorLauncher
         // Start checks
         public void Load()
         {
-            //await Task.Delay(1500); // give time to initiliaze, otherwise switching to main launcher page bugs out.
-
             if (_isSteamAPIInit == false)
             {
                 _isSteamAPIInit = InitSteamAPI();
@@ -48,19 +46,16 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            var isSteamRunning = CheckSteam();
-            if (isSteamRunning == false)
+            if (CheckSteam() == false)
                 return;
 
-            var isAttilaInstalled = CheckAttilaInstalled();
-            if (isAttilaInstalled == false)
+            if (CheckAttilaInstalled() == false)
                 return;
 
-            var isOnline = CheckInternet();
-            if (isOnline == false)
+            if (CheckInternet() == false)
                 return;
-            else
-                Continue(offline: false);
+
+            Continue(offline: false);
         }
 
         private void DisplayError(string errClass, string errDescr, bool showOfflineBtn, bool showLoadingScreen)
@@ -131,10 +126,9 @@ namespace RiseofMordorLauncher
 
                 return isOnline;
             }
-            catch (Exception ex)
+            catch
             {
                 DisplayError("NO INTERNET", "An internet connection could not be made. You will not be able to download updates until you reconnect.", true, false);
-                return false;
             }
 
             return false;

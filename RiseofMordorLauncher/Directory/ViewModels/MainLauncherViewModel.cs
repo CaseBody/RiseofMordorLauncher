@@ -105,9 +105,6 @@ namespace RiseofMordorLauncher
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
 
-            launcherVersionService = new APILauncherVersionInfo();
-            LauncherVersion = await launcherVersionService.GetLauncherVersionInfo(SharedData);
-
             downloadThread = new Thread(PostUiLoadAsync);
             downloadThread.IsBackground = true;
             downloadThread.Start();
@@ -229,11 +226,12 @@ namespace RiseofMordorLauncher
             Process.GetCurrentProcess().Kill();
         }
 
-        private void LaunchGame()
+        private async void LaunchGame()
         {
             UserPreferences prefs = new UserPreferences();
             SubmodService = new APISteamSubmodService();
             UserPreferencesService = new APIUserPreferencesService();
+            Version = await _modVersionService.GetModVersionInfo(SharedData);
 
             prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
@@ -379,31 +377,37 @@ namespace RiseofMordorLauncher
                 SettingsPage.DataContext = SettingsPageViewModel;
                 SettingsVisibility = Visibility.Visible;
 
-                SharedData.RPCClient.SetPresence(new RichPresence()
+                try
                 {
-                    Details = "Rise of Mordor Launcher",
-                    State = "Tweaking Settings",
-                    Assets = new Assets()
+                    SharedData.RPCClient.SetPresence(new RichPresence()
                     {
-                        LargeImageKey = "large_image",
-                        LargeImageText = "discord.com/riseofmordor",
-                    }
-                });
+                        Details = "Rise of Mordor Launcher",
+                        State = "Tweaking Settings",
+                        Assets = new Assets()
+                        {
+                            LargeImageKey = "large_image",
+                            LargeImageText = "discord.com/riseofmordor",
+                        }
+                    });
+                } catch { }
             }
             else
             {
                 SettingsVisibility = Visibility.Hidden;
 
-                SharedData.RPCClient.SetPresence(new RichPresence()
+                try
                 {
-                    Details = "Rise of Mordor Launcher",
-                    State = "On the main page",
-                    Assets = new Assets()
+                    SharedData.RPCClient.SetPresence(new RichPresence()
                     {
-                        LargeImageKey = "large_image",
-                        LargeImageText = "discord.com/riseofmordor",
-                    }
-                });
+                        Details = "Rise of Mordor Launcher",
+                        State = "On the main page",
+                        Assets = new Assets()
+                        {
+                            LargeImageKey = "large_image",
+                            LargeImageText = "discord.com/riseofmordor",
+                        }
+                    });
+                } catch { }
             }
         }
 

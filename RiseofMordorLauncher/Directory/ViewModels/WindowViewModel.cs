@@ -37,8 +37,18 @@ namespace RiseofMordorLauncher
         // Load login page
         public WindowViewModel()
         {
-            RpcClient = new DiscordRpcClient("748940888494833754");
-            RpcClient.Initialize();
+            try
+            {
+                RpcClient = new DiscordRpcClient("748940888494833754");
+                RpcClient.Initialize();
+            } catch { }
+
+            SharedData.AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var launcherAppDataPath = $@"{SharedData.AppData}\RiseofMordor\RiseofMordorLauncher\";
+            if (System.IO.Directory.Exists(launcherAppDataPath) == false)
+            {
+                System.IO.Directory.CreateDirectory(launcherAppDataPath);
+            }
 
             loginViewModel.SharedData = SharedData;
             loginViewModel.SwitchPageEvent += SwitchPage;
@@ -53,11 +63,6 @@ namespace RiseofMordorLauncher
             UpdateThread.IsBackground = true;
             UpdateThread.Start();
             
-            var launcherAppDataPath = $@"{SharedData.AppData}\RiseofMordor\RiseofMordorLauncher\";
-            if (System.IO.Directory.Exists(launcherAppDataPath) == false)
-            {
-                System.IO.Directory.CreateDirectory(launcherAppDataPath);
-            }
         }
 
         // switch page, can be fired by the page ViewModels
@@ -74,16 +79,19 @@ namespace RiseofMordorLauncher
                     MainLauncherPage.DataContext = mainLauncherViewModel;
                     CurrentPage = MainLauncherPage;
 
-                    RpcClient.SetPresence(new RichPresence()
+                    try
                     {
-                        Details = "Rise of Mordor Launcher",
-                        State = "On the main page",
-                        Assets = new Assets()
+                        RpcClient.SetPresence(new RichPresence()
                         {
-                            LargeImageKey = "large_image",
-                            LargeImageText = "discord.com/riseofmordor",
-                        }
-                    });
+                            Details = "Rise of Mordor Launcher",
+                            State = "On the main page",
+                            Assets = new Assets()
+                            {
+                                LargeImageKey = "large_image",
+                                LargeImageText = "discord.com/riseofmordor",
+                            }
+                        });
+                    } catch { }
                     break;
 
                 case ApplicationPage.Login:
@@ -103,16 +111,20 @@ namespace RiseofMordorLauncher
                     SubmodsPage.DataContext = submodsViewModel;
                     CurrentPage = SubmodsPage;
 
-                    RpcClient.SetPresence(new RichPresence()
+                    try
                     {
-                        Details = "Rise of Mordor Launcher",
-                        State = "Browsing Submods",
-                        Assets = new Assets()
+                        RpcClient.SetPresence(new RichPresence()
                         {
-                            LargeImageKey = "large_image",
-                            LargeImageText = "discord.com/riseofmordor",
-                        }
-                    });
+                            Details = "Rise of Mordor Launcher",
+                            State = "Browsing Submods",
+                            Assets = new Assets()
+                            {
+                                LargeImageKey = "large_image",
+                                LargeImageText = "discord.com/riseofmordor",
+                            }
+                        });
+                    }
+                    catch { }
                     break;
             }
 

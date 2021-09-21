@@ -74,11 +74,11 @@ namespace RiseofMordorLauncher
                         current_list = 1;
                     }
 
-                    submod.VisitSteamPressed += VisitSteamPressed;
-                    submod.SubscribeButtonPressed += SubscribeButtonPressed;
-                    submod.EnableButtonPressed += EnableButtonPressed;
-                    submod.UpvoteButtonPressed += UpvoteButtonPressed;
-                    submod.DownvoteButtonPressed += DownvoteButtonPressed;
+                    submod.VisitSteamPressed        += VisitSteamPressed;
+                    submod.SubscribeButtonPressed   += SubscribeButtonPressed;
+                    submod.EnableButtonPressed      += EnableButtonPressed;
+                    submod.UpvoteButtonPressed      += UpvoteButtonPressed;
+                    submod.DownvoteButtonPressed    += DownvoteButtonPressed;
                 }
             }));
         }
@@ -125,14 +125,16 @@ namespace RiseofMordorLauncher
             {
                 SteamUGC.UnsubscribeItem(item);
                 DisableSubmod(submod);
-                submod.EnableButtonVisibility = Visibility.Hidden;
-                submod.EnableButtonText = "ENABLE";
-                submod.EnableButtonBackground = SharedData.NiceGreen;
-                submod.SubscribeButtonBackground = SharedData.NiceGreen;
-                submod.SubscribeButtonText = "SUBSCRIBE";
-                submod.IsInstalled = false;
-                submod.IsEnabled = false;
-                submod.ProgressBarValue = 2;
+                submod.EnableButtonVisibility       = Visibility.Hidden;
+                submod.EnableButtonText             = "ENABLE";
+                submod.EnableButtonBackground       = Brushes.LightGreen;
+                submod.EnableButtonForeground       = Brushes.Black;
+                submod.SubscribeButtonBackground    = Brushes.LightGreen;
+                submod.SubscribeButtonForeground    = Brushes.Black;
+                submod.SubscribeButtonText          = "SUBSCRIBE";
+                submod.IsInstalled                  = false;
+                submod.IsEnabled                    = false;
+                submod.ProgressBarValue             = 2;
             }
         }
 
@@ -145,15 +147,17 @@ namespace RiseofMordorLauncher
             {
                 EnableSubmod(submod);
                 submod.IsEnabled = true;
-                submod.EnableButtonBackground = Brushes.Red;
-                submod.EnableButtonText = "DISABLE";
+                submod.EnableButtonBackground   = Brushes.OrangeRed;
+                submod.EnableButtonForeground   = Brushes.White;
+                submod.EnableButtonText         = "DISABLE";
             }
             else
             {               
                 DisableSubmod(submod);
                 submod.IsEnabled = false;
-                submod.EnableButtonBackground = SharedData.NiceGreen;
-                submod.EnableButtonText = "ENABLE";
+                submod.EnableButtonBackground   = Brushes.LightGreen;
+                submod.EnableButtonForeground   = Brushes.Black;
+                submod.EnableButtonText         = "ENABLE";
             }
         }
 
@@ -239,14 +243,16 @@ namespace RiseofMordorLauncher
                             {
                                 if (downloaded_bytes >= total_bytes)
                                 {
-                                    submod.IsInstalled = true;
-                                    submod.ProgressBarVisibility = Visibility.Hidden;
-                                    submod.ProgressBarValue = 0;
-                                    submod.SubscribeButtonBackground = Brushes.Red;
-                                    submod.SubscribeButtonText = "UNSUBSCRIBE";
-                                    submod.EnableButtonVisibility = Visibility.Visible;
-                                    submod.EnableButtonText = "ENABLE";
-                                    submod.EnableButtonBackground = SharedData.NiceGreen;
+                                    submod.IsInstalled                  = true;
+                                    submod.ProgressBarVisibility        = Visibility.Hidden;
+                                    submod.ProgressBarValue             = 0;
+                                    submod.SubscribeButtonBackground    = Brushes.OrangeRed;
+                                    submod.SubscribeButtonForeground    = Brushes.White;
+                                    submod.SubscribeButtonText          = "UNSUBSCRIBE";
+                                    submod.EnableButtonVisibility       = Visibility.Visible;
+                                    submod.EnableButtonText             = "ENABLE";
+                                    submod.EnableButtonBackground       = Brushes.LightGreen;
+                                    submod.EnableButtonForeground       = Brushes.Black;
 
                                     DownloadingSubmods.RemoveAt(i);
                                 }
@@ -257,14 +263,16 @@ namespace RiseofMordorLauncher
                             }
                             else if (total_bytes == 0 && submod.ProgressBarValue > 1)
                             {
-                                submod.IsInstalled = true;
-                                submod.ProgressBarVisibility = Visibility.Hidden;
-                                submod.ProgressBarValue = 0;
-                                submod.SubscribeButtonBackground = Brushes.Red;
-                                submod.SubscribeButtonText = "UNSUBSCRIBE";
-                                submod.EnableButtonVisibility = Visibility.Visible;
-                                submod.EnableButtonText = "ENABLE";
-                                submod.EnableButtonBackground = SharedData.NiceGreen;
+                                submod.IsInstalled                  = true;
+                                submod.ProgressBarVisibility        = Visibility.Hidden;
+                                submod.ProgressBarValue             = 0;
+                                submod.SubscribeButtonBackground    = Brushes.OrangeRed;
+                                submod.SubscribeButtonForeground    = Brushes.White;
+                                submod.SubscribeButtonText          = "UNSUBSCRIBE";
+                                submod.EnableButtonVisibility       = Visibility.Visible;
+                                submod.EnableButtonText             = "ENABLE";
+                                submod.EnableButtonBackground       = Brushes.LightGreen;
+                                submod.EnableButtonForeground       = Brushes.Black;
                                 DownloadingSubmods.RemoveAt(i);
 
                             }
@@ -272,14 +280,16 @@ namespace RiseofMordorLauncher
                         }
                         else
                         {
-                            submod.IsInstalled = true;
-                            submod.ProgressBarVisibility = Visibility.Hidden;
-                            submod.ProgressBarValue = 0;
-                            submod.SubscribeButtonBackground = Brushes.Red;
-                            submod.SubscribeButtonText = "UNSUBSCRIBE";
-                            submod.EnableButtonVisibility = Visibility.Visible;
-                            submod.EnableButtonText = "ENABLE";
-                            submod.EnableButtonBackground = SharedData.NiceGreen;
+                            submod.IsInstalled                      = true;
+                            submod.ProgressBarVisibility            = Visibility.Hidden;
+                            submod.ProgressBarValue                 = 0;
+                            submod.SubscribeButtonBackground        = Brushes.OrangeRed;
+                            submod.SubscribeButtonBackground        = Brushes.White;
+                            submod.SubscribeButtonText              = "UNSUBSCRIBE";
+                            submod.EnableButtonVisibility           = Visibility.Visible;
+                            submod.EnableButtonText                 = "ENABLE";
+                            submod.EnableButtonBackground           = Brushes.LightGreen;
+                            submod.EnableButtonBackground           = Brushes.Black;
                             DownloadingSubmods.RemoveAt(i);
                         }
                     }

@@ -86,11 +86,13 @@ namespace RiseofMordorLauncher
                 var submod                          = new SubmodModel();
 
                 submod.IsEnabled                    = bEnabled;
-                submod.EnableButtonBackground       = bEnabled ? Brushes.Red : Brushes.LightGreen;
+                submod.EnableButtonBackground       = bEnabled ? Brushes.OrangeRed : Brushes.LightGreen;
+                submod.EnableButtonForeground       = bEnabled ? Brushes.White : Brushes.Black;
                 submod.EnableButtonText             = bEnabled ? "DISABLE" : "ENABLE";
 
                 submod.IsInstalled                  = bInstalled;
-                submod.SubscribeButtonBackground    = bInstalled ? Brushes.Red : Brushes.LightGreen;
+                submod.SubscribeButtonBackground    = bInstalled ? Brushes.OrangeRed : Brushes.LightGreen;
+                submod.SubscribeButtonForeground    = bInstalled ? Brushes.White : Brushes.Black;
                 submod.SubscribeButtonText          = bInstalled ? "UNSUBSCRIBE" : "SUBSCRIBE";
                 submod.EnableButtonVisibility       = bInstalled ? Visibility.Visible : Visibility.Hidden;
 
@@ -114,11 +116,11 @@ namespace RiseofMordorLauncher
                 SteamUGC.GetQueryUGCPreviewURL(pCallback.m_handle, i, out string thumbUrl, 1000);
                 submod.ThumbnailPath = thumbUrl;
 
-                if (submod.SubmodName.Length > 34)
-                {
-                    submod.SubmodName = submod.SubmodName.Substring(0, 32);
-                    submod.SubmodName = submod.SubmodName + "...";
-                }
+                //if (submod.SubmodName.Length > 34)
+                //{
+                //    submod.SubmodName = submod.SubmodName.Substring(0, 32);
+                //    submod.SubmodName = submod.SubmodName + "...";
+                //}
 
                 submodList.Add(submod);
             }

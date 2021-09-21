@@ -82,6 +82,7 @@
                               ItemsSource="{Binding SubmodsList3}"
                               ItemTemplate="{StaticResource SubmodTemplate}">
                 </ItemsControl>
+
             </Grid>
             
         </ScrollViewer>

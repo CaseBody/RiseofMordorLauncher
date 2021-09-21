@@ -93,7 +93,7 @@ namespace RiseofMordorLauncher
 
             #region Submods Page Setup
             submodsViewModel = new SubmodsViewModel();
-            submodsViewModel.sharedData       = SharedData;
+            submodsViewModel.SharedData       = SharedData;
             submodsViewModel.SwitchPageEvent += SwitchPage;
             submodsViewModel.Load();
 

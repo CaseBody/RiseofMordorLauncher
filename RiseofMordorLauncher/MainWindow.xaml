@@ -11,6 +11,7 @@
         Style="{StaticResource BorderlessWindow}"
         MouseDown="Window_MouseDown"
         Title="RoM Launcher"
+        WindowStartupLocation="CenterScreen"
         Height="650"
         Width="1200">
 

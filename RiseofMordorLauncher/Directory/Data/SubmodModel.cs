@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -10,7 +11,7 @@ using System.Windows.Media;
 
 namespace RiseofMordorLauncher
 {
-    public class SubmodModel : BaseViewModel
+    public class SubmodModel : BaseViewModel, ICloneable
     {
         public string ThumbnailPath              { get; set; }
         public string FileName                   { get; set; }
@@ -87,5 +88,31 @@ namespace RiseofMordorLauncher
         }
         #endregion
 
+        public object Clone()
+        {
+            var copy = new SubmodModel();
+
+            copy.ThumbnailPath               = ThumbnailPath;
+            copy.FileName                    = FileName;
+            copy.SubmodSteamId               = SubmodSteamId;
+            copy.SubmodName                  = SubmodName;
+            copy.InstallDir                  = InstallDir;
+            copy.SubmodDesc                  = SubmodDesc;
+            copy.IsInstalled                 = IsInstalled;
+            copy.IsEnabled                   = IsEnabled;
+            copy.EnableButtonVisibility      = EnableButtonVisibility;
+            copy.SubscribeButtonText         = SubscribeButtonText;
+            copy.EnableButtonText            = EnableButtonText;
+            copy.EnableButtonBackground      = EnableButtonBackground;
+            copy.SubscribeButtonBackground   = SubscribeButtonBackground;
+            copy.SteamId                     = SteamId;
+            copy.ProgressBarVisibility       = ProgressBarVisibility;
+            copy.ProgressBarValue            = ProgressBarValue;
+            copy.has_voted                   = has_voted;
+            copy.up_voted                    = up_voted;
+            copy.down_voted                  = down_voted;
+
+            return copy;
+        }
     }
 }

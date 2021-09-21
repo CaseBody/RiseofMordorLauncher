@@ -121,7 +121,7 @@ namespace RiseofMordorLauncher
 
         }
 
-        private async void DisableSubmod(string id)
+        private void DisableSubmod(string id)
         {
             string output = "";
 

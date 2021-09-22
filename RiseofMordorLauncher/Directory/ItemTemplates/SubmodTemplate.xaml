@@ -46,27 +46,28 @@
                     <StackPanel VerticalAlignment="Center"
                                 HorizontalAlignment="Left"
                                 Orientation="Horizontal">
-                            
-                            <Image Source="../Images/upvote.png"
+
+                        <Image Source="../Images/upvote.png"
                                    Width="30"
                                    Margin="10 0 0 0"
                                    VerticalAlignment="Center"
-                                   Cursor="Hand">
-                                
-                                <Image.InputBindings>
-                                    <MouseBinding Command="{Binding UpvoteButtonCommand}"
+                                   Cursor="Hand"
+                                   RenderOptions.BitmapScalingMode="Fant">
+
+                            <Image.InputBindings>
+                                <MouseBinding Command="{Binding UpvoteButtonCommand}"
                                                   MouseAction="LeftClick"/>
-                                </Image.InputBindings>
-                                
-                            </Image>
-                            
-                            <Label Content="{Binding UpvoteCount, FallbackValue=10}"
+                            </Image.InputBindings>
+
+                        </Image>
+
+                        <Label Content="{Binding UpvoteCount, FallbackValue=10}"
                                    FontSize="20"
                                    Padding="10"
                                    VerticalAlignment="Center"
                                    Foreground="LightGreen" />
-                            
-                        </StackPanel>
+
+                    </StackPanel>
 
                     <StackPanel VerticalAlignment="Center"
                                 HorizontalAlignment="Left"
@@ -76,7 +77,8 @@
                                Width="30"
                                Margin="10 0 0 0"
                                VerticalAlignment="Center"
-                               Cursor="Hand">
+                               Cursor="Hand"
+                               RenderOptions.BitmapScalingMode="Fant">
 
                             <Image.InputBindings>
                                 <MouseBinding Command="{Binding DownvoteButtonCommand}"
@@ -92,8 +94,9 @@
                                Foreground="Red"/>
 
                     </StackPanel>
+
                 </StackPanel>
-                
+
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            Grid.ColumnSpan="2"
@@ -105,7 +108,14 @@
                            TextAlignment="Center"
                            FontSize="18"
                            Padding="5"
-                           TextWrapping="WrapWithOverflow"/>
+                           TextWrapping="WrapWithOverflow"
+                           Cursor="Hand">
+
+                    <TextBlock.InputBindings>
+                        <MouseBinding Command="{Binding VisitSteamPageCommand}"
+                                          MouseAction="LeftClick"/>
+                    </TextBlock.InputBindings>
+                </TextBlock>
                 
                 <!--StackPanel Orientation="Horizontal"
                             Grid.Row="2">
@@ -146,7 +156,8 @@
                             Foreground="{Binding SubscribeButtonForeground, FallbackValue=Black}"
                             Background="{Binding SubscribeButtonBackground, FallbackValue=LightGreen}"
                             Content="{Binding SubscribeButtonText, FallbackValue=SUBSCRIBE}"
-                            Command="{Binding SubscribeButtonCommand}" />
+                            Command="{Binding SubscribeButtonCommand}" 
+                            Cursor="Hand"/>
                     
                     <Button BorderThickness="0"
                             FontWeight="Bold"
@@ -158,7 +169,8 @@
                             Background="{Binding EnableButtonBackground, FallbackValue=LightGreen}"
                             Content="{Binding EnableButtonText, FallbackValue=ENABLE}"
                             Command="{Binding EnableButtonCommand}"
-                            Visibility="{Binding EnableButtonVisibility, FallbackValue=Visible}" />
+                            Visibility="{Binding EnableButtonVisibility, FallbackValue=Visible}" 
+                            Cursor="Hand"/>
                     
                 </StackPanel>
 

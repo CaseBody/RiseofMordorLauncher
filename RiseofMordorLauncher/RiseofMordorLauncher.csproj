@@ -63,7 +63,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>image0.ico</ApplicationIcon>
+    <ApplicationIcon>image0 %281%29.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
@@ -319,6 +319,12 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="image0.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="image0 %281%29.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\rom_logo_small.jpeg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

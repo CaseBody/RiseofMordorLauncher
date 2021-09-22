@@ -552,5 +552,55 @@ namespace RiseofMordorLauncher
             SwitchPageEvent?.Invoke(this, page);
         }
 
+        #region SocialButtons
+        private ICommand _DiscordCommand;
+        public ICommand DiscordCommand
+        {
+            get
+            {
+                return _DiscordCommand ?? (_DiscordCommand = new CommandHandler(() => Process.Start("https://discord.gg/KMhmdCb7Ut"), () => true)) ; ;
+            }
+        }
+
+        private ICommand _YoutubeCommand;
+        public ICommand YoutubeCommand
+        {
+            get
+            {
+                return _YoutubeCommand ?? (_YoutubeCommand = new CommandHandler(() => Process.Start("https://www.youtube.com/channel/UCangGj6TUjUb9ri8CXcxQuw"), () => true)); ;
+            }
+        }
+
+        private ICommand _ModdbCommand;
+
+        public ICommand ModdbCommand
+        {
+            get
+            {
+                return _ModdbCommand ?? (_ModdbCommand = new CommandHandler(() => Process.Start("https://www.moddb.com/mods/total-war-rise-of-mordor"), () => true)); ;
+            }
+        }
+
+        private ICommand _RedditCommand;
+
+        public ICommand RedditCommand
+        {
+            get
+            {
+                return _RedditCommand ?? (_RedditCommand = new CommandHandler(() => Process.Start("https://www.reddit.com/r/RiseofMordor/"), () => true)); ;
+            }
+        }
+
+        private ICommand _InstagramCommand;
+
+        public ICommand InstagramCommand
+        {
+            get
+            {
+                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor_tw/"), () => true)); ;
+            }
+        }
+        #endregion
+
     }
 }

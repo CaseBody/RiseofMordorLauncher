@@ -129,8 +129,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Margin="80 0"
-                        Grid.Column="0"
-                        Visibility="{Binding ShowPreview}">
+                        Grid.Column="0">
 
                 <Border BorderThickness="1"
                         BorderBrush="#080808"
@@ -145,8 +144,7 @@
                                Foreground="White"
                                FontWeight="Bold"
                                Background="#080808"
-                               Width="439"
-                               />
+                               Width="439" />
 
                 </Border>
 

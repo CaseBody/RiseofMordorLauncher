@@ -48,7 +48,7 @@ namespace RiseofMordorLauncher
             });
 
             FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 10;
+            listRequest.PageSize = 50;
             listRequest.Fields = "nextPageToken, files(id, name)";
 
             // List files.

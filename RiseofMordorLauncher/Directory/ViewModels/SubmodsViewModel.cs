@@ -19,76 +19,77 @@ namespace RiseofMordorLauncher
 {
     class SubmodsViewModel : BaseViewModel
     {
-        public ObservableCollection<SubmodModel> SubmodsList1 { get; private set; }
-        public ObservableCollection<SubmodModel> SubmodsList2 { get; private set; }
-        public ObservableCollection<SubmodModel> SubmodsList3 { get; private set; }
-        public List<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
+        public IList<SubmodModel> SubmodsList1 { get; set; }
+        public IList<SubmodModel> SubmodsList2 { get; set; }
+        public IList<SubmodModel> SubmodsList3 { get; set; }
+        public IList<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
+
+        public event EventHandler<ApplicationPage> SwitchPageEvent;
+
         private System.Timers.Timer SubmodDownloadTimer;
 
         ISteamSubmodsService steamSubmodsService = new APISteamSubmodService();
-        public SharedData sharedData { get; set; }
+        public SharedData SharedData { get; set; }
 
         public SubmodsViewModel()
         {
-        }
-
-        public async void Load()
-        {
-            Application.Current.Dispatcher.BeginInvoke(
-                new ThreadStart(() =>
-                {
-                    steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
-
-                })
-            );
-            steamSubmodsService.GetSubmods(sharedData);
-
-            Thread DownloadUpdateThread = new Thread(SetupTimer);
-            DownloadUpdateThread.IsBackground = true;
-            DownloadUpdateThread.Start();
-        }
-
-        private async void LoadSubmodData(object sender, List<SubmodModel> submods)
-        {
-            submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
-
-            int current_list = 1;
             SubmodsList1 = new ObservableCollection<SubmodModel>();
             SubmodsList2 = new ObservableCollection<SubmodModel>();
             SubmodsList3 = new ObservableCollection<SubmodModel>();
-
-            foreach (var submod in submods)
-            {
-                if (current_list == 1)
-                {
-                    SubmodsList1.Add(submod);
-                    current_list = 2;
-                }
-                else if (current_list == 2)
-                {
-                    SubmodsList2.Add(submod);
-                    current_list = 3;
-                }
-                else
-                {
-                    SubmodsList3.Add(submod);
-                    current_list = 1;
-                }
-
-                submod.VisitSteamPressed += VisitSteamPressed;
-                submod.SubscribeButtonPressed += SubscribeButtonPressed;
-                submod.EnableButtonPressed += EnableButtonPressed;
-                submod.UpvoteButtonPressed += UpvoteButtonPressed;
-                submod.DownvoteButtonPressed += DownvoteButtonPressed;
-            }
         }
-        private async void VisitSteamPressed(object sender, EventArgs e)
-        {
-            SubmodModel submod = (SubmodModel)sender;
 
+        public void Load()
+        {
+            steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
+            steamSubmodsService.GetSubmods(SharedData);
+
+            SubmodDownloadTimer = new System.Timers.Timer(300);
+            SubmodDownloadTimer.Elapsed += (o, s) => Task.Factory.StartNew(() => CheckDownloads(o, s));
+            SubmodDownloadTimer.AutoReset = true;
+            SubmodDownloadTimer.Start();
+        }
+
+        public void LoadSubmodData(object sender, List<SubmodModel> submods)
+        {
+            Application.Current.Dispatcher.Invoke(new ThreadStart(() =>
+            {
+                submods = submods.OrderByDescending(x => x.UpvoteCount - x.DownvoteCount).ToList();
+                int current_list = 1;
+
+                foreach (var submod in submods)
+                {
+                    if (current_list == 1)
+                    {
+                        SubmodsList1.Add(submod);
+                        current_list = 2;
+                    }
+                    else if (current_list == 2)
+                    {
+                        SubmodsList2.Add(submod);
+                        current_list = 3;
+                    }
+                    else
+                    {
+                        SubmodsList3.Add(submod);
+                        current_list = 1;
+                    }
+
+                    submod.VisitSteamPressed        += VisitSteamPressed;
+                    submod.SubscribeButtonPressed   += SubscribeButtonPressed;
+                    submod.EnableButtonPressed      += EnableButtonPressed;
+                    submod.UpvoteButtonPressed      += UpvoteButtonPressed;
+                    submod.DownvoteButtonPressed    += DownvoteButtonPressed;
+                }
+            }));
+        }
+
+        private void VisitSteamPressed(object sender, EventArgs e)
+        {
+            var submod = sender as SubmodModel;
             Process.Start($"https://steamcommunity.com/sharedfiles/filedetails/?id={submod.SubmodSteamId}");
         }
-        private async void SubscribeButtonPressed(object sender, EventArgs e)
+
+        private void SubscribeButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
             PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
@@ -98,7 +99,9 @@ namespace RiseofMordorLauncher
                 SteamUGC.SubscribeItem(item);
                 SteamUGC.DownloadItem(item, true);
                 submod.ProgressBarVisibility = Visibility.Visible;
-                submod.ProgressBarValue = 0;
+
+                if (submod.ProgressBarValue != 2)
+                    submod.ProgressBarValue = 0;
 
                 if (DownloadingSubmods.Count > 0)
                 {
@@ -122,16 +125,20 @@ namespace RiseofMordorLauncher
             {
                 SteamUGC.UnsubscribeItem(item);
                 DisableSubmod(submod);
-                submod.EnableButtonVisibility = Visibility.Hidden;
-                submod.EnableButtonText = "ENABLE";
-                submod.EnableButtonBackground = SharedData.NiceGreen;
-                submod.SubscribeButtonBackground = SharedData.NiceGreen;
-                submod.SubscribeButtonText = "SUBSCRIBE";
-                submod.IsInstalled = false;
-                submod.IsEnabled = false;
+                submod.EnableButtonVisibility       = Visibility.Hidden;
+                submod.EnableButtonText             = "ENABLE";
+                submod.EnableButtonBackground       = Brushes.LightGreen;
+                submod.EnableButtonForeground       = Brushes.Black;
+                submod.SubscribeButtonBackground    = Brushes.LightGreen;
+                submod.SubscribeButtonForeground    = Brushes.Black;
+                submod.SubscribeButtonText          = "SUBSCRIBE";
+                submod.IsInstalled                  = false;
+                submod.IsEnabled                    = false;
+                submod.ProgressBarValue             = 2;
             }
         }
-        private async void EnableButtonPressed(object sender, EventArgs e)
+
+        private void EnableButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
             PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
@@ -140,18 +147,21 @@ namespace RiseofMordorLauncher
             {
                 EnableSubmod(submod);
                 submod.IsEnabled = true;
-                submod.EnableButtonBackground = Brushes.Red;
-                submod.EnableButtonText = "DISABLE";
+                submod.EnableButtonBackground   = Brushes.OrangeRed;
+                submod.EnableButtonForeground   = Brushes.White;
+                submod.EnableButtonText         = "DISABLE";
             }
             else
             {               
                 DisableSubmod(submod);
                 submod.IsEnabled = false;
-                submod.EnableButtonBackground = SharedData.NiceGreen;
-                submod.EnableButtonText = "ENABLE";
+                submod.EnableButtonBackground   = Brushes.LightGreen;
+                submod.EnableButtonForeground   = Brushes.Black;
+                submod.EnableButtonText         = "ENABLE";
             }
         }
-        private async void UpvoteButtonPressed(object sender, EventArgs e)
+
+        private void UpvoteButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
 
@@ -177,7 +187,7 @@ namespace RiseofMordorLauncher
                 SteamUGC.SetUserItemVote(item, true);
             }
         }
-        private async void DownvoteButtonPressed(object sender, EventArgs e)
+        private void DownvoteButtonPressed(object sender, EventArgs e)
         {
             SubmodModel submod = (SubmodModel)sender;
 
@@ -204,97 +214,104 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private void SetupTimer()
-        {
-            SubmodDownloadTimer = new System.Timers.Timer(300);
-            SubmodDownloadTimer.Elapsed += CheckDownloads;
-            SubmodDownloadTimer.AutoReset = true;
-            SubmodDownloadTimer.Start();
-        }
         private void CheckDownloads(object source, ElapsedEventArgs e)
         {
-            if (DownloadingSubmods.Count > 0)
+            try
             {
-                int i = -1;
-
-                foreach (SubmodModel submod in DownloadingSubmods)
+                if (DownloadingSubmods.Count > 0)
                 {
-                    i++;
-                    PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
+                    int i = -1;
 
-                    ulong downloaded_bytes = 0;
-                    ulong total_bytes = 0;
-                    bool success = false;
-
-                    try { 
-                        success = SteamUGC.GetItemDownloadInfo(item, out downloaded_bytes, out total_bytes); 
-                    } catch { }
-
-                    if (success)
+                    foreach (SubmodModel submod in DownloadingSubmods)
                     {
-                        if (!(total_bytes == 0))
-                        {
-                            if (downloaded_bytes >= total_bytes)
-                            {
-                                submod.IsInstalled = true;
-                                submod.ProgressBarVisibility = Visibility.Hidden;
-                                submod.ProgressBarValue = 0;
-                                submod.SubscribeButtonBackground = Brushes.Red;
-                                submod.SubscribeButtonText = "UNSUBSCRIBE";
-                                submod.EnableButtonVisibility = Visibility.Visible;
-                                submod.EnableButtonText = "ENABLE";
-                                submod.EnableButtonBackground = SharedData.NiceGreen;
+                        i++;
+                        PublishedFileId_t item = new PublishedFileId_t(ulong.Parse(submod.SteamId));
 
+                        ulong downloaded_bytes = 0;
+                        ulong total_bytes = 0;
+                        bool success = false;
+
+                        try
+                        {
+                            success = SteamUGC.GetItemDownloadInfo(item, out downloaded_bytes, out total_bytes);
+                        }
+                        catch { }
+
+                        if (success)
+                        {
+                            if (!(total_bytes == 0))
+                            {
+                                if (downloaded_bytes >= total_bytes)
+                                {
+                                    submod.IsInstalled                  = true;
+                                    submod.ProgressBarVisibility        = Visibility.Hidden;
+                                    submod.ProgressBarValue             = 0;
+                                    submod.SubscribeButtonBackground    = Brushes.OrangeRed;
+                                    submod.SubscribeButtonForeground    = Brushes.White;
+                                    submod.SubscribeButtonText          = "UNSUBSCRIBE";
+                                    submod.EnableButtonVisibility       = Visibility.Visible;
+                                    submod.EnableButtonText             = "ENABLE";
+                                    submod.EnableButtonBackground       = Brushes.LightGreen;
+                                    submod.EnableButtonForeground       = Brushes.Black;
+
+                                    DownloadingSubmods.RemoveAt(i);
+                                }
+                                else
+                                {
+                                    submod.ProgressBarValue = Math.Round((decimal)downloaded_bytes / total_bytes * 100);
+                                }
+                            }
+                            else if (total_bytes == 0 && submod.ProgressBarValue > 1)
+                            {
+                                submod.IsInstalled                  = true;
+                                submod.ProgressBarVisibility        = Visibility.Hidden;
+                                submod.ProgressBarValue             = 0;
+                                submod.SubscribeButtonBackground    = Brushes.OrangeRed;
+                                submod.SubscribeButtonForeground    = Brushes.White;
+                                submod.SubscribeButtonText          = "UNSUBSCRIBE";
+                                submod.EnableButtonVisibility       = Visibility.Visible;
+                                submod.EnableButtonText             = "ENABLE";
+                                submod.EnableButtonBackground       = Brushes.LightGreen;
+                                submod.EnableButtonForeground       = Brushes.Black;
                                 DownloadingSubmods.RemoveAt(i);
+
                             }
-                            else
-                            {
-                                submod.ProgressBarValue = Math.Round((decimal)downloaded_bytes / total_bytes * 100);
-                            }
+
                         }
-                        else if (total_bytes == 0 && submod.ProgressBarValue > 1)
+                        else
                         {
-                            submod.IsInstalled = true;
-                            submod.ProgressBarVisibility = Visibility.Hidden;
-                            submod.ProgressBarValue = 0;
-                            submod.SubscribeButtonBackground = Brushes.Red;
-                            submod.SubscribeButtonText = "UNSUBSCRIBE";
-                            submod.EnableButtonVisibility = Visibility.Visible;
-                            submod.EnableButtonText = "ENABLE";
-                            submod.EnableButtonBackground = SharedData.NiceGreen;
+                            submod.IsInstalled                      = true;
+                            submod.ProgressBarVisibility            = Visibility.Hidden;
+                            submod.ProgressBarValue                 = 0;
+                            submod.SubscribeButtonBackground        = Brushes.OrangeRed;
+                            submod.SubscribeButtonBackground        = Brushes.White;
+                            submod.SubscribeButtonText              = "UNSUBSCRIBE";
+                            submod.EnableButtonVisibility           = Visibility.Visible;
+                            submod.EnableButtonText                 = "ENABLE";
+                            submod.EnableButtonBackground           = Brushes.LightGreen;
+                            submod.EnableButtonBackground           = Brushes.Black;
                             DownloadingSubmods.RemoveAt(i);
-
                         }
-
-                    }
-                    else
-                    {
-                        submod.IsInstalled = true;
-                        submod.ProgressBarVisibility = Visibility.Hidden;
-                        submod.ProgressBarValue = 0;
-                        submod.SubscribeButtonBackground = Brushes.Red;
-                        submod.SubscribeButtonText = "UNSUBSCRIBE";
-                        submod.EnableButtonVisibility = Visibility.Visible;
-                        submod.EnableButtonText = "ENABLE";
-                        submod.EnableButtonBackground = SharedData.NiceGreen;
-                        DownloadingSubmods.RemoveAt(i);
                     }
                 }
+
             }
+            catch { }
         }
-        private async void EnableSubmod(SubmodModel submod)
+
+        private void EnableSubmod(SubmodModel submod)
         {
             string output = "";
 
-            if (!File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
-                using (StreamWriter writer = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+                using (StreamWriter writer = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
                 {
-                    try { File.CreateText($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                    try { File.CreateText($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
                 }
             }
 
-            string[] lines = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
+            string[] lines = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
             if (lines.Count() == 0)
             {
                 output = submod.SteamId;
@@ -307,24 +324,25 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            using (StreamWriter writer = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            using (StreamWriter writer = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
                 writer.Write(output);
             }
         }
-        private async void DisableSubmod(SubmodModel submod)
+
+        private void DisableSubmod(SubmodModel submod)
         {
             string output = "";
 
-            if (!File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
                 return;
             }
 
-            string[] lines = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
+            string[] lines = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
             if (lines.Count() == 0)
             {
-                try { File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
                 return;
             }
             else
@@ -333,7 +351,7 @@ namespace RiseofMordorLauncher
                 {
                     if (lines.ToString() == submod.SteamId)
                     {
-                        try { File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                        try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
                         return;
                     }
                     else
@@ -371,12 +389,33 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            using (StreamWriter writer = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            using (StreamWriter writer = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
                 writer.Write(output);
             }
+
+        }
+        protected virtual void SwitchPage(ApplicationPage page)
+        {
+            SwitchPageEvent?.Invoke(this, page);
         }
 
+        private ICommand _BackCommand;
+        private ICommand _SubmitCommand;
+        public ICommand BackCommand
+        {
+            get
+            {
+                return _BackCommand ?? (_BackCommand = new CommandHandler(() => SwitchPage(ApplicationPage.MainLauncher), () => true));
+            }
+        }
 
+        public ICommand SubmitCommand
+        {
+            get
+            {
+                return _SubmitCommand ?? (_SubmitCommand = new CommandHandler(() => { MessageBox.Show("Creator of a Rise of Mordor submod? Contact Case#9810 on Discord to get your submod approved and added to the list.", "Submit a Submod"); }, () => true));
+            }
+        }
     }
 }

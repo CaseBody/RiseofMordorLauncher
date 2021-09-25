@@ -10,28 +10,28 @@
 
     <StackPanel Background="Black" Orientation="Vertical">
         <StackPanel Margin="3 3 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <CheckBox Background="Black" BorderBrush="#fc9b00" Foreground="#fc9b00"/>
+            <CheckBox Background="Black" BorderBrush="#fc9b00" Foreground="#fc9b00" IsChecked="{Binding AutoInstall}"/>
             <TextBlock Text="Auto install updates" Foreground="#fc9b00" Margin="3 0 0 0"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 15 0 0">
-            <Image Source="../images/upvote.png" Width="20" Margin="0 -2.8 5 0"/>
+            <Image Source="../images/upvote.png" Width="20" Margin="0 -2.8 5 0">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding UpCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
             <TextBlock Text="Load Order" Foreground="#fc9b00" Margin="0 0 0 0" TextDecorations="underline"/>
-            <Image Source="../images/downvote.png" Width="20" Margin="5 -2.8 0 0"/>
+            <Image Source="../images/downvote.png" Width="20" Margin="5 -2.8 0 0">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding DownCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
         </StackPanel>
 
         <Border BorderBrush="#fc9b00" BorderThickness="1">
-            <ScrollViewer Height="190" Margin="1,0,-1,0" Background="Black">
-                <ListBox Background="Black" BorderBrush="Black">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Text}" Background="Black" Foreground="#fc9b00" HorizontalAlignment="Center"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+            <ScrollViewer Height="247" Margin="1,0,-1,0" Background="Black">
+                <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}" SelectedIndex="{Binding SelectedItem}"/>
             </ScrollViewer>
         </Border>
-
-        <Button Style="{StaticResource DarkButton}" Content="Apply" Background="LightGreen" BorderThickness="0" Margin="0 8 0 0" Padding="8" Width="100" FontSize="20" Foreground="Black"/>
     </StackPanel>
 </Page>

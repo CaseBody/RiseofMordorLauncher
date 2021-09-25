@@ -23,16 +23,16 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -61,6 +61,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>image0 %281%29.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
@@ -133,10 +136,13 @@
     </Compile>
     <Compile Include="Directory\Data\ApplicationPage.cs" />
     <Compile Include="Directory\Data\ExtraLauncherInfo.cs" />
+    <Compile Include="Directory\Data\LauncherVersion.cs" />
     <Compile Include="Directory\Data\ModVersion.cs" />
     <Compile Include="Directory\Data\SharedData.cs" />
     <Compile Include="Directory\Data\SteamUser.cs" />
+    <Compile Include="Directory\Data\SubmodInstallation.cs" />
     <Compile Include="Directory\Data\SubmodModel.cs" />
+    <Compile Include="Directory\Data\UserPreferences.cs" />
     <Compile Include="Directory\Data\YouTubeData.cs" />
     <Compile Include="Directory\Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
@@ -154,13 +160,17 @@
       <DependentUpon>SubmodsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Directory\Services\API\APIGoogleDriveService.cs" />
+    <Compile Include="Directory\Services\API\APILauncherVersionService.cs" />
     <Compile Include="Directory\Services\API\APISteamSubmodService.cs" />
     <Compile Include="Directory\Services\API\APISteamUserService.cs" />
     <Compile Include="Directory\Services\API\APIModVersionService.cs" />
+    <Compile Include="Directory\Services\API\APIUserPreferencesService.cs" />
     <Compile Include="Directory\Services\API\APIYouTubeDataService.cs" />
     <Compile Include="Directory\Services\CommandHandler.cs" />
     <Compile Include="Directory\Services\IGoogleDriveService.cs" />
+    <Compile Include="Directory\Services\ILauncherVersionService.cs" />
     <Compile Include="Directory\Services\IModVersionService.cs" />
+    <Compile Include="Directory\Services\IUserPreferencesService.cs" />
     <Compile Include="Directory\Services\ISteamSubmodsService.cs" />
     <Compile Include="Directory\Services\IYouTubeDataService.cs" />
     <Compile Include="Directory\Services\ISteamUserService.cs" />
@@ -171,6 +181,7 @@
     <Compile Include="Directory\ViewModels\LatestPreviewViewModel.cs" />
     <Compile Include="Directory\ViewModels\LoginViewModel.cs" />
     <Compile Include="Directory\ViewModels\MainLauncherViewModel.cs" />
+    <Compile Include="Directory\ViewModels\SettingsViewModel.cs" />
     <Compile Include="Directory\ViewModels\SubmodsViewModel.cs" />
     <Compile Include="Directory\ViewModels\WindowViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
@@ -220,9 +231,6 @@
     <Resource Include="Directory\Images\rom_logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Directory\Images\thumbnail.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Directory\Images\play_button.png" />
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +262,9 @@
     </PackageReference>
     <PackageReference Include="Discord.Net">
       <Version>2.4.0</Version>
+    </PackageReference>
+    <PackageReference Include="DiscordRichPresence">
+      <Version>1.0.175</Version>
     </PackageReference>
     <PackageReference Include="DSharpPlus">
       <Version>4.1.0</Version>
@@ -301,6 +312,19 @@
     <Resource Include="Directory\Images\reddit_icon.png" />
     <Resource Include="Directory\Images\settings_icon.png" />
     <Resource Include="Directory\Images\youtube_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\loading_screen.png" />
+    <Resource Include="Directory\Images\submods_title.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="image0.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="image0 %281%29.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\rom_logo_small.jpeg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

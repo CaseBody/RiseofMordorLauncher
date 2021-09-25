@@ -16,20 +16,51 @@
         </ResourceDictionary>
     </Page.Resources>
    
-
     <Grid>
-            <Grid.Background>
-                <ImageBrush ImageSource="../Images/unknown.png" Stretch="UniformToFill"/>
-            </Grid.Background>
+        <Grid.Background>
+            <ImageBrush ImageSource="../Images/unknown.png"
+                        Stretch="UniformToFill"/>
+        </Grid.Background>
 
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="5*"/>
-            </Grid.RowDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="5*"/>
+        </Grid.RowDefinitions>
 
-            <TextBlock Text="Rise of Mordor Submods" Foreground="#fc9b00" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="60"/>
+        <Button Style="{StaticResource DarkButton}"
+                Margin="20 0 0 0"
+                Padding="20 10"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                Foreground="#a82c26"
+                BorderThickness="0"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Content="BACK"
+                Command="{Binding BackCommand}" />
 
-        <ScrollViewer Grid.Row="2" Margin="40 20" VerticalScrollBarVisibility="Hidden">
+        <Button Style="{StaticResource DarkButton}"
+                Padding="20 10"
+                Margin="0 0 20 0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Foreground="#a82c26"
+                BorderThickness="0"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Content="SUBMIT MOD"
+                Command="{Binding SubmitCommand}" />
+        
+        <Image Source="../Images/submods_title.png"
+               Height="200"
+               Width="480"
+               Margin="0 -30 0 0"
+               RenderOptions.BitmapScalingMode="Fant"/>
+
+        <ScrollViewer Grid.Row="2"
+                      Margin="40 20"
+                      VerticalScrollBarVisibility="Hidden">
+            
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -37,22 +68,25 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <ItemsControl ItemsSource="{Binding SubmodsList1}"
-                          ItemTemplate="{StaticResource SubmodTemplate}">
-
+                <ItemsControl Grid.Column="0"
+                              ItemsSource="{Binding SubmodsList1}"
+                              ItemTemplate="{StaticResource SubmodTemplate}">
                 </ItemsControl>
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding SubmodsList2}"
-                          ItemTemplate="{StaticResource SubmodTemplate}">
-
+                
+                <ItemsControl Grid.Column="1"
+                              ItemsSource="{Binding SubmodsList2}"
+                              ItemTemplate="{StaticResource SubmodTemplate}">
                 </ItemsControl>
-                <ItemsControl Grid.Column="2" ItemsSource="{Binding SubmodsList3}"
-                          ItemTemplate="{StaticResource SubmodTemplate}">
-
+                
+                <ItemsControl Grid.Column="2"
+                              ItemsSource="{Binding SubmodsList3}"
+                              ItemTemplate="{StaticResource SubmodTemplate}">
                 </ItemsControl>
+
             </Grid>
+            
         </ScrollViewer>
-
-        </Grid>
-
+        
+    </Grid>
 
 </Page>

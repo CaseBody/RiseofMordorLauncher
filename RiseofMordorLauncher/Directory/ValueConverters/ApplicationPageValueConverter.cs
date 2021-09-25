@@ -15,8 +15,6 @@ namespace RiseofMordorLauncher
             // Find the appropriate page
             switch ((ApplicationPage)value)
             {
-                case ApplicationPage.MainLauncher:
-                    return new MainLauncher();
                 default:
                     Debugger.Break();
                     return null;

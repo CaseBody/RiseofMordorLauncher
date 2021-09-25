@@ -58,6 +58,7 @@ namespace RiseofMordorLauncher
                             if (line.StartsWith("version"))
                             {
                                 string raw_version = line.Split('=').ElementAt(1);
+                                version.VersionText = raw_version;
                                 char[] char_array = raw_version.ToCharArray();
                                 string final = "";
                                 bool has_hit_first_dot = false;
@@ -179,7 +180,43 @@ namespace RiseofMordorLauncher
             }
             else
             {
-                version.InstalledVersionNumber = 0;
+
+                if (version.LatestVersionNumber != 0 && !sharedData.IsOffline)
+                {
+
+                    if (version.LatestPackFiles.Count != 0)
+                    {
+                        bool packs_installed = true;
+
+                        foreach (string pack in version.LatestPackFiles)
+                        {
+                            if (!(System.IO.File.Exists($"{AttilaDir}/data/{pack}")))
+                            {
+                                packs_installed = false;
+                            }
+                        }
+
+                        if (!packs_installed)
+                        {
+                            version.InstalledVersionNumber = 0;
+                        }
+                        else
+                        {
+                            version.InstalledVersionNumber = version.LatestVersionNumber;
+                            try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
+                            try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
+                            System.IO.File.Copy($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+                        }
+                    }
+                    else
+                    {
+                        version.InstalledVersionNumber = 0;
+                    }
+                }
+                else
+                {
+                    version.InstalledVersionNumber = 0;
+                }
             }
 
             // If a local version is installed, ensure all pack files are in present in Data. if not return version as 0 so they will be downloaded.

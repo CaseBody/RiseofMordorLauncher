@@ -144,12 +144,11 @@
                                Foreground="White"
                                FontWeight="Bold"
                                Background="#080808"
-                               Width="439"
-                               />
+                               Width="439" />
 
                 </Border>
 
-                <Grid x:Name="LatestPreviewFrame">
+                <Grid DataContext="{Binding LatestPreviewVM}">
                     <Border Height="220"
                             Background="#080808"
                             BorderBrush="#080808"
@@ -157,9 +156,16 @@
 
                         <Image Source="{Binding PreviewImage}"
                                RenderOptions.BitmapScalingMode="Fant"
-                               Stretch="UniformToFill"/>
+                               Stretch="UniformToFill"
+                               Cursor="Hand">
+
+                        </Image>
 
                     </Border>
+
+                    <Grid.InputBindings>
+                        <MouseBinding Command="{Binding PreviewCommand}" MouseAction="LeftClick"/>
+                    </Grid.InputBindings>
                 </Grid>
             </StackPanel>
 
@@ -175,7 +181,7 @@
                                Opacity="0.8"
                                TextAlignment="Left"
                                Padding="5"
-                               Text="Featured Video"
+                               Text="Latest Video"
                                FontSize="12"
                                Foreground="White"
                                FontWeight="Bold"
@@ -198,6 +204,36 @@
             </StackPanel>
 
         </Grid>
+
+        <Frame Grid.Row="0" Grid.RowSpan="2" Margin="0 60 0 0" HorizontalAlignment="Left" Width="200" Visibility="{Binding SettingsVisibility}" Content="{Binding SettingsPage}"/>
+
+        <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Right" Width="80">
+            <Image Source="../Images/discord_icon.png" Cursor="Hand" Margin="20 4 20 10" RenderOptions.BitmapScalingMode="Fant">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding DiscordCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+            <Image Source="../Images/youtube_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding YoutubeCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+            <Image Source="../Images/moddb_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding ModdbCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+            <Image Source="../Images/reddit_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding RedditCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+            <Image Source="../Images/instagram_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+                <Image.InputBindings>
+                    <MouseBinding Command="{Binding InstagramCommand}" MouseAction="LeftClick"/>
+                </Image.InputBindings>
+            </Image>
+        </StackPanel>
 
         <Grid Grid.Row="2"
               MinHeight="150"

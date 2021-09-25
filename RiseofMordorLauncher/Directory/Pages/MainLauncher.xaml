@@ -156,9 +156,16 @@
 
                         <Image Source="{Binding PreviewImage}"
                                RenderOptions.BitmapScalingMode="Fant"
-                               Stretch="UniformToFill"/>
+                               Stretch="UniformToFill"
+                               Cursor="Hand">
+
+                        </Image>
 
                     </Border>
+
+                    <Grid.InputBindings>
+                        <MouseBinding Command="{Binding PreviewCommand}" MouseAction="LeftClick"/>
+                    </Grid.InputBindings>
                 </Grid>
             </StackPanel>
 

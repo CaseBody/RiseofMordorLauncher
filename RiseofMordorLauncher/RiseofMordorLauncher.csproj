@@ -65,6 +65,9 @@
   <PropertyGroup>
     <ApplicationIcon>image0 %281%29.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>Directory\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Steamworks.NET">
@@ -209,6 +212,7 @@
     </EmbeddedResource>
     <None Include="credentials.json" />
     <Resource Include="Directory\Fonts\Middleearth.ttf" />
+    <None Include="Directory\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

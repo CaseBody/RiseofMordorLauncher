@@ -1,13 +1,16 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Discord;
 using Discord.WebSocket;
 using DSharpPlus;
+using RiseofMordorLauncher.Directory.Services;
 
 namespace RiseofMordorLauncher
 {
@@ -94,6 +97,16 @@ namespace RiseofMordorLauncher
             }
 
             return Task.CompletedTask;
+        }
+
+        private ICommand _PreviewCommand;
+ 
+        public ICommand PreviewCommand
+        {
+            get
+            {
+                return _PreviewCommand ?? (_PreviewCommand = new CommandHandler(() => Process.Start("https://discord.com/channels/328911806372511744/739128378669662228"), () => true)); ;
+            }
         }
     }
 }

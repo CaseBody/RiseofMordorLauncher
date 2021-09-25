@@ -20,7 +20,7 @@
         
         <Image Grid.Row="0"
                Grid.RowSpan="2"
-               Source="Images/background.png"
+               Source="pack://application:,,,/Images/background.png"
                Stretch="UniformToFill"
                HorizontalAlignment="Center"
                VerticalAlignment="Center" />

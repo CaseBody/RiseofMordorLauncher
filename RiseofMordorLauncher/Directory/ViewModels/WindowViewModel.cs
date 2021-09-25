@@ -12,6 +12,7 @@ using RiseofMordorLauncher.Directory.Services;
 using DiscordRPC;
 using System.IO;
 using System.Diagnostics;
+using System.Windows;
 
 namespace RiseofMordorLauncher
 {
@@ -62,27 +63,42 @@ namespace RiseofMordorLauncher
             #endregion
 
             #region Main Page Setup
-            mainLauncherViewModel = new MainLauncherViewModel();
-            mainLauncherViewModel.SharedData       = SharedData;
-            mainLauncherViewModel.SwitchPageEvent += SwitchPage;
-            mainLauncherViewModel.Load();
-
-            MainLauncherPage = new MainLauncher(SharedData)
+            try
             {
-                DataContext = mainLauncherViewModel
-            };
+
+                mainLauncherViewModel = new MainLauncherViewModel();
+                mainLauncherViewModel.SharedData = SharedData;
+                mainLauncherViewModel.SwitchPageEvent += SwitchPage;
+                mainLauncherViewModel.Load();
+
+                MainLauncherPage = new MainLauncher(SharedData)
+                {
+                    DataContext = mainLauncherViewModel
+                };
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("INIT MAIN VIEW ERROR" + e.Message);
+            }
             #endregion
 
             #region Login Page Setup
-            loginViewModel = new LoginViewModel();
-            loginViewModel.SharedData       = SharedData;
-            loginViewModel.SwitchPageEvent += SwitchPage;
-            loginViewModel.Load();
-
-            LoginPage = new Login
+            try
             {
-                DataContext = loginViewModel
-            };
+                loginViewModel = new LoginViewModel();
+                loginViewModel.SharedData = SharedData;
+                loginViewModel.SwitchPageEvent += SwitchPage;
+                loginViewModel.Load();
+
+                LoginPage = new Login
+                {
+                    DataContext = loginViewModel
+                };
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("INIT LOGIN VIEW ERROR" + e.Message);
+            }
             #endregion
 
             #region Setup Update Thread

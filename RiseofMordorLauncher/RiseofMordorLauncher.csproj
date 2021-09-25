@@ -214,6 +214,7 @@
     <None Include="app.manifest" />
     <None Include="credentials.json" />
     <Resource Include="Directory\Fonts\Middleearth.ttf" />
+    <None Include="Directory\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -197,7 +197,8 @@
                             BorderBrush="#080808"
                             BorderThickness="1">
                         
-                        <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}" Height="220" />
+                        <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}"
+                                                Height="220" />
                         
                     </Border>
                 </Grid>

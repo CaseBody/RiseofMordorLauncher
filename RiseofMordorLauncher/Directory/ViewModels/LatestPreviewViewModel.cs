@@ -31,6 +31,8 @@ namespace RiseofMordorLauncher
         {
             if (sharedData.IsOffline)
             {
+                Logger.Log("Hiding Latest Preview...");
+
                 ShowPreview = Visibility.Hidden;
                 OnPropertyChanged(nameof(ShowPreview));
             }
@@ -43,6 +45,8 @@ namespace RiseofMordorLauncher
 
         public async void MainAsync()
         {
+            Logger.Log("Downloading latest discord preview...");
+
             var discord = new DiscordClient(new DiscordConfiguration()
             {
                 Token           = DISCORD_BOT_TOKEN,
@@ -50,12 +54,14 @@ namespace RiseofMordorLauncher
                 Intents         = DiscordIntents.All
             });
 
+            Logger.Log("Connected to discord...");
             await discord.ConnectAsync();
 
             _client             = new DiscordSocketClient();
             _client.Ready       += OnDiscordClientConnected;
             _client.LoggedOut   += () =>
             {
+                Logger.Log("Logged in discord...");
                 _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
                 return Task.CompletedTask;
             };
@@ -67,9 +73,12 @@ namespace RiseofMordorLauncher
 
         private Task OnDiscordClientConnected()
         {
+            Logger.Log("Discord client connected...");
             try
             {
+                Logger.Log("Getting #previews channel...");
                 _previewChannel = _client.GetChannel(PREVIEWS_CHANNEL_ID) as ISocketMessageChannel;
+                Logger.Log("Getting latest preview message...");
                 var lastMessageAsync = _previewChannel.GetMessagesAsync(1);
                 var lastMsgArr = AsyncEnumerableExtensions.FlattenAsync(lastMessageAsync);
                 var lastMsg = lastMsgArr.Result.First();
@@ -79,6 +88,7 @@ namespace RiseofMordorLauncher
                 {
                     _latestPreviewURL = attachment.Url;
 
+                    Logger.Log("Updating the Latest Preview image...");
                     Application.Current.Dispatcher.BeginInvoke(
                         new ThreadStart(() =>
                         {

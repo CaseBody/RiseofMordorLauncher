@@ -12,35 +12,37 @@ using Google.Apis.Drive.v3.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using System.Windows;
+using System.Globalization;
 
 namespace RiseofMordorLauncher
 {
     public class APIModVersionService : IModVersionService
     {
-
         // Return info about installed mod version and latest downloadable version
         public async Task<ModVersion> GetModVersionInfo(SharedData sharedData)
         {
-            SteamAPI.Init();
-            AppId_t attila_appid = (AppId_t)325610;
-            ModVersion version = new ModVersion();
-            
-            string AttilaDir = "";
-            SteamApps.GetAppInstallDir(attila_appid, out AttilaDir, 10000);
-            string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            Logger.Log("Getting mod version info...");
 
-            IGoogleDriveService drive_service = new APIGoogleDriveService();
+            var culture = new CultureInfo("en");
+            var version = new ModVersion();
+            var AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            var drive_service = new APIGoogleDriveService();
 
             // check if online, if not latest downloadable mod version will be turned as 0 otherwise get latest info.
-
             if (!sharedData.IsOffline)
             {
+                Logger.Log("Downloading current_mod_version.txt...");
+
                 await drive_service.DownloadFile("current_mod_version.txt", $"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", 1);
 
-                string[] current_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt");
-                bool is_reading_pack_files = false;
-                version.LatestPackFiles = new List<string>();
-                foreach (string line in current_info)
+                try
+                {
+                    var current_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt");
+                    var is_reading_pack_files = false;
+                    version.LatestPackFiles = new List<string>();
+
+                    Logger.Log("Parsing current_mod_version.txt...");
+                    foreach (var line in current_info)
                     {
                         if (is_reading_pack_files)
                         {
@@ -57,140 +59,143 @@ namespace RiseofMordorLauncher
                         {
                             if (line.StartsWith("version"))
                             {
-                                string raw_version = line.Split('=').ElementAt(1);
+                                var raw_version = line.Split('=').ElementAt(1);
                                 version.VersionText = raw_version;
-                                char[] char_array = raw_version.ToCharArray();
-                                string final = "";
-                                bool has_hit_first_dot = false;
+                                var char_array = raw_version.ToCharArray();
+                                var final = "";
+                                var has_hit_first_dot = false;
 
                                 foreach (char charachter in char_array)
                                 {
                                     if (charachter == '.')
                                     {
-                                        if (has_hit_first_dot)
-                                        {
-
-                                        }
-                                        else
+                                        if (has_hit_first_dot == false)
                                         {
                                             has_hit_first_dot = true;
-                                            final = final + charachter;
+                                            final += charachter;
                                         }
                                     }
                                     else
                                     {
-                                        final = final + charachter;
+                                        final += charachter;
                                     }
                                 }
-                                version.LatestVersionNumber = double.Parse(final);
+
+                                version.LatestVersionNumber = double.Parse(final, culture);
                             }
                             else if (line.StartsWith("size"))
                             {
-                            version.DownloadNumberOfBytes = long.Parse(line.Split('=').ElementAt(1));
+                                version.DownloadNumberOfBytes = long.Parse(line.Split('=').ElementAt(1), culture);
                             }
-                            else if (line == ("pack_files = {")) { is_reading_pack_files = true; }
+                            else if (line == "pack_files = {")
+                            {
+                                is_reading_pack_files = true;
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message);
+                }
             }
             else
             {
                 version.LatestVersionNumber = 0;
             }
 
-            // Check if a local version is currently installed
-
+            Logger.Log("Checking if local_version.txt is installed...");
             if (System.IO.File.Exists($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/local_version.txt"))
             {
-                string[] local_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
-                bool is_reading_pack_files = false;
-                bool is_reading_changelog = false;
+                var local_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+                var is_reading_pack_files = false;
+                var is_reading_changelog = false;
                 version.InstalledPackFiles = new List<string>();
                 foreach (string line in local_info)
+                {
+                    if (is_reading_pack_files)
                     {
-                        if (is_reading_pack_files)
+                        if (line == "}")
                         {
-                            if (line == "}")
-                            {
-                                is_reading_pack_files = false;
-                            }
-                            else
-                            {
-                                version.InstalledPackFiles.Add(line);
-                            }
-                        }
-                        else if (is_reading_changelog)
-                        {
-                            if (line == "}")
-                            {
-                                is_reading_changelog = false;
-                            }
-                            else
-                            {
-                                if (version.ChangeLog == "")
-                                {
-                                    version.ChangeLog = line;
-                                }
-                                else
-                                {
-                                    if (line == "")
-                                    {
-                                        version.ChangeLog = version.ChangeLog + Environment.NewLine;
-                                    }
-                                    else
-                                    {
-                                        version.ChangeLog = version.ChangeLog + Environment.NewLine + line;
-                                    }
-                                }
-                            }
+                            is_reading_pack_files = false;
                         }
                         else
                         {
-                            if (line.StartsWith("version"))
+                            version.InstalledPackFiles.Add(line);
+                        }
+                    }
+                    else if (is_reading_changelog)
+                    {
+                        if (line == "}")
+                        {
+                            is_reading_changelog = false;
+                        }
+                        else
+                        {
+                            if (version.ChangeLog == "")
                             {
-                                string raw_version = line.Split('=').ElementAt(1);
-                                char[] char_array = raw_version.ToCharArray();
-                                string final = "";
-                                bool has_hit_first_dot = false;
-
-                                foreach (char charachter in char_array)
+                                version.ChangeLog = line;
+                            }
+                            else
+                            {
+                                if (line == "")
                                 {
-                                    if (charachter == '.')
-                                    {
-                                        if (has_hit_first_dot)
-                                        {
+                                    version.ChangeLog = version.ChangeLog + Environment.NewLine;
+                                }
+                                else
+                                {
+                                    version.ChangeLog = version.ChangeLog + Environment.NewLine + line;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (line.StartsWith("version"))
+                        {
+                            string raw_version = line.Split('=').ElementAt(1);
+                            char[] char_array = raw_version.ToCharArray();
+                            string final = "";
+                            bool has_hit_first_dot = false;
 
-                                        }
-                                        else
-                                        {
-                                            has_hit_first_dot = true;
-                                            final = final + charachter;
-                                        }
+                            foreach (char charachter in char_array)
+                            {
+                                if (charachter == '.')
+                                {
+                                    if (has_hit_first_dot)
+                                    {
+
                                     }
                                     else
                                     {
+                                        has_hit_first_dot = true;
                                         final = final + charachter;
                                     }
                                 }
-                                version.InstalledVersionNumber = double.Parse(final);
+                                else
+                                {
+                                    final = final + charachter;
+                                }
                             }
-                            else if (line == ("pack_files = {")) { is_reading_pack_files = true; }
-                            else if (line == ("change_log = {")) { is_reading_changelog = true; }
+
+                            version.InstalledVersionNumber = double.Parse(final, culture);
                         }
+                        else if (line == ("pack_files = {")) { is_reading_pack_files = true; }
+                        else if (line == ("change_log = {")) { is_reading_changelog = true; }
                     }
+                }
             }
             else
             {
-
                 if (version.LatestVersionNumber != 0 && !sharedData.IsOffline)
                 {
-
                     if (version.LatestPackFiles.Count != 0)
                     {
                         bool packs_installed = true;
 
                         foreach (string pack in version.LatestPackFiles)
                         {
-                            if (!(System.IO.File.Exists($"{AttilaDir}/data/{pack}")))
+                            if (!System.IO.File.Exists($"{sharedData.AttilaDir}/data/{pack}"))
                             {
                                 packs_installed = false;
                             }
@@ -219,8 +224,7 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            // If a local version is installed, ensure all pack files are in present in Data. if not return version as 0 so they will be downloaded.
-
+            Logger.Log("Ensuring all pack files are in present in Data...");
             if (version.InstalledPackFiles != null)
             {
                 if (version.InstalledPackFiles.Count != 0)
@@ -229,7 +233,7 @@ namespace RiseofMordorLauncher
 
                     foreach (string pack in version.InstalledPackFiles)
                     {
-                        if (!(System.IO.File.Exists($"{AttilaDir}/data/{pack}")))
+                        if (!System.IO.File.Exists($"{sharedData.AttilaDir}/data/{pack}"))
                         {
                             packs_installed = false;
                         }

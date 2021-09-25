@@ -19,6 +19,11 @@ using DiscordRPC;
 
 namespace RiseofMordorLauncher
 {
+    class Constants
+    {
+        public static AppId_t ATTILA_APP_ID = (AppId_t)325610;
+    }
+
     class MainLauncherViewModel : BaseViewModel
     {
         private ISteamUserService _steamUserService;
@@ -82,12 +87,16 @@ namespace RiseofMordorLauncher
 
         public async void Load()
         {
+            Logger.Log("Started loading Main Launcher");
+
             // get steam user data
             _steamUserService = new APISteamUserService();
+            Logger.Log("Getting steam user data...");
             var user = await _steamUserService.GetSteamUser();
             SteamUserName = user.UserName;
             SteamAvatarUrl = user.AvatarUrl;
 
+            Logger.Log("Getting YoutTube video data...");
             // get YoutTube video data (if offline hide player)
             if (!SharedData.IsOffline)
             {
@@ -100,6 +109,7 @@ namespace RiseofMordorLauncher
                 ShowVideo = Visibility.Hidden;
             }
 
+            Logger.Log("Getting version data...");
             // get version data
             _modVersionService = new APIModVersionService();
             Version = await _modVersionService.GetModVersionInfo(SharedData);
@@ -119,12 +129,14 @@ namespace RiseofMordorLauncher
         {
             if (SharedData.IsOffline && Version.InstalledVersionNumber == 0)
             {
+                Logger.Log("PostUiLoadAsync: (SharedData.IsOffline && Version.InstalledVersionNumber == 0)");
                 MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: Rise of Mordor");
                 PlayButtonText = "UPDATING";
                 PlayButtonEnabled = false;
             }
             else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
             {
+                Logger.Log("Loading user preferences...");
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
@@ -146,17 +158,23 @@ namespace RiseofMordorLauncher
 
         private async void DownloadUpdate()
         {
+            Logger.Log("Updating mod files...");
+
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
             PlayButtonMargin = "350 30";
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            IGoogleDriveService googleDriveService = new APIGoogleDriveService();
+            Logger.Log("Creating gdrive service...");
+            var googleDriveService = new APIGoogleDriveService();
             googleDriveService.DownloadUpdate += DownloadProgressUpdate;
+
+            Logger.Log("Downloading rom_pack_files.rar from gdrive...");
             await googleDriveService.DownloadFile("rom_pack_files.rar", $"{SharedData.AttilaDir}/data/rom_pack_files.rar", Version.DownloadNumberOfBytes);
             ProgressBarProgress = 100;
-
+            
+            Logger.Log("Extracting rom_pack_files.rar...");
             ProgressText = "EXTRACTING...";
             using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
             {
@@ -170,6 +188,7 @@ namespace RiseofMordorLauncher
                 }
             }
 
+            Logger.Log("Deleting rom_pack_files.rar...");
             File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
@@ -485,7 +504,6 @@ namespace RiseofMordorLauncher
             }
         }
 
-
         private void WritePrefs(UserPreferences prefs2)
         {
             if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
@@ -547,8 +565,10 @@ namespace RiseofMordorLauncher
             }
 
         }
+        
         protected virtual void SwitchPage(ApplicationPage page)
         {
+            Logger.Log($"Switching page to {page}");
             SwitchPageEvent?.Invoke(this, page);
         }
 

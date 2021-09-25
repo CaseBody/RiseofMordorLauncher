@@ -70,6 +70,8 @@ namespace RiseofMordorLauncher
 
         private bool InitSteamAPI()
         {
+            Logger.Log("Initialising Steam API...");
+         
             bool didInit = SteamAPI.Init();
             if (didInit == false)
             {
@@ -85,6 +87,8 @@ namespace RiseofMordorLauncher
         /// <returns>True if Steam client is running; False if it isn't</returns>
         private bool CheckSteam()
         {
+            Logger.Log("Checking whether Steam app is running...");
+            
             bool isSteamRunning = SteamAPI.IsSteamRunning();
             if (isSteamRunning == false)
             {
@@ -97,7 +101,9 @@ namespace RiseofMordorLauncher
         // second check, ensure Attila is installed. Mandatory
         private bool CheckAttilaInstalled()
         {
-            bool isAttilaInstalled = SteamApps.BIsAppInstalled((AppId_t)325610);
+            Logger.Log("Checking whether ATTILA is installed...");
+
+            bool isAttilaInstalled = SteamApps.BIsAppInstalled(Constants.ATTILA_APP_ID);
             if (isAttilaInstalled == false)
             {
                 DisplayError("ATTILA WAS NOT DETECTED", "Total War: Attila Steam installation was not detected. Please ensure you have Total War: Attila installed.", false, false);
@@ -109,6 +115,8 @@ namespace RiseofMordorLauncher
         // third check, check if there is an internet connection. If not, offer to start in Offline mode.
         private bool CheckInternet()
         {
+            Logger.Log("Checking internet connection...");
+            
             try
             {
                 var myPing      = new Ping();
@@ -136,9 +144,7 @@ namespace RiseofMordorLauncher
 
         private void Continue(bool offline)
         {
-            var attila_appid = (AppId_t)325610;
-
-            SteamApps.GetAppInstallDir(attila_appid, out string AttilaDir, 10000);
+            SteamApps.GetAppInstallDir(Constants.ATTILA_APP_ID, out string AttilaDir, 10000);
 
             SharedData.AttilaDir    = AttilaDir;
             SharedData.IsOffline    = offline;

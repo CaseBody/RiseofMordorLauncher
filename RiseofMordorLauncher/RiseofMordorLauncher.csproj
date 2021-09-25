@@ -65,6 +65,9 @@
   <PropertyGroup>
     <ApplicationIcon>image0 %281%29.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Steamworks.NET">
@@ -144,6 +147,7 @@
     <Compile Include="Directory\Data\SubmodModel.cs" />
     <Compile Include="Directory\Data\UserPreferences.cs" />
     <Compile Include="Directory\Data\YouTubeData.cs" />
+    <Compile Include="Directory\Logger\Logger.cs" />
     <Compile Include="Directory\Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
@@ -207,6 +211,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="credentials.json" />
     <Resource Include="Directory\Fonts\Middleearth.ttf" />
     <None Include="Properties\Settings.settings">

@@ -16,7 +16,10 @@ namespace RiseofMordorLauncher
 {
     public class LatestPreviewViewModel : BaseViewModel
     {
-        private static string   DISCORD_BOT_TOKEN   = "NzQ4OTQwODg4NDk0ODMzNzU0.X0kvjg.7LGEK6yxa64ziaRzGmdjpsO3bgQ";
+        // main bot:    "NzQ4OTQwODg4NDk0ODMzNzU0.X0kvjg.7LGEK6yxa64ziaRzGmdjpsO3bgQ"
+        // preview bot: "ODgxNTc0OTkzNDM0MTI0MzY5.YSu0sQ.eG52NviALZKPpljLR8kGlBHeXX0"
+
+        private static string DISCORD_BOT_TOKEN = "ODgxNTc0OTkzNDM0MTI0MzY5.YSu0sQ.eG52NviALZKPpljLR8kGlBHeXX0";
         private static ulong    PREVIEWS_CHANNEL_ID = 739128378669662228;
         //private static ulong    ROM_SERVER_ID       = 328911806372511744;
 

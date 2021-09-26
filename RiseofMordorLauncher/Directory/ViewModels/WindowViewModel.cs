@@ -158,7 +158,7 @@ namespace RiseofMordorLauncher
                     Assets = new Assets()
                     {
                         LargeImageKey = "large_image",
-                        LargeImageText = "discord.com/riseofmordor",
+                        LargeImageText = "discord.gg/riseofmordor",
                     }
                 });
             }

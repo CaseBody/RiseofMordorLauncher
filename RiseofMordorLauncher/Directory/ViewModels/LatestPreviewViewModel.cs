@@ -39,7 +39,15 @@ namespace RiseofMordorLauncher
             else
             {
                 PreviewImage = new BitmapImage();
-                MainAsync();
+
+                try
+                {
+                    MainAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(ex.Message);
+                }
             }
         }
 

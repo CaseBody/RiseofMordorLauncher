@@ -56,30 +56,37 @@ namespace RiseofMordorLauncher
 
         public async void MainAsync()
         {
-            Logger.Log("Downloading latest discord preview...");
-
-            var discord = new DiscordClient(new DiscordConfiguration()
+           try
             {
-                Token           = DISCORD_BOT_TOKEN,
-                TokenType       = DSharpPlus.TokenType.Bot,
-                Intents         = DiscordIntents.All
-            });
+                Logger.Log("Downloading latest discord preview...");
 
-            Logger.Log("Connected to discord...");
-            await discord.ConnectAsync();
+                var discord = new DiscordClient(new DiscordConfiguration()
+                {
+                    Token = DISCORD_BOT_TOKEN,
+                    TokenType = DSharpPlus.TokenType.Bot,
+                    Intents = DiscordIntents.All
+                });
 
-            _client             = new DiscordSocketClient();
-            _client.Ready       += OnDiscordClientConnected;
-            _client.LoggedOut   += () =>
+                Logger.Log("Connected to discord...");
+                await discord.ConnectAsync();
+
+                _client = new DiscordSocketClient();
+                _client.Ready += OnDiscordClientConnected;
+                _client.LoggedOut += () =>
+                {
+                    Logger.Log("Logged in discord...");
+                    _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
+                    return Task.CompletedTask;
+                };
+
+                await _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
+                await _client.StartAsync();
+                await Task.Delay(-1);
+            }
+            catch
             {
-                Logger.Log("Logged in discord...");
-                _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
-                return Task.CompletedTask;
-            };
 
-            await _client.LoginAsync(Discord.TokenType.Bot, DISCORD_BOT_TOKEN);
-            await _client.StartAsync();
-            await Task.Delay(-1);
+            }
         }
 
         private Task OnDiscordClientConnected()

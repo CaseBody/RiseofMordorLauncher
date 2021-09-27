@@ -57,7 +57,7 @@ namespace RiseofMordorLauncher
         public Settings SettingsPage { get; set; } = new Settings();
         private SettingsViewModel SettingsPageViewModel { get; set; }
         
-        public LatestPreviewViewModel LatestPreviewVM { get; private set; }
+        public ILatestPreview LatestPreviewVM { get; private set; }
 
         private ICommand _PlayCommand;
         private ICommand _SettingsCommand;
@@ -120,7 +120,8 @@ namespace RiseofMordorLauncher
             downloadThread.IsBackground = true;
             downloadThread.Start();
 
-            LatestPreviewVM = new LatestPreviewViewModel(SharedData);
+            //LatestPreviewVM = new LatestPreviewDiscordViewModel(SharedData);
+            LatestPreviewVM = new LatestPreviewModDBViewModel(SharedData);
 
             SwitchPage(ApplicationPage.MainLauncher);
         }

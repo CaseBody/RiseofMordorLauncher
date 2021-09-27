@@ -14,7 +14,7 @@ using RiseofMordorLauncher.Directory.Services;
 
 namespace RiseofMordorLauncher
 {
-    public class LatestPreviewViewModel : BaseViewModel
+    public class LatestPreviewDiscordViewModel : BaseViewModel, ILatestPreview
     {
         // main bot:    "NzQ4OTQwODg4NDk0ODMzNzU0.X0kvjg.7LGEK6yxa64ziaRzGmdjpsO3bgQ"
         // preview bot: "ODgxNTc0OTkzNDM0MTI0MzY5.YSu0sQ.eG52NviALZKPpljLR8kGlBHeXX0"
@@ -27,10 +27,10 @@ namespace RiseofMordorLauncher
         private ISocketMessageChannel   _previewChannel;
         private string                  _latestPreviewURL;
 
-        public BitmapImage PreviewImage { get; private set; }
-        public Visibility ShowPreview { get; private set; } = Visibility.Visible;
+        public BitmapImage PreviewImage { get; set; }
+        public Visibility ShowPreview { get; set; } = Visibility.Visible;
 
-        public LatestPreviewViewModel(SharedData sharedData)
+        public LatestPreviewDiscordViewModel(SharedData sharedData)
         {
             if (sharedData.IsOffline)
             {
@@ -54,7 +54,7 @@ namespace RiseofMordorLauncher
             }
         }
 
-        public async void MainAsync()
+        private async void MainAsync()
         {
            try
             {
@@ -133,7 +133,7 @@ namespace RiseofMordorLauncher
         {
             get
             {
-                return _PreviewCommand ?? (_PreviewCommand = new CommandHandler(() => Process.Start("https://discord.com/channels/328911806372511744/739128378669662228"), () => true)); ;
+                return _PreviewCommand ?? (_PreviewCommand = new CommandHandler(() => Process.Start("https://discord.com/channels/328911806372511744/739128378669662228"), () => true));
             }
         }
     }

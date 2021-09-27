@@ -155,7 +155,6 @@
                             BorderThickness="1">
 
                         <Image Source="{Binding PreviewImage}"
-                               RenderOptions.BitmapScalingMode="Fant"
                                Stretch="UniformToFill"
                                Cursor="Hand">
 

@@ -407,6 +407,11 @@ namespace RiseofMordorLauncher
                     {
                         Details = "Rise of Mordor Launcher",
                         State = "Tweaking Settings",
+                        Buttons = new DiscordRPC.Button[]
+                        {
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                        },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
@@ -425,10 +430,15 @@ namespace RiseofMordorLauncher
                     {
                         Details = "Rise of Mordor Launcher",
                         State = "On the main page",
+                        Buttons = new DiscordRPC.Button[]
+                        {
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                        },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
-                            LargeImageText = "discord.com/riseofmordor",
+                            LargeImageText = "discord.gg/riseofmordor",
                         }
                     });
                 } catch { }

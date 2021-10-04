@@ -8,7 +8,7 @@ namespace RiseofMordorLauncher
 {
     public class ModVersion
     {
-        public long DownloadNumberOfBytes;
+        public string ModdbDownloadPageUrl { get; set; }
         public double LatestVersionNumber { get; set; }  
         public double InstalledVersionNumber { get; set; }
         public string ChangeLog { get; set; }

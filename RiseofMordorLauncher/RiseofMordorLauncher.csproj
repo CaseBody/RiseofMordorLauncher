@@ -164,6 +164,7 @@
     <Compile Include="Directory\Pages\SubmodsPage.xaml.cs">
       <DependentUpon>SubmodsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Directory\Services\API\APIModdbDownloadService.cs" />
     <Compile Include="Directory\Services\API\APIGoogleDriveService.cs" />
     <Compile Include="Directory\Services\API\APILauncherVersionService.cs" />
     <Compile Include="Directory\Services\API\APISteamSubmodService.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Directory\Services\API\APIUserPreferencesService.cs" />
     <Compile Include="Directory\Services\API\APIYouTubeDataService.cs" />
     <Compile Include="Directory\Services\CommandHandler.cs" />
+    <Compile Include="Directory\Services\IModdbDownloadService.cs" />
     <Compile Include="Directory\Services\IGoogleDriveService.cs" />
     <Compile Include="Directory\Services\ILauncherVersionService.cs" />
     <Compile Include="Directory\Services\IModVersionService.cs" />

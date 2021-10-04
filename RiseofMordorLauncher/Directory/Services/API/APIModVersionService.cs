@@ -83,9 +83,9 @@ namespace RiseofMordorLauncher
 
                                 version.LatestVersionNumber = double.Parse(final, culture);
                             }
-                            else if (line.StartsWith("size"))
+                            else if (line.StartsWith("url"))
                             {
-                                version.DownloadNumberOfBytes = long.Parse(line.Split('=').ElementAt(1), culture);
+                                version.ModdbDownloadPageUrl = line.Split('=').ElementAt(1);
                             }
                             else if (line == "pack_files = {")
                             {

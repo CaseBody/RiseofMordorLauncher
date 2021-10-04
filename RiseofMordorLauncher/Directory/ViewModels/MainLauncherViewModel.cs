@@ -167,48 +167,13 @@ namespace RiseofMordorLauncher
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            Logger.Log("Creating gdrive service...");
-            var googleDriveService = new APIGoogleDriveService();
-            googleDriveService.DownloadUpdate += DownloadProgressUpdate;
+            Logger.Log("Creating moddb service...");
+            IModdbDownloadService moddbService = new APIModdbDownloadService();
+            moddbService.DownloadUpdate += DownloadProgressUpdate;
 
-            Logger.Log("Downloading rom_pack_files.rar from gdrive...");
-            await googleDriveService.DownloadFile("rom_pack_files.rar", $"{SharedData.AttilaDir}/data/rom_pack_files.rar", Version.DownloadNumberOfBytes);
-            ProgressBarProgress = 100;
+            Logger.Log("Downloading rom_pack_files.rar from moddb...");
+            moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
             
-            Logger.Log("Extracting rom_pack_files.rar...");
-            ProgressText = "EXTRACTING...";
-            using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
-            {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                {
-                    entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-                }
-            }
-
-            Logger.Log("Deleting rom_pack_files.rar...");
-            File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
-
-            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
-            {
-                x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
-            }
-
-            PlayButtonText = "PLAY";
-            PlayButtonEnabled = true;
-            PlayButtonMargin = "450 30";
-            SubmodButtonEnabled = true;
-            ShowProgressBar = Visibility.Hidden;
-
-            Version = await _modVersionService.GetModVersionInfo(SharedData);
-            VersionText = "Version " + Version.VersionText;
-            ChangelogText = Version.ChangeLog;
         }
 
         private async void DownloadLauncherUpdate()
@@ -445,9 +410,47 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private void DownloadProgressUpdate(object sender, int percent_finished)
+        private async void DownloadProgressUpdate(object sender, int percent_finished)
         {
             ProgressBarProgress = percent_finished;
+
+            if (percent_finished == 105)
+            {
+                Logger.Log("Extracting rom_pack_files.rar...");
+                ProgressText = "EXTRACTING...";
+                using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
+                {
+                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                    {
+                        entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+                    }
+                }
+
+                Logger.Log("Deleting rom_pack_files.rar...");
+                File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
+                File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+
+                using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+                {
+                    x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                }
+
+                PlayButtonText = "PLAY";
+                PlayButtonEnabled = true;
+                PlayButtonMargin = "450 30";
+                SubmodButtonEnabled = true;
+                ShowProgressBar = Visibility.Hidden;
+
+                Version = await _modVersionService.GetModVersionInfo(SharedData);
+                VersionText = "Version " + Version.VersionText;
+                ChangelogText = Version.ChangeLog;
+            }
         }
 
         private void DisableSubmod(string id)

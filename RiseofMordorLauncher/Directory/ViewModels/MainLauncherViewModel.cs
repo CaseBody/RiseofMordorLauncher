@@ -631,7 +631,7 @@ namespace RiseofMordorLauncher
         {
             get
             {
-                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor_tw/"), () => true)); ;
+                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor/"), () => true)); ;
             }
         }
         #endregion

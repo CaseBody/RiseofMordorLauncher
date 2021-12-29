@@ -38,10 +38,12 @@ namespace RiseofMordorLauncher
         private List<String> EnabledSubmodsRaw;
         ISteamSubmodsService SubmodService;
         IUserPreferencesService UserPreferencesService;
+        MainLauncherViewModel mainLauncher;
         SharedData sharedData;
-        public SettingsViewModel(SharedData sharedDataInput)
+        public SettingsViewModel(SharedData sharedDataInput, MainLauncherViewModel mainLauncherInput)
         {
             sharedData = sharedDataInput;
+            mainLauncher = mainLauncherInput;
 
             UserPreferencesService = new APIUserPreferencesService();
             SubmodService = new APISteamSubmodService();
@@ -314,9 +316,15 @@ namespace RiseofMordorLauncher
             }
         }
 
+        private void Redownload()
+        {
+            mainLauncher.DownloadUpdate();
+        }
+
  
         private ICommand _UpCommand;
         private ICommand _DownCommand;
+        private ICommand _RedownloadCommand;
         public ICommand UpCommand
         {
             get
@@ -333,7 +341,13 @@ namespace RiseofMordorLauncher
             }
         }
 
-
+        public ICommand RedownloadCommand
+        {
+            get
+            {
+                return _RedownloadCommand ?? (_RedownloadCommand = new CommandHandler(() => Redownload(), () => true));
+            }
+        }
 
     }
 }

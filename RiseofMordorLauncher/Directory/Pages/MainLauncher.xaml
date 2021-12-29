@@ -205,8 +205,6 @@
 
         </Grid>
 
-        <Frame Grid.Row="0" Grid.RowSpan="2" Margin="0 60 0 0" HorizontalAlignment="Left" Width="200" Visibility="{Binding SettingsVisibility}" Content="{Binding SettingsPage}"/>
-
         <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Right" Width="80">
             <Image Source="../Images/discord_icon.png" Cursor="Hand" Margin="20 4 20 10" RenderOptions.BitmapScalingMode="Fant">
                 <Image.InputBindings>

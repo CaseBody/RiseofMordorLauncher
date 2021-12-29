@@ -55,6 +55,7 @@ namespace RiseofMordorLauncher
 
         public Visibility SettingsVisibility { get; set; } = Visibility.Hidden;
         public Settings SettingsPage { get; set; } = new Settings();
+        private Window SettingsWindow { get; set; } = new Window();
         private SettingsViewModel SettingsPageViewModel { get; set; }
         
         public ILatestPreview LatestPreviewVM { get; private set; }
@@ -157,7 +158,7 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private async void DownloadUpdate()
+        public async void DownloadUpdate()
         {
             Logger.Log("Updating mod files...");
 
@@ -360,12 +361,12 @@ namespace RiseofMordorLauncher
 
         private void SettingsButtonClick()
         {
-            if (SettingsVisibility == Visibility.Hidden)
+            if (!SettingsPage.IsVisible)
             {
-                SettingsPageViewModel = new SettingsViewModel(SharedData);
+                SettingsPage = new Settings();
+                SettingsPageViewModel = new SettingsViewModel(SharedData, this);
                 SettingsPage.DataContext = SettingsPageViewModel;
-                SettingsVisibility = Visibility.Visible;
-
+                SettingsPage.Show();
                 try
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()
@@ -387,8 +388,7 @@ namespace RiseofMordorLauncher
             }
             else
             {
-                SettingsVisibility = Visibility.Hidden;
-
+                SettingsPage.Hide();
                 try
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()

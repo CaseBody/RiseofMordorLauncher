@@ -1,11 +1,13 @@
-﻿<Page x:Class="RiseofMordorLauncher.Directory.Pages.Settings"
+﻿<Window x:Class="RiseofMordorLauncher.Directory.Pages.Settings"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="200"
+      Height="400"
+      Width="200"
+      ResizeMode="NoResize"
       Title="Settings">
 
     <StackPanel Background="Black" Orientation="Vertical">
@@ -33,5 +35,19 @@
                 <ListBox Background="Black" BorderBrush="Black" Foreground="#fc9b00" ItemsSource="{Binding SubmodLoadOrder}" SelectedIndex="{Binding SelectedItem}"/>
             </ScrollViewer>
         </Border>
+
+        <Button Grid.Row="1"
+                    Content="Redownload Packs"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Foreground="#fc9b00"
+                    BorderThickness="0"
+                    FontSize="20"
+                    FontWeight="SemiBold"
+                    Height="50"
+                    Width="180"
+                    Margin="0 10 0 0"
+                    Command="{Binding RedownloadCommand}"
+                    Style="{StaticResource DarkButton}"/>
     </StackPanel>
-</Page>
+</Window>

@@ -218,6 +218,11 @@ namespace RiseofMordorLauncher
 
         private async void LaunchGame()
         {
+            if (SteamApps.GetCurrentGameLanguage() != "english")
+            {
+                MessageBox.Show("Your game language has been detected as non-english. This may lead to issues. Rise of Mordor currently only supports English, we recommend switching the game language through Steam.");
+            }
+
             UserPreferences prefs = new UserPreferences();
             SubmodService = new APISteamSubmodService();
             UserPreferencesService = new APIUserPreferencesService();

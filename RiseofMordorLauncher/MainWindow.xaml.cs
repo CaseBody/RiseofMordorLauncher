@@ -62,7 +62,7 @@ namespace RiseofMordorLauncher
 
         private void Close(object sender, EventArgs e)
         {
-            this.Close();
+            Process.GetCurrentProcess().Kill();
         }
     }
 }

@@ -5,9 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AutoUpdater"
         mc:Ignorable="d"
-        Title="MainWindow"
+        Title="Launcher Updater"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
+        ResizeMode="NoResize"
         MouseDown="Window_MouseDown"
         Height="350"
         Width="600">
@@ -25,12 +26,12 @@
                HorizontalAlignment="Center"
                VerticalAlignment="Center" />
 
-        <TextBlock Grid.Row="1"
+        <TextBlock x:Name="StatusText" Grid.Row="1"
                    VerticalAlignment="Center"
                    HorizontalAlignment="Center"
                    Foreground="White"
                    FontSize="24"
-                   Text="CHEKING FOR UPDATES..."/>
+                   Text="Checking for launcher updates..."/>
     </Grid>
     
 </Window>

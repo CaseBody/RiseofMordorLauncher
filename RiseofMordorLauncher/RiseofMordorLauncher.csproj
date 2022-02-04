@@ -65,6 +65,9 @@
   <PropertyGroup>
     <ApplicationIcon>image0 %281%29.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="Steamworks.NET">
@@ -144,6 +147,8 @@
     <Compile Include="Directory\Data\SubmodModel.cs" />
     <Compile Include="Directory\Data\UserPreferences.cs" />
     <Compile Include="Directory\Data\YouTubeData.cs" />
+    <Compile Include="Directory\Interfaces\ILatestPreview.cs" />
+    <Compile Include="Directory\Logger\Logger.cs" />
     <Compile Include="Directory\Pages\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
@@ -159,6 +164,7 @@
     <Compile Include="Directory\Pages\SubmodsPage.xaml.cs">
       <DependentUpon>SubmodsPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Directory\Services\API\APIModdbDownloadService.cs" />
     <Compile Include="Directory\Services\API\APIGoogleDriveService.cs" />
     <Compile Include="Directory\Services\API\APILauncherVersionService.cs" />
     <Compile Include="Directory\Services\API\APISteamSubmodService.cs" />
@@ -167,6 +173,7 @@
     <Compile Include="Directory\Services\API\APIUserPreferencesService.cs" />
     <Compile Include="Directory\Services\API\APIYouTubeDataService.cs" />
     <Compile Include="Directory\Services\CommandHandler.cs" />
+    <Compile Include="Directory\Services\IModdbDownloadService.cs" />
     <Compile Include="Directory\Services\IGoogleDriveService.cs" />
     <Compile Include="Directory\Services\ILauncherVersionService.cs" />
     <Compile Include="Directory\Services\IModVersionService.cs" />
@@ -178,7 +185,8 @@
     <Compile Include="Directory\ValueConverters\ApplicationPageValueConverter.cs" />
     <Compile Include="Directory\ValueConverters\BaseValueConverter.cs" />
     <Compile Include="Directory\ViewModels\BaseViewModel.cs" />
-    <Compile Include="Directory\ViewModels\LatestPreviewViewModel.cs" />
+    <Compile Include="Directory\ViewModels\LatestPreviewDiscordViewModel.cs" />
+    <Compile Include="Directory\ViewModels\LatestPreviewModDBViewModel.cs" />
     <Compile Include="Directory\ViewModels\LoginViewModel.cs" />
     <Compile Include="Directory\ViewModels\MainLauncherViewModel.cs" />
     <Compile Include="Directory\ViewModels\SettingsViewModel.cs" />
@@ -207,6 +215,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.manifest" />
     <None Include="credentials.json" />
     <Resource Include="Directory\Fonts\Middleearth.ttf" />
     <None Include="Properties\Settings.settings">
@@ -276,6 +285,9 @@
     </PackageReference>
     <PackageReference Include="Google.Apis.Drive.v3">
       <Version>1.54.0.2397</Version>
+    </PackageReference>
+    <PackageReference Include="HtmlAgilityPack">
+      <Version>1.11.36</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options">
       <Version>6.0.0-preview.6.21352.12</Version>

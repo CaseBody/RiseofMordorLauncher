@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace RiseofMordorLauncher.Directory.Pages
+namespace RiseofMordorLauncherUpdater
 {
     /// <summary>
-    /// Interaction logic for Settings.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class Settings : Window
+    public partial class MainWindow : Window
     {
-        public Settings()
+        public MainWindow()
         {
             InitializeComponent();
         }

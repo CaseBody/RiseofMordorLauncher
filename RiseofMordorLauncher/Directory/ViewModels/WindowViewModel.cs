@@ -12,6 +12,7 @@ using RiseofMordorLauncher.Directory.Services;
 using DiscordRPC;
 using System.IO;
 using System.Diagnostics;
+using System.Windows;
 
 namespace RiseofMordorLauncher
 {
@@ -30,7 +31,7 @@ namespace RiseofMordorLauncher
 
         private MainLauncher MainLauncherPage;
         private readonly Login LoginPage;
-        private readonly SubmodsPage SubmodsPage;
+        private SubmodsPage SubmodsPage;
         private Thread UpdateThread;
         public Page CurrentPage { get; set; }
 
@@ -61,46 +62,29 @@ namespace RiseofMordorLauncher
             }
             #endregion
 
-            #region Main Page Setup
-            mainLauncherViewModel = new MainLauncherViewModel();
-            mainLauncherViewModel.SharedData       = SharedData;
-            mainLauncherViewModel.SwitchPageEvent += SwitchPage;
-            mainLauncherViewModel.Load();
-
-            MainLauncherPage = new MainLauncher(SharedData)
-            {
-                DataContext = mainLauncherViewModel
-            };
-            #endregion
-
             #region Login Page Setup
-            loginViewModel = new LoginViewModel();
-            loginViewModel.SharedData       = SharedData;
-            loginViewModel.SwitchPageEvent += SwitchPage;
-            loginViewModel.Load();
-
-            LoginPage = new Login
+            try
             {
-                DataContext = loginViewModel
-            };
+                loginViewModel = new LoginViewModel();
+                loginViewModel.SharedData = SharedData;
+                loginViewModel.SwitchPageEvent += SwitchPage;
+                loginViewModel.Load();
+
+                LoginPage = new Login
+                {
+                    DataContext = loginViewModel
+                };
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("INIT LOGIN VIEW ERROR" + e.Message);
+            }
             #endregion
 
             #region Setup Update Thread
             UpdateThread = new Thread(Update);
             UpdateThread.IsBackground = true;
             UpdateThread.Start();
-            #endregion
-
-            #region Submods Page Setup
-            submodsViewModel = new SubmodsViewModel();
-            submodsViewModel.SharedData       = SharedData;
-            submodsViewModel.SwitchPageEvent += SwitchPage;
-            submodsViewModel.Load();
-
-            SubmodsPage = new SubmodsPage
-            {
-                DataContext = submodsViewModel
-            };
             #endregion
 
             // Initial page is Login Page
@@ -110,6 +94,41 @@ namespace RiseofMordorLauncher
         // switch page, can be fired by the page ViewModels
         private void SwitchPage(object sender, ApplicationPage page)
         {
+            if (sender is LoginViewModel)
+            {
+                #region Main Page Setup
+                try
+                {
+
+                    mainLauncherViewModel = new MainLauncherViewModel();
+                    mainLauncherViewModel.SharedData = SharedData;
+                    mainLauncherViewModel.SwitchPageEvent += SwitchPage;
+                    mainLauncherViewModel.Load();
+
+                    MainLauncherPage = new MainLauncher(SharedData)
+                    {
+                        DataContext = mainLauncherViewModel
+                    };
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show("INIT MAIN VIEW ERROR" + e.Message);
+                }
+                #endregion
+
+                #region Submods Page Setup
+                submodsViewModel = new SubmodsViewModel();
+                submodsViewModel.SharedData = SharedData;
+                submodsViewModel.SwitchPageEvent += SwitchPage;
+                submodsViewModel.Load();
+
+                SubmodsPage = new SubmodsPage
+                {
+                    DataContext = submodsViewModel
+                };
+                #endregion
+            }
+
             string discordStateText;
             switch (page)
             {
@@ -139,10 +158,15 @@ namespace RiseofMordorLauncher
                 {
                     Details = "Rise of Mordor Launcher",
                     State = discordStateText,
+                    Buttons = new DiscordRPC.Button[]
+                    {
+                        new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
+                        new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                    },
                     Assets = new Assets()
                     {
                         LargeImageKey = "large_image",
-                        LargeImageText = "discord.com/riseofmordor",
+                        LargeImageText = "discord.gg/riseofmordor",
                     }
                 });
             }

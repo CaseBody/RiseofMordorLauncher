@@ -19,6 +19,11 @@ using DiscordRPC;
 
 namespace RiseofMordorLauncher
 {
+    class Constants
+    {
+        public static AppId_t ATTILA_APP_ID = (AppId_t)325610;
+    }
+
     class MainLauncherViewModel : BaseViewModel
     {
         private ISteamUserService _steamUserService;
@@ -50,9 +55,10 @@ namespace RiseofMordorLauncher
 
         public Visibility SettingsVisibility { get; set; } = Visibility.Hidden;
         public Settings SettingsPage { get; set; } = new Settings();
+        private Window SettingsWindow { get; set; } = new Window();
         private SettingsViewModel SettingsPageViewModel { get; set; }
         
-        public LatestPreviewViewModel LatestPreviewVM { get; private set; }
+        public ILatestPreview LatestPreviewVM { get; private set; }
 
         private ICommand _PlayCommand;
         private ICommand _SettingsCommand;
@@ -82,12 +88,16 @@ namespace RiseofMordorLauncher
 
         public async void Load()
         {
+            Logger.Log("Started loading Main Launcher");
+
             // get steam user data
             _steamUserService = new APISteamUserService();
+            Logger.Log("Getting steam user data...");
             var user = await _steamUserService.GetSteamUser();
             SteamUserName = user.UserName;
             SteamAvatarUrl = user.AvatarUrl;
 
+            Logger.Log("Getting YoutTube video data...");
             // get YoutTube video data (if offline hide player)
             if (!SharedData.IsOffline)
             {
@@ -100,6 +110,7 @@ namespace RiseofMordorLauncher
                 ShowVideo = Visibility.Hidden;
             }
 
+            Logger.Log("Getting version data...");
             // get version data
             _modVersionService = new APIModVersionService();
             Version = await _modVersionService.GetModVersionInfo(SharedData);
@@ -110,7 +121,8 @@ namespace RiseofMordorLauncher
             downloadThread.IsBackground = true;
             downloadThread.Start();
 
-            LatestPreviewVM = new LatestPreviewViewModel(SharedData);
+            //LatestPreviewVM = new LatestPreviewDiscordViewModel(SharedData);
+            LatestPreviewVM = new LatestPreviewModDBViewModel(SharedData);
 
             SwitchPage(ApplicationPage.MainLauncher);
         }
@@ -119,12 +131,14 @@ namespace RiseofMordorLauncher
         {
             if (SharedData.IsOffline && Version.InstalledVersionNumber == 0)
             {
+                Logger.Log("PostUiLoadAsync: (SharedData.IsOffline && Version.InstalledVersionNumber == 0)");
                 MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: Rise of Mordor");
                 PlayButtonText = "UPDATING";
                 PlayButtonEnabled = false;
             }
             else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
             {
+                Logger.Log("Loading user preferences...");
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
@@ -144,51 +158,23 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private async void DownloadUpdate()
+        public async void DownloadUpdate()
         {
+            Logger.Log("Updating mod files...");
+
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
             PlayButtonMargin = "350 30";
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            IGoogleDriveService googleDriveService = new APIGoogleDriveService();
-            googleDriveService.DownloadUpdate += DownloadProgressUpdate;
-            await googleDriveService.DownloadFile("rom_pack_files.rar", $"{SharedData.AttilaDir}/data/rom_pack_files.rar", Version.DownloadNumberOfBytes);
-            ProgressBarProgress = 100;
+            Logger.Log("Creating moddb service...");
+            IModdbDownloadService moddbService = new APIModdbDownloadService();
+            moddbService.DownloadUpdate += DownloadProgressUpdate;
 
-            ProgressText = "EXTRACTING...";
-            using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
-            {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                {
-                    entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-                }
-            }
-
-            File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
-
-            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
-            {
-                x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
-            }
-
-            PlayButtonText = "PLAY";
-            PlayButtonEnabled = true;
-            PlayButtonMargin = "450 30";
-            SubmodButtonEnabled = true;
-            ShowProgressBar = Visibility.Hidden;
-
-            Version = await _modVersionService.GetModVersionInfo(SharedData);
-            VersionText = "Version " + Version.VersionText;
-            ChangelogText = Version.ChangeLog;
+            Logger.Log("Downloading rom_pack_files.rar from moddb...");
+            moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            
         }
 
         private async void DownloadLauncherUpdate()
@@ -232,6 +218,11 @@ namespace RiseofMordorLauncher
 
         private async void LaunchGame()
         {
+            if (SteamApps.GetCurrentGameLanguage() != "english")
+            {
+                MessageBox.Show("Your game language has been detected as non-english. This may lead to issues. Rise of Mordor currently only supports English, we recommend switching the game language through Steam.");
+            }
+
             UserPreferences prefs = new UserPreferences();
             SubmodService = new APISteamSubmodService();
             UserPreferencesService = new APIUserPreferencesService();
@@ -375,49 +366,96 @@ namespace RiseofMordorLauncher
 
         private void SettingsButtonClick()
         {
-            if (SettingsVisibility == Visibility.Hidden)
+            if (!SettingsPage.IsVisible)
             {
-                SettingsPageViewModel = new SettingsViewModel(SharedData);
+                SettingsPage = new Settings();
+                SettingsPageViewModel = new SettingsViewModel(SharedData, this);
                 SettingsPage.DataContext = SettingsPageViewModel;
-                SettingsVisibility = Visibility.Visible;
-
+                SettingsPage.Show();
                 try
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()
                     {
                         Details = "Rise of Mordor Launcher",
                         State = "Tweaking Settings",
+                        Buttons = new DiscordRPC.Button[]
+                        {
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                        },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
-                            LargeImageText = "discord.com/riseofmordor",
+                            LargeImageText = "discord.gg/riseofmordor",
                         }
                     });
                 } catch { }
             }
             else
             {
-                SettingsVisibility = Visibility.Hidden;
-
+                SettingsPage.Hide();
                 try
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()
                     {
                         Details = "Rise of Mordor Launcher",
                         State = "On the main page",
+                        Buttons = new DiscordRPC.Button[]
+                        {
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                        },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
-                            LargeImageText = "discord.com/riseofmordor",
+                            LargeImageText = "discord.gg/riseofmordor",
                         }
                     });
                 } catch { }
             }
         }
 
-        private void DownloadProgressUpdate(object sender, int percent_finished)
+        private async void DownloadProgressUpdate(object sender, int percent_finished)
         {
             ProgressBarProgress = percent_finished;
+
+            if (percent_finished == 105)
+            {
+                Logger.Log("Extracting rom_pack_files.rar...");
+                ProgressText = "EXTRACTING...";
+                using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
+                {
+                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                    {
+                        entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
+                        {
+                            ExtractFullPath = true,
+                            Overwrite = true
+                        });
+                    }
+                }
+
+                Logger.Log("Deleting rom_pack_files.rar...");
+                File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
+                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
+                File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+
+                using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+                {
+                    x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                }
+
+                PlayButtonText = "PLAY";
+                PlayButtonEnabled = true;
+                PlayButtonMargin = "450 30";
+                SubmodButtonEnabled = true;
+                ShowProgressBar = Visibility.Hidden;
+
+                Version = await _modVersionService.GetModVersionInfo(SharedData);
+                VersionText = "Version " + Version.VersionText;
+                ChangelogText = Version.ChangeLog;
+            }
         }
 
         private void DisableSubmod(string id)
@@ -485,7 +523,6 @@ namespace RiseofMordorLauncher
             }
         }
 
-
         private void WritePrefs(UserPreferences prefs2)
         {
             if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
@@ -547,8 +584,10 @@ namespace RiseofMordorLauncher
             }
 
         }
+        
         protected virtual void SwitchPage(ApplicationPage page)
         {
+            Logger.Log($"Switching page to {page}");
             SwitchPageEvent?.Invoke(this, page);
         }
 
@@ -597,7 +636,7 @@ namespace RiseofMordorLauncher
         {
             get
             {
-                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor_tw/"), () => true)); ;
+                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor/"), () => true)); ;
             }
         }
         #endregion

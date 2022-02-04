@@ -94,7 +94,9 @@ namespace AutoUpdater
                     }
                 }
 
-                File.Delete($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
+                if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
+                    File.Delete($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
+
                 File.CreateText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
                 File.WriteAllText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt", current.ToString());
 

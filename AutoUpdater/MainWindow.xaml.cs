@@ -66,10 +66,10 @@ namespace AutoUpdater
             }
         }
 
-        private async void CheckUpdate()
+        private void CheckUpdate()
         {
             var local = GetLocalVersion();
-            var current = await GetCurrentVersion();
+            var current = GetCurrentVersion();
 
             if (current > local || !File.Exists($"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe"))
             {
@@ -118,10 +118,13 @@ namespace AutoUpdater
             }
         }
 
-        private async Task<int> GetCurrentVersion()
+        private int GetCurrentVersion()
         {
             HttpClient client = new HttpClient();
-            return int.Parse(await client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/current"));
+            var t = client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/current");
+            t.Wait();
+
+            return int.Parse(t.Result);
         }
 
         private void DownloadLauncher()

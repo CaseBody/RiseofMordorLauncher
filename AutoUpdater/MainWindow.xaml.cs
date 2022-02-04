@@ -37,18 +37,32 @@ namespace AutoUpdater
             try
             {
                 InitializeComponent();
-                Task.Delay(200);
-                Thread thread = new Thread(CheckUpdate);
+                Thread thread = new Thread(BackgroundEntryPoint);
                 thread.IsBackground = true;
 
                 thread.Start();
+
+                Thread.CurrentThread.Join();
             }
             catch
             {
+            }
+        }
+
+        private void BackgroundEntryPoint()
+        {
+            try
+            {
+                CheckUpdate();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error");
                 StatusText.Text = "Error while updating launcher. Starting local version.";
+
                 Task.Delay(500);
 
-                Process launcher = new Process();
+                var launcher = new Process();
                 launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe";
                 launcher.Start();
 

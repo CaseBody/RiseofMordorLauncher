@@ -149,4 +149,8 @@
     <Resource Include="image0.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy $(ProjectDir)credentials.json $(ProjectDir)$(OutDir) /f/y
+xcopy $(ProjectDir)token.json\Google.Apis.Auth.OAuth2.Responses.TokenResponse-user $(ProjectDir)$(OutDir)token.json\ /f/y</PostBuildEvent>
+  </PropertyGroup>
 </Project>

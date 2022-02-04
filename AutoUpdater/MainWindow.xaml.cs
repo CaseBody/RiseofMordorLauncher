@@ -34,19 +34,13 @@ namespace AutoUpdater
 
         public MainWindow()
         {
-            try
-            {
-                InitializeComponent();
-                Thread thread = new Thread(BackgroundEntryPoint);
-                thread.IsBackground = true;
+            InitializeComponent();
+            Thread thread = new Thread(BackgroundEntryPoint);
+            thread.IsBackground = true;
 
-                thread.Start();
+            thread.Start();
 
-                Thread.CurrentThread.Join();
-            }
-            catch
-            {
-            }
+            Thread.CurrentThread.Join();
         }
 
         private void BackgroundEntryPoint()

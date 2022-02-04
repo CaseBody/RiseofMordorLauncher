@@ -22,6 +22,8 @@ using System.Diagnostics;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Archives;
 using SharpCompress.Common;
+using System.Net.Http;
+using System.Net;
 
 namespace AutoUpdater
 {
@@ -40,7 +42,7 @@ namespace AutoUpdater
 
             thread.Start();
 
-            Thread.CurrentThread.Join();
+            thread.Join();
         }
 
         private void BackgroundEntryPoint()
@@ -51,7 +53,7 @@ namespace AutoUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Error");
+                MessageBox.Show("An error occured while updating. You can pass on the following message to the developers: " + Environment.NewLine + ex.Message, "Updater Error");
                 StatusText.Text = "Error while updating launcher. Starting local version.";
 
                 Task.Delay(500);
@@ -64,24 +66,22 @@ namespace AutoUpdater
             }
         }
 
-        private void CheckUpdate()
+        private async void CheckUpdate()
         {
             var local = GetLocalVersion();
-            var current = GetCurrentVersion();
+            var current = await GetCurrentVersion();
 
-            if (current > local)
+            if (current > local || !File.Exists($"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe"))
             {
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "Update found, downloading now...";
                 }));
-                Task.Delay(200);
 
-                DownloadFile("launcher.rar", $"{Directory.GetCurrentDirectory()}/../launcher.rar");
+                DownloadLauncher();
 
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "Update Downloaded, extracting now...";
                 }));
-                Task.Delay(200);
                 using (var archive = RarArchive.Open($"{Directory.GetCurrentDirectory()}/../launcher.rar"))
                 {
                     foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
@@ -107,7 +107,7 @@ namespace AutoUpdater
             {
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "No updates found!";
-                })); Task.Delay(200);
+                })); 
                 Process launcher = new Process();
                 launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe";
                 launcher.Start();
@@ -115,97 +115,17 @@ namespace AutoUpdater
             }
         }
 
-        private int GetCurrentVersion()
+        private async Task<int> GetCurrentVersion()
         {
-            DownloadFile("current_launcher_version.txt", $"{AppData}/RiseofMordor/RiseofMordorLauncher/current_launcher_version.txt");
-            return int.Parse(File.ReadAllText($"{AppData}/RiseofMordor/RiseofMordorLauncher/current_launcher_version.txt"));
+            HttpClient client = new HttpClient();
+            return int.Parse(await client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/current"));
         }
 
-        private Task DownloadFile(string file_name, string output_path)
+        private void DownloadLauncher()
         {
-            string[] Scopes = { DriveService.Scope.DriveReadonly };
-            string ApplicationName = "RiseofMordorLauncher";
-
-            UserCredential credential;
-            using (var stream1 =
-                new FileStream("credentials.json", FileMode.Open, FileAccess.Read))
-            {
-                // The file token.json stores the user's access and refresh tokens, and is created
-                // automatically when the authorization flow completes for the first time.
-                string credPath = "token.json";
-                credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
-                    GoogleClientSecrets.FromStream(stream1).Secrets,
-                    Scopes,
-                    "user",
-                    CancellationToken.None,
-                    new FileDataStore(credPath, true)).Result;
-            }
-
-            // Create Drive API service.
-            var service = new DriveService(new BaseClientService.Initializer()
-            {
-                HttpClientInitializer = credential,
-                ApplicationName = ApplicationName,
-            });
-
-            FilesResource.ListRequest listRequest = service.Files.List();
-            listRequest.PageSize = 50;
-            listRequest.Fields = "nextPageToken, files(id, name)";
-
-            // List files.
-            IList<Google.Apis.Drive.v3.Data.File> files = listRequest.Execute().Files;
-            string file_id = "";
-            if (files != null && files.Count > 0)
-            {
-                foreach (var file in files)
-                {
-                    if (file.Name == file_name)
-                    {
-                        file_id = file.Id;
-                    }
-                }
-            }
-
-            var request = service.Files.Get(file_id);
-            var stream = new MemoryStream();
-            using (var file_stream = new FileStream(output_path, FileMode.Create, FileAccess.Write))
-            {
-                request.MediaDownloader.ProgressChanged += (Google.Apis.Download.IDownloadProgress progress) =>
-                {
-                    switch (progress.Status)
-                    {
-                        case Google.Apis.Download.DownloadStatus.Completed:
-                            {
-                                //  using (var file = new FileStream(output_path, FileMode.Create, FileAccess.Write))
-                                // {
-                                //    stream.WriteTo(file);
-                                // }
-                                break;
-                            }
-                        case Google.Apis.Download.DownloadStatus.Downloading:
-                            {
-                                break;
-                            }
-                        case Google.Apis.Download.DownloadStatus.Failed:
-                            {
-                                request.Download(file_stream);
-                                Console.WriteLine("Download failed.");
-                                break;
-                            }
-                    }
-                };
-
-                request.Download(file_stream);
-            }
-
-            // Add a handler which will be notified on progress changes.
-            // It will notify on each chunk download and when the
-            // download is completed or failed.
-
-
-            return Task.CompletedTask;
+            var client = new WebClient();
+            client.DownloadFile("http://3ba9.l.time4vps.cloud/launcher/launcher.rar", $"{Directory.GetCurrentDirectory()}/../launcher.rar");
         }
-
         private int GetLocalVersion()
         {
             if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))

@@ -16,6 +16,8 @@ using System.Windows;
 using System.Windows.Input;
 using RiseofMordorLauncher.Directory.Pages;
 using DiscordRPC;
+using System.Net;
+using System.ComponentModel;
 
 namespace RiseofMordorLauncher
 {
@@ -168,52 +170,18 @@ namespace RiseofMordorLauncher
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            Logger.Log("Creating moddb service...");
-            IModdbDownloadService moddbService = new APIModdbDownloadService();
-            moddbService.DownloadUpdate += DownloadProgressUpdate;
+            //Logger.Log("Creating moddb service...");
+            //IModdbDownloadService moddbService = new APIModdbDownloadService();
+            //moddbService.DownloadUpdate += DownloadProgressUpdate;
 
-            Logger.Log("Downloading rom_pack_files.rar from moddb...");
-            moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
-            
-        }
+            //Logger.Log("Downloading rom_pack_files.rar from moddb...");
+            //moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
 
-        private async void DownloadLauncherUpdate()
-        {
-            PlayButtonText = "UPDATING LAUNCHER";
-            PlayButtonEnabled = false;
-            PlayButtonMargin = "350 30";
-            SubmodButtonEnabled = false;
-            ShowProgressBar = Visibility.Visible;
-
-            IGoogleDriveService googleDriveService = new APIGoogleDriveService();
-            googleDriveService.DownloadUpdate += DownloadProgressUpdate;
-            await googleDriveService.DownloadFile("launcher.rar", $"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar", LauncherVersion.DownloadNumberOfBytes);
-            ProgressBarProgress = 100;
-
-            System.IO.Directory.CreateDirectory($"{System.IO.Directory.GetCurrentDirectory()}/temp/");
-            ProgressText = "APPLYING LAUNCHER UPDATE";
-            using (var archive = RarArchive.Open($"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar"))
-            {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                {
-                    entry.WriteToDirectory(System.IO.Directory.GetCurrentDirectory() + "/temp/", new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-                }
-            }
-
-            File.Delete($"{System.IO.Directory.GetCurrentDirectory()}/launcher.rar");
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_launcher_version.txt"); } catch { }
-            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_launcher_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_launcher_version.txt");
-
-            Process Launcher = new Process();
-            Launcher.StartInfo.FileName = $"{System.IO.Directory.GetCurrentDirectory()}/temp/RiseofMordorLauncher.exe";
-            Launcher.StartInfo.Arguments = "update_1";
-            Launcher.Start();
-
-            Process.GetCurrentProcess().Kill();
+            Logger.Log("downloading latest version from RoM server...");
+            WebClient client = new WebClient();
+            client.DownloadProgressChanged += DownloadProgressUpdate;
+            client.DownloadFileCompleted += new AsyncCompletedEventHandler(Buffer);
+            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/rom_pack_files.rar");  
         }
 
         private async void LaunchGame()
@@ -415,47 +383,61 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private async void DownloadProgressUpdate(object sender, int percent_finished)
+        private async void DownloadProgressUpdate(object sender, DownloadProgressChangedEventArgs e)
         {
-            ProgressBarProgress = percent_finished;
+            var percent_finished = e.ProgressPercentage;
 
-            if (percent_finished == 105)
+            if (percent_finished > 95)
             {
-                Logger.Log("Extracting rom_pack_files.rar...");
-                ProgressText = "EXTRACTING...";
-                using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
-                {
-                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                    {
-                        entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
-                        {
-                            ExtractFullPath = true,
-                            Overwrite = true
-                        });
-                    }
-                }
+                percent_finished = 100;
+                ProgressText = "EXTRACTING DATA...";
 
-                Logger.Log("Deleting rom_pack_files.rar...");
-                File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
-                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
-                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-                File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
-
-                using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
-                {
-                    x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
-                }
-
-                PlayButtonText = "PLAY";
-                PlayButtonEnabled = true;
-                PlayButtonMargin = "450 30";
-                SubmodButtonEnabled = true;
-                ShowProgressBar = Visibility.Hidden;
-
-                Version = await _modVersionService.GetModVersionInfo(SharedData);
-                VersionText = "Version " + Version.VersionText;
-                ChangelogText = Version.ChangeLog;
             }
+
+            ProgressBarProgress = percent_finished;
+        }
+        
+        private void Buffer(object sender, AsyncCompletedEventArgs e)
+        {
+            Thread s = new Thread(DownloadCompleted);
+            s.IsBackground = true;
+            s.Start();
+        }
+        private async void DownloadCompleted()
+        {
+            Logger.Log("Extracting rom_pack_files.rar...");
+            using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
+            {
+                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                {
+                    entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+                }
+            }
+
+            Logger.Log("Deleting rom_pack_files.rar...");
+            File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
+            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
+            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+
+            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            {
+                x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+            }
+
+            PlayButtonText = "PLAY";
+            PlayButtonEnabled = true;
+            PlayButtonMargin = "450 30";
+            SubmodButtonEnabled = true;
+            ShowProgressBar = Visibility.Hidden;
+
+            Version = await _modVersionService.GetModVersionInfo(SharedData);
+            VersionText = "Version " + Version.VersionText;
+            ChangelogText = Version.ChangeLog;
         }
 
         private void DisableSubmod(string id)

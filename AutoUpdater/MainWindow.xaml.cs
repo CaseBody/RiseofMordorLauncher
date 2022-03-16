@@ -24,6 +24,7 @@ using SharpCompress.Archives;
 using SharpCompress.Common;
 using System.Net.Http;
 using System.Net;
+using System.Windows.Threading;
 
 namespace AutoUpdater
 {
@@ -41,8 +42,6 @@ namespace AutoUpdater
             thread.IsBackground = true;
 
             thread.Start();
-
-            thread.Join();
         }
 
         private void BackgroundEntryPoint()
@@ -53,13 +52,16 @@ namespace AutoUpdater
             }
             catch (Exception ex)
             {
-                MessageBox.Show("An error occured while updating. You can pass on the following message to the developers: " + Environment.NewLine + ex.Message, "Updater Error");
-                StatusText.Text = "Error while updating launcher. Starting local version.";
+                MessageBox.Show("An error occured while updating. You can pass on the following message to the developers: " + Environment.NewLine + ex, "Updater Error");
+                Dispatcher.Invoke(new Action(() => {
+                    StatusText.Text = "Error while updating launcher. Starting local version.";
+                }));
 
                 Task.Delay(500);
 
                 var launcher = new Process();
-                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe";
+                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe";
+                launcher.StartInfo.WorkingDirectory = $"{Directory.GetCurrentDirectory()}/../";
                 launcher.Start();
 
                 Process.GetCurrentProcess().Kill();
@@ -71,11 +73,12 @@ namespace AutoUpdater
             var local = GetLocalVersion();
             var current = GetCurrentVersion();
 
-            if (current > local || !File.Exists($"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe"))
+            if (current > local || !File.Exists($"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe"))
             {
-                Dispatcher.Invoke(new Action(() => {
-                    StatusText.Text = "Update found, downloading now...";
+                StatusText.Dispatcher.Invoke(new Action(() => {
+                   StatusText.Text = "Update found, downloading now...";
                 }));
+
 
                 DownloadLauncher();
 
@@ -97,11 +100,15 @@ namespace AutoUpdater
                 if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
                     File.Delete($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
 
-                File.CreateText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
-                File.WriteAllText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt", current.ToString());
+                using (var x = new StreamWriter($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
+                {
+                    x.Write(current.ToString());
+                }
+
 
                 Process launcher = new Process();
-                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe";
+                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe";
+                launcher.StartInfo.WorkingDirectory = $"{Directory.GetCurrentDirectory()}/../";
                 launcher.Start();
 
                 Process.GetCurrentProcess().Kill();
@@ -112,7 +119,8 @@ namespace AutoUpdater
                     StatusText.Text = "No updates found!";
                 })); 
                 Process launcher = new Process();
-                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../RiseofMordorLauncher.exe";
+                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe";
+                launcher.StartInfo.WorkingDirectory = $"{Directory.GetCurrentDirectory()}/../";
                 launcher.Start();
                 Process.GetCurrentProcess().Kill();
             }
@@ -136,7 +144,11 @@ namespace AutoUpdater
         {
             if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
             {
-                return int.Parse(File.ReadAllText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"));
+                try
+                {
+                    return int.Parse(File.ReadAllText($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"));
+                }
+                catch { return 0; }
             }
             else
             {

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows;
 using System.ComponentModel;
+using System.Net.Http;
 
 namespace RiseofMordorLauncher
 {
@@ -38,9 +39,12 @@ namespace RiseofMordorLauncher
             }
 
             // Get list of rom submods id's
-            var driveService = new APIGoogleDriveService();
-            await driveService.DownloadFile("approved_submods.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt", 1);
-            var ApprovedSubmodsIdString = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/approved_submods.txt");
+
+            HttpClient client = new HttpClient();
+            var a = client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/approved_submods");
+            a.Wait();
+
+            var ApprovedSubmodsIdString = a.Result.Split(new string[] { Environment.NewLine },StringSplitOptions.None);
 
             var ApprovedSubmodsIdList = new List<PublishedFileId_t>();
             foreach (var item in ApprovedSubmodsIdString)

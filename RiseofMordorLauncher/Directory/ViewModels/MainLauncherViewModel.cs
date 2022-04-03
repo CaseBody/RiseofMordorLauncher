@@ -181,7 +181,8 @@ namespace RiseofMordorLauncher
             WebClient client = new WebClient();
             client.DownloadProgressChanged += DownloadProgressUpdate;
             client.DownloadFileCompleted += new AsyncCompletedEventHandler(Buffer);
-            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/rom_pack_files.rar");  
+            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/rom_pack_files.rar"); 
+           
         }
 
         private async void LaunchGame()
@@ -422,7 +423,8 @@ namespace RiseofMordorLauncher
             File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-            File.Copy($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+            WebClient client = new WebClient();
+            client.DownloadFile("http://80.208.231.54/launcher/local_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
 
             using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
             {

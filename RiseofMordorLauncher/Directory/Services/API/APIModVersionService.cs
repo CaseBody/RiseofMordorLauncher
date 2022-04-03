@@ -15,6 +15,7 @@ using System.Windows;
 using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
+using System.Net;
 
 namespace RiseofMordorLauncher
 {
@@ -237,7 +238,8 @@ namespace RiseofMordorLauncher
                             version.InstalledVersionNumber = version.LatestVersionNumber;
                             try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
                             try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-                            System.IO.File.Copy($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+                            WebClient client = new WebClient();
+                            client.DownloadFile("http://80.208.231.54/launcher/local_version.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
                         }
                     }
                     else

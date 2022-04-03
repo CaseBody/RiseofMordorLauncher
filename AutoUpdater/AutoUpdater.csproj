@@ -38,7 +38,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>Dawnless_Days_square_dark.ico</ApplicationIcon>
+    <ApplicationIcon>logo_vOY_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Google.Apis, Version=1.55.0.0, Culture=neutral, PublicKeyToken=4b01fa6e34db77ab, processorArchitecture=MSIL">
@@ -150,6 +150,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Dawnless_Days_square_dark.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="logo_vOY_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

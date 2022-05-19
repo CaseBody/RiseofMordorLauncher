@@ -345,17 +345,17 @@ namespace RiseofMordorLauncher
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()
                     {
-                        Details = "Rise of Mordor Launcher",
+                        Details = "The Dawnless Days Launcher",
                         State = "Tweaking Settings",
                         Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
-                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/RzYRVdQezF" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
                         },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
-                            LargeImageText = "discord.gg/riseofmordor",
+                            LargeImageText = "The Dawnless Days",
                         }
                     });
                 } catch { }
@@ -367,17 +367,16 @@ namespace RiseofMordorLauncher
                 {
                     SharedData.RPCClient.SetPresence(new RichPresence()
                     {
-                        Details = "Rise of Mordor Launcher",
-                        State = "On the main page",
+                        Details = "The Dawnless Days Launcher",
                         Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://www.discord.gg/riseofmordor" },
-                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.moddb.com/mods/total-war-rise-of-mordor" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/RzYRVdQezF" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
                         },
                         Assets = new Assets()
                         {
                             LargeImageKey = "large_image",
-                            LargeImageText = "discord.gg/riseofmordor",
+                            LargeImageText = "The Dawnless Days",
                         }
                     });
                 } catch { }

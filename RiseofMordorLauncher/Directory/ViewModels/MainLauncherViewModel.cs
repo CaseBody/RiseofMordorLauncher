@@ -18,6 +18,7 @@ using RiseofMordorLauncher.Directory.Pages;
 using DiscordRPC;
 using System.Net;
 using System.ComponentModel;
+using System.Net.Http;
 
 namespace RiseofMordorLauncher
 {
@@ -176,6 +177,10 @@ namespace RiseofMordorLauncher
 
             //Logger.Log("Downloading rom_pack_files.rar from moddb...");
             //moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            HttpClient httpClient = new HttpClient();
+            Logger.Log("Adding download log to RoM server...");
+            var request = await httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
+            Logger.Log($"Download log response: Code: {request.StatusCode}");
 
             Logger.Log("downloading latest version from RoM server...");
             WebClient client = new WebClient();

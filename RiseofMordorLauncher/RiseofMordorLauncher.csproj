@@ -121,6 +121,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Directory\Styles\Checkbox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Directory\Styles\ComboBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Directory\Styles\Button.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -324,7 +332,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Directory\Images\loading_screen.png" />
-    <Resource Include="Directory\Images\submods_title.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="image0.ico" />
@@ -338,6 +345,18 @@
   <ItemGroup>
     <Resource Include="Directory\Images\rom_logo.png" />
     <Resource Include="Directory\Images\rom_logo_small.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\background_rohirrim.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\background_uruk_hai.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\submods_title.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\nexus_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

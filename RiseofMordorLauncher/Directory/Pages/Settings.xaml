@@ -5,18 +5,38 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
       mc:Ignorable="d" 
-      Height="400"
+      Height="520"
       Width="200"
       ResizeMode="NoResize"
       Title="Settings">
 
     <StackPanel Background="Black" Orientation="Vertical">
         <StackPanel Margin="3 10 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
-            <CheckBox Background="Black" BorderBrush="#fc9b00" Foreground="#fc9b00" IsChecked="{Binding AutoInstall}"/>
+            <CheckBox IsChecked="{Binding AutoInstall}" Style="{StaticResource DarkCheckBox}"/>
             <TextBlock Text="Auto install updates" Foreground="#fc9b00" Margin="3 0 0 0"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 15 0 0">
+        <StackPanel Margin="3 10 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <CheckBox IsChecked="{Binding ShowLatestPreview}" Style="{StaticResource DarkCheckBox}"/>
+            <TextBlock Text="Show latest preview" Foreground="#fc9b00" Margin="3 0 0 0"/>
+        </StackPanel>
+
+        <StackPanel Margin="3 10 0 0" Orientation="Horizontal" HorizontalAlignment="Center">
+            <CheckBox IsChecked="{Binding ShowLatestVideo}" Style="{StaticResource DarkCheckBox}"/>
+            <TextBlock Text="Show latest video" Foreground="#fc9b00" Margin="3 0 0 0"/>
+        </StackPanel>
+
+        <StackPanel Margin="3 10 0 0" Orientation="Vertical" HorizontalAlignment="Center">
+            <TextBlock Text="Background:" Foreground="#fc9b00" Margin="3 0 0 0"/>
+            <ComboBox Width="140" SelectedValuePath="Tag" SelectedValue="{Binding SelectedBackground}" Style="{StaticResource DarkComboBox}">
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="unknown.png">Goblins</ComboBoxItem>
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="background_one.png">Marines</ComboBoxItem>
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="background_rohirrim.png">The Rohirrim</ComboBoxItem>
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="background_uruk_hai.png">Uruk-hai</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 15 0 0">
             <Image Source="../images/upvote.png" Width="20" Margin="0 -2.8 5 0">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding UpCommand}" MouseAction="LeftClick"/>
@@ -42,10 +62,10 @@
                     VerticalAlignment="Center"
                     Foreground="#fc9b00"
                     BorderThickness="0"
-                    FontSize="20"
+                    FontSize="18"
                     FontWeight="SemiBold"
                     Height="50"
-                    Width="180"
+                    Width="170"
                     Margin="0 10 0 0"
                     Command="{Binding RedownloadCommand}"
                     Style="{StaticResource SquareDarkButton}"/>

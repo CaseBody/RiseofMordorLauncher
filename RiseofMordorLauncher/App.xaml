@@ -12,6 +12,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Directory/Styles/Button.xaml"/>
                 <ResourceDictionary Source="Directory/Styles/Window.xaml"/>
+                <ResourceDictionary Source="Directory/Styles/ComboBox.xaml"/>
+                <ResourceDictionary Source="Directory/Styles/Checkbox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!--<Style TargetType="TextBlock">

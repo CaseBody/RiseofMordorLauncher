@@ -10,9 +10,13 @@
       d:DesignWidth="1200"
       Title="MainLauncher">
 
+    <Page.Resources>
+        <BitmapImage x:Key="DefaultImage" UriSource="../Images/unknown.png" />
+    </Page.Resources>
+
     <Grid>
         <Grid.Background>
-            <ImageBrush ImageSource="../Images/unknown.png"
+            <ImageBrush ImageSource="{Binding BackgroundImage, FallbackValue={StaticResource DefaultImage}}"
                         Stretch="UniformToFill"/>
         </Grid.Background>
 
@@ -129,7 +133,8 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Margin="80 0"
-                        Grid.Column="0">
+                        Grid.Column="0"
+                        Visibility="{Binding ShowPreview}">
 
                 <Border BorderThickness="1"
                         BorderBrush="#080808"
@@ -216,9 +221,9 @@
                     <MouseBinding Command="{Binding YoutubeCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
-            <Image Source="../Images/moddb_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/nexus_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
                 <Image.InputBindings>
-                    <MouseBinding Command="{Binding ModdbCommand}" MouseAction="LeftClick"/>
+                    <MouseBinding Command="{Binding NexusCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
             <Image Source="../Images/reddit_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">

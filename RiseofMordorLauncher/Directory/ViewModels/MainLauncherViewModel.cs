@@ -46,6 +46,7 @@ namespace RiseofMordorLauncher
         public string YouTubeVideoURL { get; set; }
         public SharedData SharedData { get; set; }
         public Visibility ShowVideo { get; set; } = Visibility.Visible;
+        public Visibility ShowPreview { get; set; } = Visibility.Visible;
         public Visibility ShowProgressBar { get; set; } = Visibility.Hidden;
         public string PlayButtonText { get; set; } = "PLAY";
         public string PlayButtonMargin { get; set; } = "450 30";
@@ -53,6 +54,7 @@ namespace RiseofMordorLauncher
         public bool PlayButtonEnabled { get; set; } = true;
         public bool SubmodButtonEnabled { get; set; } = true;
         public int ProgressBarProgress { get; set; }
+        public string BackgroundImage { get; set; }
         private ModVersion Version { get; set; }
         private LauncherVersion LauncherVersion { get; set; }
 
@@ -60,7 +62,6 @@ namespace RiseofMordorLauncher
         public Settings SettingsPage { get; set; } = new Settings();
         private Window SettingsWindow { get; set; } = new Window();
         private SettingsViewModel SettingsPageViewModel { get; set; }
-        
         public ILatestPreview LatestPreviewVM { get; private set; }
 
         private ICommand _PlayCommand;
@@ -99,6 +100,14 @@ namespace RiseofMordorLauncher
             var user = await _steamUserService.GetSteamUser();
             SteamUserName = user.UserName;
             SteamAvatarUrl = user.AvatarUrl;
+
+            Logger.Log("Applying user prefs on main launcher");
+            UserPreferencesService = new APIUserPreferencesService();
+            var prefs = UserPreferencesService.GetUserPreferences(SharedData);
+
+            BackgroundImage = $"Directory/Images/{prefs.BackgroundImage}";
+            ShowPreview = (bool)prefs.ShowLatestPreview ? Visibility.Visible : Visibility.Hidden;
+            ShowVideo = (bool)prefs.ShowLatestVideo ? Visibility.Visible : Visibility.Hidden;
 
             Logger.Log("Getting YoutTube video data...");
             // get YoutTube video data (if offline hide player)
@@ -205,6 +214,7 @@ namespace RiseofMordorLauncher
             prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
             string Arguments = "";
+            string used_mods = "";
 
             if (File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
@@ -289,6 +299,16 @@ namespace RiseofMordorLauncher
                             {
                                 Arguments = Arguments + $" mod {pack};";
                             }
+
+                            if (used_mods == "")
+                            {
+                                used_mods = $"mod \"{pack}\";";
+                            }
+                            else
+                            {
+                                used_mods = used_mods + Environment.NewLine + $"mod \"{pack}\";";
+                            }
+
                         }
                     }
                     else
@@ -324,8 +344,19 @@ namespace RiseofMordorLauncher
                     {
                         Arguments = Arguments + $" mod {pack};";
                     }
+
+                    if (used_mods == "")
+                    {
+                        used_mods = $"mod \"{pack}\";";
+                    }
+                    else
+                    {
+                        used_mods = used_mods + Environment.NewLine + $"mod \"{pack}\";";
+                    }
                 }
             }
+
+            File.WriteAllText($@"{SharedData.AttilaDir}\used_mods.txt", used_mods);
 
             SteamAPI.RestartAppIfNecessary((AppId_t)325610);
 
@@ -354,7 +385,7 @@ namespace RiseofMordorLauncher
                         State = "Tweaking Settings",
                         Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/RzYRVdQezF" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/tdd" },
                             new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
                         },
                         Assets = new Assets()
@@ -598,13 +629,13 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private ICommand _ModdbCommand;
+        private ICommand _NexusCommand;
 
-        public ICommand ModdbCommand
+        public ICommand NexusCommand
         {
             get
             {
-                return _ModdbCommand ?? (_ModdbCommand = new CommandHandler(() => Process.Start("https://www.moddb.com/mods/total-war-rise-of-mordor"), () => true)); ;
+                return _NexusCommand ?? (_NexusCommand = new CommandHandler(() => Process.Start("https://www.nexusmods.com/totalwarattila/mods/1"), () => true)); ;
             }
         }
 
@@ -624,7 +655,7 @@ namespace RiseofMordorLauncher
         {
             get
             {
-                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/riseofmordor/"), () => true)); ;
+                return _InstagramCommand ?? (_InstagramCommand = new CommandHandler(() => Process.Start("https://www.instagram.com/thedawnlessdays"), () => true)); ;
             }
         }
         #endregion

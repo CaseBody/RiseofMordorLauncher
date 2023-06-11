@@ -39,6 +39,18 @@ namespace RiseofMordorLauncher
                         {
                             pref.AutoUpdate = bool.Parse(line.Split('=').ElementAt(1));
                         }
+                        else if (line.StartsWith("background"))
+                        {
+                            pref.BackgroundImage = line.Split('=').ElementAt(1);
+                        }
+                        else if (line.StartsWith("show_latest_video"))
+                        {
+                            pref.ShowLatestVideo = bool.Parse(line.Split('=').ElementAt(1));
+                        }
+                        else if (line.StartsWith("show_latest_preview"))
+                        {
+                            pref.ShowLatestPreview = bool.Parse(line.Split('=').ElementAt(1));
+                        }
                         else if (line == "load_order = {")
                         {
                             is_reading_packs = true;
@@ -56,16 +68,33 @@ namespace RiseofMordorLauncher
                     pref.LoadOrder = Packs;
                 }
 
-                return pref;
+                if (pref.BackgroundImage == null)
+                {
+                    pref.BackgroundImage = "unknown.png";
+                }
 
+                if (pref.ShowLatestVideo == null)
+                {
+                    pref.ShowLatestVideo = true;
+                }
+
+                if (pref.ShowLatestPreview == null)
+                {
+                    pref.ShowLatestPreview = true;
+                }
+
+                return pref;
             }
             else
             {
                 using (var x = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
                 {
-                    x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                    x.Write($"auto_update=true{Environment.NewLine}show_latest_preview=true{Environment.NewLine}show_latest_video=true{Environment.NewLine}background=unknown.png{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
                 }
                 pref.AutoUpdate = true;
+                pref.BackgroundImage = "unknown.png";
+                pref.ShowLatestPreview = true;
+                pref.ShowLatestVideo = true;
                 pref.LoadOrder = new List<string>();
                 pref.LoadOrder.Add("rom_base");
                 return pref;

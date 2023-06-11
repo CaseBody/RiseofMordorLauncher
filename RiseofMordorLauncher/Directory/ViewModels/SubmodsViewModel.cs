@@ -23,6 +23,7 @@ namespace RiseofMordorLauncher
         public IList<SubmodModel> SubmodsList2 { get; set; }
         public IList<SubmodModel> SubmodsList3 { get; set; }
         public IList<SubmodModel> DownloadingSubmods { get; set; } = new List<SubmodModel>();
+        public string BackgroundImage { get; set; }
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
 
@@ -40,6 +41,11 @@ namespace RiseofMordorLauncher
 
         public void Load()
         {
+            var userPreferencesService = new APIUserPreferencesService();
+            var prefs = userPreferencesService.GetUserPreferences(SharedData);
+
+            BackgroundImage = $"Directory/Images/{prefs.BackgroundImage}";
+
             steamSubmodsService.SubmodDataFinishedEvent += LoadSubmodData;
             steamSubmodsService.GetSubmods(SharedData);
 

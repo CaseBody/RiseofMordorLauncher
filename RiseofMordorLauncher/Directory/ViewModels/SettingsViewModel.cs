@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace RiseofMordorLauncher
@@ -33,6 +35,42 @@ namespace RiseofMordorLauncher
             }
         }
 
+        public string _SelectedBackground = "";
+        public string SelectedBackground
+        {
+            get { return _SelectedBackground; }
+            set
+            {
+                _SelectedBackground = value;
+                mainLauncher.BackgroundImage = $"Directory/Images/{value}";
+                WritePrefs(prefs);
+            }
+        }
+
+        public bool _ShowLatestPreview = true;
+        public bool ShowLatestPreview
+        {
+            get { return _ShowLatestPreview; }
+            set
+            {
+                _ShowLatestPreview = value;
+                mainLauncher.ShowPreview = value ? Visibility.Visible : Visibility.Hidden;
+                WritePrefs(prefs);
+            }
+        }
+
+        public bool _ShowLatestVideo = true;
+        public bool ShowLatestVideo
+        {
+            get { return _ShowLatestVideo; }
+            set
+            {
+                _ShowLatestVideo = value;
+                mainLauncher.ShowVideo = value ? Visibility.Visible : Visibility.Hidden;
+                WritePrefs(prefs);
+            }
+        }
+
         UserPreferences prefs;
         private List<SubmodInstallation> EnabledSubmods;
         private List<String> EnabledSubmodsRaw;
@@ -50,6 +88,9 @@ namespace RiseofMordorLauncher
 
             prefs = UserPreferencesService.GetUserPreferences(sharedData);
             _AutoInstall = prefs.AutoUpdate;
+            _SelectedBackground = prefs.BackgroundImage;
+            _ShowLatestVideo = (bool)prefs.ShowLatestVideo;
+            _ShowLatestPreview = (bool)prefs.ShowLatestPreview;
 
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
@@ -234,7 +275,7 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            string output = $"auto_update={_AutoInstall}{Environment.NewLine}load_order = {{";
+            string output = $"auto_update={_AutoInstall}{Environment.NewLine}show_latest_preview={_ShowLatestPreview}{Environment.NewLine}show_latest_video={_ShowLatestVideo}{Environment.NewLine}background={_SelectedBackground}{Environment.NewLine}load_order = {{";
             
             foreach (string pack in prefs2.LoadOrder)
             {
@@ -320,7 +361,6 @@ namespace RiseofMordorLauncher
         {
             mainLauncher.DownloadUpdate();
         }
-
  
         private ICommand _UpCommand;
         private ICommand _DownCommand;
@@ -348,6 +388,5 @@ namespace RiseofMordorLauncher
                 return _RedownloadCommand ?? (_RedownloadCommand = new CommandHandler(() => Redownload(), () => true));
             }
         }
-
     }
 }

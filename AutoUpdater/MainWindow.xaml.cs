@@ -1,30 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.IO;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
 using System.Threading;
 using System.Diagnostics;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Archives;
-using SharpCompress.Common;
 using System.Net.Http;
 using System.Net;
 using System.Windows.Threading;
+using SevenZipExtractor;
 
 namespace AutoUpdater
 {
@@ -34,17 +20,34 @@ namespace AutoUpdater
     public partial class MainWindow : Window
     {
         private string AppData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        private string modAppData = null;
+        private string launcherAppData = null;
 
         public MainWindow()
         {
             InitializeComponent();
-            Thread thread = new Thread(BackgroundEntryPoint);
-            thread.IsBackground = true;
-
-            thread.Start();
+            InitAppData();
+            CheckInstallLauncher();
         }
 
-        private void BackgroundEntryPoint()
+        private void InitAppData()
+        {
+            modAppData = System.IO.Path.Combine(AppData, "RiseofMordor");
+
+            if (!Directory.Exists(modAppData))
+            {
+                Directory.CreateDirectory(modAppData);
+            }
+
+            launcherAppData = System.IO.Path.Combine(modAppData, "RiseofMordorLauncher");
+
+            if (!Directory.Exists(launcherAppData))
+            {
+                Directory.CreateDirectory(launcherAppData);
+            }
+        }
+
+        private void CheckInstallLauncher()
         {
             try
             {
@@ -68,47 +71,52 @@ namespace AutoUpdater
             }
         }
 
-        private void CheckUpdate()
+        private async void CheckUpdate()
         {
-            var local = GetLocalVersion();
-            var current = GetCurrentVersion();
+            var localVersion = GetLocalVersion();
+            var remoteVersion = GetCurrentVersion();
 
-            if (current > local || !File.Exists($"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe"))
+            var currentDirectory = Directory.GetCurrentDirectory();
+            var launcherDownloadPath = Path.Combine(launcherAppData, "launcher.rar");
+            var launcherExecPath = Path.Combine(currentDirectory, "..TheDawnlessDaysLauncher.exe");
+
+            if (remoteVersion > localVersion || !File.Exists(launcherExecPath))
             {
                 StatusText.Dispatcher.Invoke(new Action(() => {
                    StatusText.Text = "Update found, downloading now...";
                 }));
 
-
-                DownloadLauncher();
+                if (!File.Exists(launcherDownloadPath))
+                {
+                    await DownloadLauncher(launcherDownloadPath, StatusText);
+                }
 
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "Update Downloaded, extracting now...";
                 }));
-                using (var archive = RarArchive.Open($"{Directory.GetCurrentDirectory()}/../launcher.rar"))
+
+                using (var archiveFile = new ArchiveFile(launcherDownloadPath))
                 {
-                    foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                    var extractPath = $"{currentDirectory}/../";
+                    foreach (var entry in archiveFile.Entries)
                     {
-                        entry.WriteToDirectory($"{Directory.GetCurrentDirectory()}/../", new ExtractionOptions()
-                        {
-                            ExtractFullPath = true,
-                            Overwrite = true
-                        });
+                        entry.Extract(Path.Combine(extractPath, entry.FileName));
                     }
                 }
 
                 if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
+                {
                     File.Delete($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt");
+                }
 
                 using (var x = new StreamWriter($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
                 {
-                    x.Write(current.ToString());
+                    x.Write(remoteVersion.ToString());
                 }
 
-
-                Process launcher = new Process();
-                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe";
-                launcher.StartInfo.WorkingDirectory = $"{Directory.GetCurrentDirectory()}/../";
+                var launcher = new Process();
+                launcher.StartInfo.FileName = launcherExecPath; 
+                launcher.StartInfo.WorkingDirectory = $"{currentDirectory}/../";
                 launcher.Start();
 
                 Process.GetCurrentProcess().Kill();
@@ -118,9 +126,10 @@ namespace AutoUpdater
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "No updates found!";
                 })); 
-                Process launcher = new Process();
-                launcher.StartInfo.FileName = $"{Directory.GetCurrentDirectory()}/../TheDawnlessDaysLauncher.exe";
-                launcher.StartInfo.WorkingDirectory = $"{Directory.GetCurrentDirectory()}/../";
+
+                var launcher = new Process();
+                launcher.StartInfo.FileName = launcherExecPath;
+                launcher.StartInfo.WorkingDirectory = $"{currentDirectory}/../";
                 launcher.Start();
                 Process.GetCurrentProcess().Kill();
             }
@@ -135,11 +144,34 @@ namespace AutoUpdater
             return int.Parse(t.Result);
         }
 
-        private void DownloadLauncher()
+        private Task DownloadLauncher(string downloadDestPath, TextBlock textBlock)
         {
+            var tcs = new TaskCompletionSource<bool>();
             var client = new WebClient();
-            client.DownloadFile("http://3ba9.l.time4vps.cloud/launcher/launcher.rar", $"{Directory.GetCurrentDirectory()}/../launcher.rar");
+
+            client.DownloadProgressChanged += (s, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    textBlock.Text = $"Update found, download progress: {e.ProgressPercentage}%";
+                });
+            };
+
+            client.DownloadFileCompleted += (s, e) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    textBlock.Text = "Update found, download completed";
+                    tcs.SetResult(true);
+                });
+            };
+
+            var url = "http://3ba9.l.time4vps.cloud/launcher/launcher.rar";
+            client.DownloadFileAsync(new Uri(url), downloadDestPath);
+
+            return tcs.Task;
         }
+
         private int GetLocalVersion()
         {
             if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))

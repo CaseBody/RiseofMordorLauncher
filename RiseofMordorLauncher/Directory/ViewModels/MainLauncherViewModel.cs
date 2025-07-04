@@ -1,24 +1,19 @@
-﻿using RiseofMordorLauncher.Directory.Services;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Common;
+﻿using DiscordRPC;
+using RiseofMordorLauncher.Directory.Pages;
+using RiseofMordorLauncher.Directory.Services;
+using SevenZipExtractor;
 using Steamworks;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Text;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using RiseofMordorLauncher.Directory.Pages;
-using DiscordRPC;
-using System.Net;
-using System.ComponentModel;
-using System.Net.Http;
 
 namespace RiseofMordorLauncher
 {
@@ -90,6 +85,8 @@ namespace RiseofMordorLauncher
             }
         }
 
+        private string downloadArchiveFilename = null;
+
         public async void Load()
         {
             Logger.Log("Started loading Main Launcher");
@@ -154,18 +151,24 @@ namespace RiseofMordorLauncher
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
+                var downloadUpdate = false;
+
                 if (prefs.AutoUpdate)
                 {
-                    DownloadUpdate();
-                    Version = await _modVersionService.GetModVersionInfo(SharedData);
+                    downloadUpdate = true;
                 }
                 else
                 {
                     if (MessageBox.Show($"A new update is available for download, would you like to download it?", "Update Available", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
-                        DownloadUpdate();
-                        Version = await _modVersionService.GetModVersionInfo(SharedData);
+                        downloadUpdate = true;
                     }
+                }
+
+                if (downloadUpdate)
+                {
+                    DownloadUpdate();
+                    Version = await _modVersionService.GetModVersionInfo(SharedData);
                 }
             }
         }
@@ -184,19 +187,21 @@ namespace RiseofMordorLauncher
             //IModdbDownloadService moddbService = new APIModdbDownloadService();
             //moddbService.DownloadUpdate += DownloadProgressUpdate;
 
-            //Logger.Log("Downloading rom_pack_files.rar from moddb...");
-            //moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            //Logger.Log($"Downloading {downloadArchiveFilename} from moddb...");
+            //moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
             HttpClient httpClient = new HttpClient();
             Logger.Log("Adding download log to RoM server...");
             var request = await httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
             Logger.Log($"Download log response: Code: {request.StatusCode}");
 
             Logger.Log("downloading latest version from RoM server...");
-            WebClient client = new WebClient();
+
+            downloadArchiveFilename = Path.GetFileName(Version.download_url);
+
+            var client = new WebClient();
             client.DownloadProgressChanged += DownloadProgressUpdate;
             client.DownloadFileCompleted += new AsyncCompletedEventHandler(Buffer);
-            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/rom_pack_files.rar"); 
-           
+            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}"); 
         }
 
         private async void LaunchGame()
@@ -439,23 +444,22 @@ namespace RiseofMordorLauncher
             s.IsBackground = true;
             s.Start();
         }
+
         private async void DownloadCompleted()
         {
-            Logger.Log("Extracting rom_pack_files.rar...");
-            using (var archive = RarArchive.Open($"{SharedData.AttilaDir}/data/rom_pack_files.rar"))
+            Logger.Log($"Extracting {downloadArchiveFilename}...");
+
+            using (var archiveFile = new ArchiveFile(downloadArchiveFilename))
             {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                var extractPath = $"{SharedData.AttilaDir}/data/";
+                foreach (var entry in archiveFile.Entries)
                 {
-                    entry.WriteToDirectory($"{SharedData.AttilaDir}/data/", new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
+                    entry.Extract(Path.Combine(extractPath, entry.FileName));
                 }
             }
 
-            Logger.Log("Deleting rom_pack_files.rar...");
-            File.Delete($"{SharedData.AttilaDir}/data/rom_pack_files.rar");
+            Logger.Log($"Deleting {downloadArchiveFilename}...");
+            File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
             WebClient client = new WebClient();

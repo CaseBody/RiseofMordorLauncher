@@ -762,7 +762,7 @@ namespace RiseofMordorLauncher
             }
 
             Logger.Log($"Deleting {downloadArchiveFilename}...");
-            //File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
+            File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
             WebClient client = new WebClient();

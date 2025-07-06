@@ -617,7 +617,6 @@ namespace RiseofMordorLauncher
             {
                 x.Write(output);
             }
-
         }
         
         protected virtual void SwitchPage(ApplicationPage page)

@@ -161,7 +161,6 @@ namespace RiseofMordorLauncher
 
                 WritePrefs(prefs);
             }
-
         }
 
         private void DisableSubmod(string id)
@@ -232,7 +231,9 @@ namespace RiseofMordorLauncher
         private void WritePrefs(UserPreferences prefs2)
         {
             if (!File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            {
                 File.CreateText($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt");
+            }
 
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
@@ -288,7 +289,6 @@ namespace RiseofMordorLauncher
             {
                 x.Write(output);
             }
-            
         }
 
         private void MoveUp()

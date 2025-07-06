@@ -1,22 +1,21 @@
-﻿using DiscordRPC;
-using RiseofMordorLauncher.Directory.Pages;
-using RiseofMordorLauncher.Directory.Services;
-using SevenZipExtractor;
-using Steamworks;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Newtonsoft.Json.Linq;
+using DiscordRPC;
+using SevenZipExtractor;
+using Steamworks;
+using RiseofMordorLauncher.Directory.Pages;
+using RiseofMordorLauncher.Directory.Services;
 
 namespace RiseofMordorLauncher
 {
@@ -32,9 +31,6 @@ namespace RiseofMordorLauncher
         private IModVersionService _modVersionService;
         private IUserPreferencesService UserPreferencesService;
         private ISteamSubmodsService SubmodService;
-        //private ILauncherVersionService launcherVersionService;
-
-        private Thread downloadThread;
 
         public event EventHandler<ApplicationPage> SwitchPageEvent;
         public string SteamUserName { get; set; }
@@ -49,6 +45,7 @@ namespace RiseofMordorLauncher
         public string PlayButtonText { get; set; } = "PLAY";
         public string PlayButtonMargin { get; set; } = "450 30";
         public string ProgressText { get; set; } = "DOWNLOADING...";
+        public string DownloadProgressText { get; set; }
         public bool PlayButtonEnabled { get; set; } = true;
         public bool SubmodButtonEnabled { get; set; } = true;
         public int ProgressBarProgress { get; set; }
@@ -80,6 +77,7 @@ namespace RiseofMordorLauncher
                 return _PlayCommand ?? (_PlayCommand = new CommandHandler(() => LaunchGame(), () => true));
             }
         }
+
         public ICommand SettingsCommand
         {
             get
@@ -87,8 +85,6 @@ namespace RiseofMordorLauncher
                 return _SettingsCommand ?? (_SettingsCommand = new CommandHandler(() => SettingsButtonClick(), () => true));
             }
         }
-
-        private string downloadArchiveFilename = null;
 
         public async void Load()
         {
@@ -140,33 +136,130 @@ namespace RiseofMordorLauncher
             }
 
             Logger.Log("Getting version data...");
+
+            InitAppDataFolders();
+
             // get version data
             _modVersionService = new APIModVersionService();
             Version = await _modVersionService.GetModVersionInfo(SharedData);
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
 
-            downloadThread = new Thread(PostUiLoadAsync);
-            downloadThread.IsBackground = true;
-            downloadThread.Start();
-
             //LatestPreviewVM = new LatestPreviewDiscordViewModel(SharedData);
             LatestPreviewVM = new LatestPreviewModDBViewModel(SharedData);
 
             SwitchPage(ApplicationPage.MainLauncher);
+
+            await PostUiLoadAsync();
         }
 
-        private async void PostUiLoadAsync()
+        private void InitAppDataFolders()
         {
-            if (SharedData.IsOffline && Version.InstalledVersionNumber == 0)
+            var modAppData = Path.Combine(SharedData.AppData, "RiseofMordor");
+
+            if (!System.IO.Directory.Exists(modAppData))
             {
-                Logger.Log("PostUiLoadAsync: (SharedData.IsOffline && Version.InstalledVersionNumber == 0)");
-                MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: Rise of Mordor");
+                System.IO.Directory.CreateDirectory(modAppData);
+            }
+
+            var launcherAppData = Path.Combine(modAppData, "RiseofMordorLauncher");
+
+            if (!System.IO.Directory.Exists(launcherAppData))
+            {
+                System.IO.Directory.CreateDirectory(launcherAppData);
+            }
+        }
+
+        private async Task PostUiLoadAsync()
+        {
+            if (SharedData.IsOffline)
+            {
+                Logger.Log("PostUiLoadAsync: No internet connection.");
+                MessageBox.Show("Please connect to the internet and restart the Launcher to install Total War: The Dawnless Days");
+                PlayButtonText = "OFFLINE";
+                PlayButtonEnabled = false;
+                return;
+            }
+
+            if (Version.InstalledVersionNumber == 0)
+            {
+                Logger.Log("PostUiLoadAsync: Version.InstalledVersionNumber == 0");
                 PlayButtonText = "UPDATING";
                 PlayButtonEnabled = false;
             }
-            else if (Version.LatestVersionNumber > Version.InstalledVersionNumber && !SharedData.IsOffline)
+
+            await TryStartDownload();
+        }
+
+        private async Task TryStartDownload()
+        {
+            var modDownloadLocation = $"{SharedData.AttilaDir}/data/";
+            var requiredPacks = Version.LatestPackFiles;
+
+            if (isLatestModPacksInstalled(modDownloadLocation, requiredPacks))
             {
+                Logger.Log("PostUiLoadAsync: Latest pack files are already installed. Skipping downloading phase...");
+                return;
+            }
+
+            var regionCode = await GetRegionByIPAsync();
+            var downloadUrl = Version.DownloadUrlOther;
+
+            switch (regionCode)
+            {
+                case "Europe":
+                    downloadUrl = Version.DownloadUrlEU;
+                    break;
+
+                case "North America":
+                    downloadUrl = Version.DownloadUrlNA;
+                    break;
+
+                default: // "Africa", "Antarctica", "Asia", "Oceania", "South America"
+                    downloadUrl = Version.DownloadUrlOther;
+                    break;
+            }
+
+            var isDownloadUrlReachable = await IsEndpointReachableAsync(downloadUrl);
+
+            if (downloadUrl == null || !isDownloadUrlReachable)
+            {
+                downloadUrl = Version.DownloadUrlOther;
+            }
+
+            long remoteFileSize = GetRemoteFileSize(downloadUrl);
+            long downloadedFileSize = 0;
+
+            var doesDownloadFileExist = File.Exists(modDownloadLocation);
+
+            if (doesDownloadFileExist)
+            {
+                downloadedFileSize = new FileInfo(modDownloadLocation).Length;
+            }
+
+            var isModFullyDownloaded = remoteFileSize == downloadedFileSize;
+            if (isModFullyDownloaded)
+            {
+                Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
+                return;
+            }
+
+            if (HasEnoughSpace(modDownloadLocation, remoteFileSize, downloadedFileSize) == false)
+            {
+                Logger.Log("PostUiLoadAsync: Not enough space on drive detected. Aborting download.");
+                MessageBox.Show($"You don't have enough free space on your {Path.GetPathRoot(modDownloadLocation)} disk drive. Clean some space and retry again.", "Insufficient space!");
+                return;
+            }
+
+            var remoteVersion = Version.LatestVersionNumber;
+            var installedVersion = Version.InstalledVersionNumber;
+            var shouldDownloadUpdate = (remoteVersion > installedVersion) || !isModFullyDownloaded;
+
+            if (shouldDownloadUpdate)
+            {
+                var downloadArchiveFilename = Path.GetFileName(downloadUrl);
+                var downloadDestinationPath = $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}";
+
                 Logger.Log("Loading user preferences...");
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
@@ -187,14 +280,44 @@ namespace RiseofMordorLauncher
 
                 if (downloadUpdate)
                 {
-                    DownloadUpdate();
+                    await DownloadUpdate(downloadUrl, downloadDestinationPath);
                     Version = await _modVersionService.GetModVersionInfo(SharedData);
+
+                    DownloadCompleted(downloadArchiveFilename);
                 }
             }
         }
 
-        public async void DownloadUpdate()
+        private static long GetRemoteFileSize(string url)
         {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "HEAD";
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                return response.ContentLength;
+            }
+        }
+
+        public Task DownloadUpdate(string downloadUrl, string downloadDestPath)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            long downloadedFileSize = 0;
+            long remoteFileSize = GetRemoteFileSize(downloadUrl);
+
+            if (File.Exists(downloadDestPath))
+            {
+                downloadedFileSize = new FileInfo(downloadDestPath).Length;
+                var isModFullyDownloaded = downloadedFileSize == remoteFileSize;
+
+                if (isModFullyDownloaded)
+                {
+                    tcs.SetResult(true);
+                    return tcs.Task;
+                }
+            }
+
             Logger.Log("Updating mod files...");
 
             PlayButtonText = "UPDATING";
@@ -203,32 +326,188 @@ namespace RiseofMordorLauncher
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            //Logger.Log("Creating moddb service...");
-            //IModdbDownloadService moddbService = new APIModdbDownloadService();
-            //moddbService.DownloadUpdate += DownloadProgressUpdate;
-
-            //Logger.Log($"Downloading {downloadArchiveFilename} from moddb...");
-            //moddbService.DownloadFile(Version.ModdbDownloadPageUrl, $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
-            HttpClient httpClient = new HttpClient();
+            var httpClient = new HttpClient();
             Logger.Log("Adding download log to RoM server...");
-            var request = await httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
-            Logger.Log($"Download log response: Code: {request.StatusCode}");
 
-            Logger.Log("downloading latest version from RoM server...");
+            _ = httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
+            Logger.Log("Reporting a new download to the statistics server...");
+            Logger.Log("Downloading latest version from RoM server...");
 
-            downloadArchiveFilename = Path.GetFileName(Version.download_url);
+            Task.Run(() =>
+            {
+                try
+                {
+                    var req = (HttpWebRequest)WebRequest.Create(downloadUrl);
 
-            var client = new WebClient();
-            client.DownloadProgressChanged += DownloadProgressUpdate;
-            client.DownloadFileCompleted += new AsyncCompletedEventHandler(Buffer);
-            client.DownloadFileAsync(new Uri(Version.download_url), $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}"); 
+                    if (downloadedFileSize > 0)
+                    {
+                        req.AddRange(downloadedFileSize);
+                    }
+
+                    using (var resp = req.GetResponse())
+                    using (var stream = resp.GetResponseStream())
+                    using (var fs = new FileStream(downloadDestPath, FileMode.Append, FileAccess.Write))
+                    {
+                        var buffer = new byte[8192];
+                        var bytesRead = 0;
+                        var totalRead = downloadedFileSize;
+
+                        var stopwatch = Stopwatch.StartNew();
+                        long bytesSinceLastUpdate = 0;
+                        var lastUpdateTime = stopwatch.Elapsed;
+
+                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fs.Write(buffer, 0, bytesRead);
+                            totalRead += bytesRead;
+                            bytesSinceLastUpdate += bytesRead;
+
+                            var currentTime = stopwatch.Elapsed;
+                            var timeElapsed = (currentTime - lastUpdateTime).TotalSeconds;
+
+                            if (timeElapsed >= 1.0)
+                            {
+                                var speedBytesPerSecond = bytesSinceLastUpdate / timeElapsed;
+                                var speedString = FormatSpeed(speedBytesPerSecond);
+
+                                int percent = (int)(totalRead * 100 / remoteFileSize);
+
+                                Application.Current.Dispatcher.Invoke(() =>
+                                {
+                                    DownloadProgressUpdate(percent, speedBytesPerSecond, totalRead, remoteFileSize);
+                                });
+
+                                bytesSinceLastUpdate = 0;
+                                lastUpdateTime = currentTime;
+                            }
+                        }
+                    }
+
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    tcs.SetException(ex);
+                }
+            });
+
+            return tcs.Task;
+        }
+
+        public async void RequestRedownload()
+        {
+            if (MessageBox.Show($"You are trying to re-download the mod. Do you wish to continue?", "Re-Download the mod", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            {
+                return;
+            }
+
+            await TryStartDownload();
+
+            // TODO: Reset installed version
+        }
+
+        private string FormatSpeed(double bytesPerSecond)
+        {
+            if (bytesPerSecond >= 1024 * 1024)
+            {
+                return $"{bytesPerSecond / (1024 * 1024):0.00} MB/s";
+            }
+            else if (bytesPerSecond >= 1024)
+            {
+                return $"{bytesPerSecond / 1024:0.00} KB/s";
+            }
+            else
+            {
+                return $"{bytesPerSecond:0} B/s";
+            }
+        }
+
+        private string FormatBytes(long bytes)
+        {
+            string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+            double len = bytes;
+            int order = 0;
+
+            while (len >= 1024 && order < sizes.Length - 1)
+            {
+                order++;
+                len /= 1024;
+            }
+
+            return $"{len:0.##} {sizes[order]}";
+        }
+
+        private async Task<string> GetRegionByIPAsync()
+        {
+            using (var client = new HttpClient())
+            {
+                const string API_KEY = "11e33285579b0472f4e8b8ed03b6a367";
+                var url = $"http://api.ipapi.com/api/check?access_key={API_KEY}&fields=continent_name,ip";
+                var json = await client.GetStringAsync(url);
+
+                var obj = JObject.Parse(json);
+
+                var continent = obj["continent_name"]?.ToString();
+
+                return continent ?? "Unknown";
+            }
+        }
+
+        private bool HasEnoughSpace(string modDownloadLocation, long remoteFileSize, long downloadedFileSize)
+        {
+            var requiredSpace = remoteFileSize - downloadedFileSize;
+            var drive = new DriveInfo(Path.GetPathRoot(modDownloadLocation));
+            return drive.AvailableFreeSpace >= requiredSpace;
+        }
+
+        private Task<bool> IsEndpointReachableAsync(string url)
+        {
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    using (var httpClient = new HttpClient())
+                    {
+                        httpClient.Timeout = TimeSpan.FromSeconds(5);
+                        var response = await httpClient.GetAsync(url);
+                        return response.IsSuccessStatusCode;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            });
+        }
+
+        private bool isLatestModPacksInstalled(string installLocation, List<string> requiredPacksList)
+        {
+            if (!System.IO.Directory.Exists(installLocation))
+            {
+                return false;
+            }
+
+            var existingFiles = new HashSet<string>(System.IO.Directory.GetFiles(installLocation).Select(Path.GetFileName), StringComparer.Ordinal);
+
+            foreach (var requiredFile in requiredPacksList)
+            {
+                if (!existingFiles.Contains(requiredFile))
+                {
+                    return false;
+                }
+            }
+
+            // TODO: Verify pack files hash & file size
+
+            return true;
         }
 
         private async void LaunchGame()
         {
             if (SteamApps.GetCurrentGameLanguage() != "english")
             {
-                MessageBox.Show("Your game language has been detected as non-english. This may lead to issues. Rise of Mordor currently only supports English, we recommend switching the game language through Steam.");
+                MessageBox.Show("Your game language has been detected as non-english. This may lead to issues. The Dawnless Days currently only supports English, we recommend switching the game language through Steam.");
             }
 
             UserPreferences prefs = new UserPreferences();
@@ -444,9 +723,16 @@ namespace RiseofMordorLauncher
             }
         }
 
-        private async void DownloadProgressUpdate(object sender, DownloadProgressChangedEventArgs e)
+        private void DownloadProgressUpdate(int progress, double downloadSpeed, long bytesDownloaded, long bytesTotal)
         {
-            var percent_finished = e.ProgressPercentage;
+            var percent_finished = progress;
+            ProgressText = $"DOWNLOADING {progress}%";
+
+            var formatSizeDownloaded = FormatBytes(bytesDownloaded);
+            var formatSizeTotal = FormatBytes(bytesTotal);
+            var formatDownloadSpeed = FormatSpeed(downloadSpeed);
+
+            DownloadProgressText = $"{formatSizeDownloaded} / {formatSizeTotal} ({formatDownloadSpeed})";
 
             if (percent_finished > 95)
             {
@@ -456,22 +742,23 @@ namespace RiseofMordorLauncher
 
             ProgressBarProgress = percent_finished;
         }
-        
-        private void Buffer(object sender, AsyncCompletedEventArgs e)
-        {
-            Thread s = new Thread(DownloadCompleted);
-            s.IsBackground = true;
-            s.Start();
-        }
 
-        private async void DownloadCompleted()
+        private async void DownloadCompleted(string downloadArchiveFilename)
         {
             Logger.Log($"Extracting {downloadArchiveFilename}...");
 
-            using (var archiveFile = new ArchiveFile(downloadArchiveFilename))
+            try
             {
-                var extractPath = $"{SharedData.AttilaDir}/data/";
-                archiveFile.Extract(extractPath);
+                using (var archiveFile = new ArchiveFile(downloadArchiveFilename))
+                {
+                    var extractPath = $"{SharedData.AttilaDir}/data/";
+                    archiveFile.Extract(extractPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Log($"Extraction failed: {ex.Message}");
+                MessageBox.Show($"An exception occured while trying to extract mod files. Please forward the below message to the devs:\n{ex.Message}", "Failed to extract");
             }
 
             Logger.Log($"Deleting {downloadArchiveFilename}...");

@@ -145,18 +145,16 @@ namespace AutoUpdater
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            var isLauncherFullyDownloaded = false;
             long downloadedFileSize = 0;
             long remoteFileSize = GetRemoteFileSize(downloadUrl);
 
             if (File.Exists(downloadDestPath))
             {
                 downloadedFileSize = new FileInfo(downloadDestPath).Length;
-                isLauncherFullyDownloaded = downloadedFileSize == remoteFileSize;
+                var isLauncherFullyDownloaded = downloadedFileSize == remoteFileSize;
 
-                if (downloadedFileSize == remoteFileSize)
+                if (isLauncherFullyDownloaded)
                 {
-                    //textBlock.Text = "File already downloaded.";
                     tcs.SetResult(true);
                     return tcs.Task;
                 }

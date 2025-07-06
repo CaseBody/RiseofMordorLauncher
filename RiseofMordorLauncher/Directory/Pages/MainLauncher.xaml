@@ -337,7 +337,18 @@
                          Foreground="#a82c26"
                          Visibility="{Binding ShowProgressBar}"
                          Value="{Binding ProgressBarProgress, FallbackValue=50}"/>
-            
+
+            <TextBlock Grid.Row="1"
+                       Grid.Column="1"
+                       Visibility="{Binding ShowProgressBar}"
+                       Text="{Binding DownloadProgressText, FallbackValue=0.0Gb / 8.0Gb (1.0 MBs)}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="White"
+                       FontWeight="SemiBold"
+                       FontSize="14" />
+
+
         </Grid>
     </Grid>
 </Page>

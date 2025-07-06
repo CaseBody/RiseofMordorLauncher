@@ -1,17 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
-using System.IO;
-using Steamworks;
-using Google.Apis.Auth.OAuth2;
-using Google.Apis.Drive.v3;
-using Google.Apis.Drive.v3.Data;
-using Google.Apis.Services;
-using Google.Apis.Util.Store;
-using System.Windows;
 using System.Globalization;
 using System.Net.Http;
 using System.Text.Json;
@@ -31,86 +21,6 @@ namespace RiseofMordorLauncher
             var AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             var drive_service = new APIGoogleDriveService();
 
-            // check if online, if not latest downloadable mod version will be turned as 0 otherwise get latest info.
-
-            // GOOGLE DRIVE 
-
-            //if (!sharedData.IsOffline)
-            //{
-            //    Logger.Log("Downloading current_mod_version.txt...");
-
-            //    await drive_service.DownloadFile("current_mod_version.txt", $"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt", 1);
-
-            //    try
-            //    {
-            //        var current_info = System.IO.File.ReadAllLines($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/current_mod_version.txt");
-            //        var is_reading_pack_files = false;
-            //        version.LatestPackFiles = new List<string>();
-
-            //        Logger.Log("Parsing current_mod_version.txt...");
-            //        foreach (var line in current_info)
-            //        {
-            //            if (is_reading_pack_files)
-            //            {
-            //                if (line == "}")
-            //                {
-            //                    is_reading_pack_files = false;
-            //                }
-            //                else
-            //                {
-            //                    version.LatestPackFiles.Add(line);
-            //                }
-            //            }
-            //            else
-            //            {
-            //                if (line.StartsWith("version"))
-            //                {
-            //                    var raw_version = line.Split('=').ElementAt(1);
-            //                    version.VersionText = raw_version;
-            //                    var char_array = raw_version.ToCharArray();
-            //                    var final = "";
-            //                    var has_hit_first_dot = false;
-
-            //                    foreach (char charachter in char_array)
-            //                    {
-            //                        if (charachter == '.')
-            //                        {
-            //                            if (has_hit_first_dot == false)
-            //                            {
-            //                                has_hit_first_dot = true;
-            //                                final += charachter;
-            //                            }
-            //                        }
-            //                        else
-            //                        {
-            //                            final += charachter;
-            //                        }
-            //                    }
-
-            //                    version.LatestVersionNumber = double.Parse(final, culture);
-            //                }
-            //                else if (line.StartsWith("url"))
-            //                {
-            //                    version.ModdbDownloadPageUrl = line.Split('=').ElementAt(1);
-            //                }
-            //                else if (line == "pack_files = {")
-            //                {
-            //                    is_reading_pack_files = true;
-            //                }
-            //            }
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Logger.Log(ex.Message);
-            //    }
-            //}
-            //else
-            //{
-            //    version.LatestVersionNumber = 0;
-            //}
-
-            // NEW
             if (!sharedData.IsOffline)
             {
                 HttpClient client = new HttpClient();
@@ -124,13 +34,14 @@ namespace RiseofMordorLauncher
                 version.LatestPackFiles = mod_version.pack_files;
                 version.VersionText = mod_version.version_text;
                 version.LatestVersionNumber = mod_version.latest_version_number;
-                version.download_url = mod_version.download_url;
+                version.DownloadUrlEU = mod_version.download_url_eu;
+                version.DownloadUrlNA = mod_version.download_url_na;
+                version.DownloadUrlOther = mod_version.download_url;
             }
             else
             {
                 version.LatestVersionNumber = 0;
             }
-
 
             Logger.Log("Checking if local_version.txt is installed...");
             if (System.IO.File.Exists($"{AppDataPath}/RiseofMordor/RiseofMordorLauncher/local_version.txt"))

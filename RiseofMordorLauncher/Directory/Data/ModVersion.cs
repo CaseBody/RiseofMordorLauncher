@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RiseofMordorLauncher
 {
     public class ModVersion
     {
-        public string download_url { get; set; }
+        public string DownloadUrlEU { get; set; }
+        public string DownloadUrlNA { get; set; }
+        public string DownloadUrlOther { get; set; }
         public double LatestVersionNumber { get; set; }  
         public double InstalledVersionNumber { get; set; }
         public string ChangeLog { get; set; }
@@ -19,6 +18,8 @@ namespace RiseofMordorLauncher
 
     public class NewModVersion
     {
+        public string download_url_eu { get; set; }
+        public string download_url_na { get; set; }
         public string download_url { get; set; }
         public double latest_version_number { get; set; }
         public string change_log { get; set; }

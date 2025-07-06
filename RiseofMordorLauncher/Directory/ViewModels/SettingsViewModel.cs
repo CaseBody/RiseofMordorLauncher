@@ -1,4 +1,5 @@
-﻿using RiseofMordorLauncher.Directory.Services;
+﻿using RiseofMordorLauncher.Directory.Pages;
+using RiseofMordorLauncher.Directory.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -359,7 +360,7 @@ namespace RiseofMordorLauncher
 
         private void Redownload()
         {
-            mainLauncher.DownloadUpdate();
+            mainLauncher.RequestRedownload();
         }
  
         private ICommand _UpCommand;

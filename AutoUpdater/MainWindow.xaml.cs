@@ -96,9 +96,16 @@ namespace AutoUpdater
                     StatusText.Text = "Update downloaded, extracting...";
                 }));
 
-                using (var archiveFile = new ArchiveFile(launcherDownloadPath))
+                try
                 {
-                    archiveFile.Extract(launcherExecPath);
+                    using (var archiveFile = new ArchiveFile(launcherDownloadPath))
+                    {
+                        archiveFile.Extract(currentDirectory);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occured while trying to extract launcher. Please forward this to devs: ${ex.Message}", "An error occured");
                 }
 
                 if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))

@@ -158,7 +158,7 @@ namespace AutoUpdater
                 }
             }
 
-            if (downloadedFileSize > remoteFileSize)
+            if (downloadedFileSize >= remoteFileSize)
             {
                 File.Delete(downloadDestPath);
                 downloadedFileSize = 0;

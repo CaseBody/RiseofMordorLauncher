@@ -76,15 +76,16 @@ namespace AutoUpdater
 
             var currentDirectory = Directory.GetCurrentDirectory();
             var launcherDownloadPath = Path.Combine(launcherAppData, "launcher.7z");
-            var launcherExecPath = Path.Combine(currentDirectory, "..");
+
+            var launcherExecPath = currentDirectory;
             var launcherExecFile = Path.Combine(launcherExecPath, "TheDawnlessDaysLauncher.exe"); 
 
             var launcherDownloadUrl = "http://3ba9.l.time4vps.cloud/launcher/launcher.7z";
 
             var isNewVersionAvailable = remoteVersion > localVersion;
-            var isLauncherInstaller = File.Exists(launcherExecPath);
+            var isLauncherInstalled = File.Exists(launcherExecFile);
 
-            if (isNewVersionAvailable || !isLauncherInstaller)
+            if (isNewVersionAvailable || !isLauncherInstalled)
             {
                 StatusText.Dispatcher.Invoke(new Action(() => {
                    StatusText.Text = "Update found, downloading...";
@@ -117,26 +118,16 @@ namespace AutoUpdater
                 {
                     x.Write(remoteVersion.ToString());
                 }
-
-                var launcher = new Process();
-                launcher.StartInfo.FileName = launcherExecFile; 
-                launcher.StartInfo.WorkingDirectory = launcherExecPath;
-                launcher.Start();
-
-                Process.GetCurrentProcess().Kill();
             }
             else
             {
                 Dispatcher.Invoke(new Action(() => {
                     StatusText.Text = "No updates found!";
-                })); 
-
-                var launcher = new Process();
-                launcher.StartInfo.FileName = launcherExecPath;
-                launcher.StartInfo.WorkingDirectory = $"{currentDirectory}/../";
-                launcher.Start();
-                Process.GetCurrentProcess().Kill();
+                }));
             }
+
+            Process.Start(launcherExecFile);
+            Process.GetCurrentProcess().Kill();
         }
 
         private int GetCurrentVersion()

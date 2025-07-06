@@ -252,9 +252,6 @@
     <Resource Include="Directory\Images\upvote.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AngleSharp">
-      <Version>1.0.0-alpha-844</Version>
-    </PackageReference>
     <PackageReference Include="AutoMapper">
       <Version>10.1.1</Version>
     </PackageReference>

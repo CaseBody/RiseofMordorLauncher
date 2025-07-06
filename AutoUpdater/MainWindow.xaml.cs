@@ -160,6 +160,12 @@ namespace AutoUpdater
                 }
             }
 
+            if (downloadedFileSize > remoteFileSize)
+            {
+                File.Delete(downloadDestPath);
+                downloadedFileSize = 0;
+            }
+
             Task.Run(() =>
             {
                 try

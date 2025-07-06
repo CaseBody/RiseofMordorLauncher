@@ -1,4 +1,10 @@
-﻿using System;
+﻿using DiscordRPC;
+using Newtonsoft.Json.Linq;
+using RiseofMordorLauncher.Directory.Pages;
+using RiseofMordorLauncher.Directory.Services;
+using SevenZipExtractor;
+using Steamworks;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -8,14 +14,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Newtonsoft.Json.Linq;
-using DiscordRPC;
-using SevenZipExtractor;
-using Steamworks;
-using RiseofMordorLauncher.Directory.Pages;
-using RiseofMordorLauncher.Directory.Services;
 
 namespace RiseofMordorLauncher
 {
@@ -49,6 +50,7 @@ namespace RiseofMordorLauncher
         public bool PlayButtonEnabled { get; set; } = true;
         public bool SubmodButtonEnabled { get; set; } = true;
         public int ProgressBarProgress { get; set; }
+        private string _downloadSourceOverride = null;
         public string BackgroundImage { get; set; }
         private ModVersion Version { get; set; }
         private LauncherVersion LauncherVersion { get; set; }
@@ -101,6 +103,7 @@ namespace RiseofMordorLauncher
             UserPreferencesService = new APIUserPreferencesService();
             var prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
+            _downloadSourceOverride = prefs.DownloadSource;
             BackgroundImage = $"Directory/Images/{prefs.BackgroundImage}";
             ShowPreview = (bool)prefs.ShowLatestPreview ? Visibility.Visible : Visibility.Hidden;
             ShowVideo = (bool)prefs.ShowLatestVideo ? Visibility.Visible : Visibility.Hidden;
@@ -193,7 +196,7 @@ namespace RiseofMordorLauncher
 
         private async Task TryStartDownload()
         {
-            var modDownloadLocation = $"{SharedData.AttilaDir}/data/";
+            var modDownloadLocation = Path.Combine(SharedData.AttilaDir, "data");
             var requiredPacks = Version.LatestPackFiles;
 
             if (isLatestModPacksInstalled(modDownloadLocation, requiredPacks))
@@ -202,7 +205,17 @@ namespace RiseofMordorLauncher
                 return;
             }
 
-            var regionCode = await GetRegionByIPAsync();
+            var regionCode = "Default";
+
+            if (_downloadSourceOverride != null && _downloadSourceOverride != "Default")
+            {
+                regionCode = _downloadSourceOverride;
+            }
+            else
+            {
+                regionCode = await GetRegionByIPAsync();
+            }
+
             var downloadUrl = Version.DownloadUrlOther;
 
             switch (regionCode)
@@ -228,7 +241,7 @@ namespace RiseofMordorLauncher
             }
 
             var archiveFileName = Path.GetFileName(downloadUrl);
-            var downloadArchiveFullName = $"{modDownloadLocation}/{archiveFileName}";
+            var downloadArchiveFullName = Path.Combine(modDownloadLocation, archiveFileName);
 
             long remoteFileSize = GetRemoteFileSize(downloadUrl);
             long downloadedFileSize = 0;
@@ -282,7 +295,7 @@ namespace RiseofMordorLauncher
                     await DownloadUpdate(downloadUrl, downloadArchiveFullName);
                     Version = await _modVersionService.GetModVersionInfo(SharedData);
 
-                    DownloadCompleted(downloadArchiveFullName);
+                    DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
                 }
             }
         }
@@ -325,12 +338,15 @@ namespace RiseofMordorLauncher
             SubmodButtonEnabled = false;
             ShowProgressBar = Visibility.Visible;
 
-            var httpClient = new HttpClient();
-            Logger.Log("Adding download log to RoM server...");
+            if (!Debugger.IsAttached)
+            {
+                var httpClient = new HttpClient();
+                Logger.Log("Adding download log to RoM server...");
 
-            _ = httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
-            Logger.Log("Reporting a new download to the statistics server...");
-            Logger.Log("Downloading latest version from RoM server...");
+                _ = httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
+                Logger.Log("Reporting a new download to the statistics server...");
+                Logger.Log("Downloading latest version from RoM server...");
+            }
 
             Task.Run(() =>
             {
@@ -742,16 +758,14 @@ namespace RiseofMordorLauncher
             ProgressBarProgress = percent_finished;
         }
 
-        private async void DownloadCompleted(string downloadArchiveFilename)
+        private async void DownloadCompleted(string downloadArchiveFullName, string extractPath)
         {
-            Logger.Log($"Extracting {downloadArchiveFilename}...");
+            Logger.Log($"Extracting {downloadArchiveFullName}...");
 
             try
             {
-                var archiveFullPath = $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}";
-                using (var archiveFile = new ArchiveFile(archiveFullPath))
+                using (var archiveFile = new ArchiveFile(downloadArchiveFullName))
                 {
-                    var extractPath = $"{SharedData.AttilaDir}/data/";
                     archiveFile.Extract(extractPath);
                 }
             }
@@ -914,6 +928,11 @@ namespace RiseofMordorLauncher
         {
             Logger.Log($"Switching page to {page}");
             SwitchPageEvent?.Invoke(this, page);
+        }
+
+        public void SetDownloadSourceOverride(string preferredSource)
+        {
+            _downloadSourceOverride = preferredSource;
         }
 
         #region SocialButtons

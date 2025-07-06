@@ -30,6 +30,15 @@
             <TextBlock Text="Show latest video" Foreground="#fc9b00" Margin="3 0 0 0"/>
         </StackPanel>
 
+        <StackPanel Margin="3 10 0 0" Orientation="Vertical" HorizontalAlignment="Center">
+            <TextBlock Text="Download sources:" Foreground="#fc9b00" Margin="3 0 0 0"/>
+            <ComboBox Width="140" SelectedValuePath="Tag" SelectedValue="{Binding SelectedDownloadSource}" Style="{StaticResource DarkComboBox}">
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="Default">Default</ComboBoxItem>
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="Europe">Europe</ComboBoxItem>
+                <ComboBoxItem Style="{StaticResource DarkComboBoxItem}" Tag="North America">North America</ComboBoxItem>
+            </ComboBox>
+        </StackPanel>
+
         <!--StackPanel Margin="3 10 0 0" Orientation="Vertical" HorizontalAlignment="Center">
             <TextBlock Text="Background:" Foreground="#fc9b00" Margin="3 0 0 0"/>
             <ComboBox Width="140" SelectedValuePath="Tag" SelectedValue="{Binding SelectedBackground}" Style="{StaticResource DarkComboBox}">

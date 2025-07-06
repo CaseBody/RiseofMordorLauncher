@@ -48,6 +48,30 @@ namespace RiseofMordorLauncher
             }
         }
 
+        private string _selectedDownloadSource;
+        public string SelectedDownloadSource
+        {
+            get
+            {
+                return _selectedDownloadSource;
+            }
+            set
+            {
+                _selectedDownloadSource = value;
+
+                if (_selectedDownloadSource == "Default")
+                {
+                    mainLauncher.SetDownloadSourceOverride(null);
+                }
+                else
+                {
+                    mainLauncher.SetDownloadSourceOverride(_selectedDownloadSource);
+                }
+
+                WritePrefs(prefs);
+            }
+        }
+
         public bool _ShowLatestPreview = true;
         public bool ShowLatestPreview
         {
@@ -92,6 +116,7 @@ namespace RiseofMordorLauncher
             _SelectedBackground = prefs.BackgroundImage;
             _ShowLatestVideo = (bool)prefs.ShowLatestVideo;
             _ShowLatestPreview = (bool)prefs.ShowLatestPreview;
+            SelectedDownloadSource = prefs.DownloadSource;
 
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
@@ -238,7 +263,6 @@ namespace RiseofMordorLauncher
 
             if (File.Exists($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
             {
-
                 EnabledSubmodsRaw = File.ReadAllLines($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
                 List<SubmodInstallation> EnabledSubmods2 = new List<SubmodInstallation>();
 
@@ -277,7 +301,12 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            string output = $"auto_update={_AutoInstall}{Environment.NewLine}show_latest_preview={_ShowLatestPreview}{Environment.NewLine}show_latest_video={_ShowLatestVideo}{Environment.NewLine}background={_SelectedBackground}{Environment.NewLine}load_order = {{";
+            var output = $"auto_update={_AutoInstall}{Environment.NewLine}" +
+                        $"show_latest_preview={_ShowLatestPreview}{Environment.NewLine}" +
+                        $"show_latest_video={_ShowLatestVideo}{Environment.NewLine}" +
+                        $"download_source={SelectedDownloadSource}{Environment.NewLine}" +
+                        $"background={_SelectedBackground}{Environment.NewLine}" +
+                        $"load_order = {{";
             
             foreach (string pack in prefs2.LoadOrder)
             {

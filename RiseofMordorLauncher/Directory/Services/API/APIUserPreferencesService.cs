@@ -37,6 +37,10 @@ namespace RiseofMordorLauncher
                         {
                             pref.AutoUpdate = bool.Parse(line.Split('=').ElementAt(1));
                         }
+                        else if (line.StartsWith("download_source"))
+                        {
+                            pref.DownloadSource = line.Split('=').ElementAt(1);
+                        }
                         else if (line.StartsWith("background"))
                         {
                             pref.BackgroundImage = line.Split('=').ElementAt(1);
@@ -79,6 +83,11 @@ namespace RiseofMordorLauncher
                     doesBackgroundExist = false;
                 }
 
+                if (pref.DownloadSource == null)
+                {
+                    pref.DownloadSource = "Default";
+                }
+
                 if (pref.BackgroundImage == null || !doesBackgroundExist)
                 {
                     pref.BackgroundImage = "background.png";
@@ -100,9 +109,16 @@ namespace RiseofMordorLauncher
             {
                 using (var x = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
                 {
-                    x.Write($"auto_update=true{Environment.NewLine}show_latest_preview=true{Environment.NewLine}show_latest_video=true{Environment.NewLine}background=background.png{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                    x.Write($"auto_update=true{Environment.NewLine}" +
+                            $"show_latest_preview=true{Environment.NewLine}" +
+                            $"show_latest_video=true{Environment.NewLine}" +
+                            $"download_source=Default{Environment.NewLine}" +
+                            $"background=background.png{Environment.NewLine}" +
+                            $"load_order = {{{Environment.NewLine}" +
+                            $"rom_base{Environment.NewLine}}}");
                 }
                 pref.AutoUpdate = true;
+                pref.DownloadSource = "Default";
                 pref.BackgroundImage = "background.png";
                 pref.ShowLatestPreview = true;
                 pref.ShowLatestVideo = true;

@@ -749,7 +749,8 @@ namespace RiseofMordorLauncher
 
             try
             {
-                using (var archiveFile = new ArchiveFile(downloadArchiveFilename))
+                var archiveFullPath = $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}";
+                using (var archiveFile = new ArchiveFile(archiveFullPath))
                 {
                     var extractPath = $"{SharedData.AttilaDir}/data/";
                     archiveFile.Extract(extractPath);

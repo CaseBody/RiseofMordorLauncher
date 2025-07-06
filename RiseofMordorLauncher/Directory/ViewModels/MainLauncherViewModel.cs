@@ -117,19 +117,22 @@ namespace RiseofMordorLauncher
                 var data = await _youTubeDataService.GetYouTubeData();
                 _youtubeThumbnailUrl = data.VideoUrl;
 
-                var bitmap = new BitmapImage();
-                bitmap.BeginInit();
-                bitmap.UriSource = new Uri(data.ThumbnailUrl);
-                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                bitmap.EndInit();
-
-                if (bitmap.CanFreeze)
+                if (data.ThumbnailUrl != null)
                 {
-                    bitmap.Freeze();
-                }
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(data.ThumbnailUrl);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
 
-                YouTubeThumbnailImage = bitmap;
-                OnPropertyChanged(nameof(YouTubeThumbnailImage));
+                    if (bitmap.CanFreeze)
+                    {
+                        bitmap.Freeze();
+                    }
+
+                    YouTubeThumbnailImage = bitmap;
+                    OnPropertyChanged(nameof(YouTubeThumbnailImage));
+                }
             }
             else
             {

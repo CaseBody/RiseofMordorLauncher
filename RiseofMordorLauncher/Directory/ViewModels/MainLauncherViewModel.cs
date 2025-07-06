@@ -227,14 +227,16 @@ namespace RiseofMordorLauncher
                 downloadUrl = Version.DownloadUrlOther;
             }
 
+            var archiveFileName = Path.GetFileName(downloadUrl);
+            var downloadArchiveFullName = $"{modDownloadLocation}/{archiveFileName}";
+
             long remoteFileSize = GetRemoteFileSize(downloadUrl);
             long downloadedFileSize = 0;
 
-            var doesDownloadFileExist = File.Exists(modDownloadLocation);
-
+            var doesDownloadFileExist = File.Exists(downloadArchiveFullName);
             if (doesDownloadFileExist)
             {
-                downloadedFileSize = new FileInfo(modDownloadLocation).Length;
+                downloadedFileSize = new FileInfo(downloadArchiveFullName).Length;
             }
 
             var isModFullyDownloaded = remoteFileSize == downloadedFileSize;
@@ -257,9 +259,6 @@ namespace RiseofMordorLauncher
 
             if (shouldDownloadUpdate)
             {
-                var downloadArchiveFilename = Path.GetFileName(downloadUrl);
-                var downloadDestinationPath = $"{SharedData.AttilaDir}/data/{downloadArchiveFilename}";
-
                 Logger.Log("Loading user preferences...");
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
@@ -280,10 +279,10 @@ namespace RiseofMordorLauncher
 
                 if (downloadUpdate)
                 {
-                    await DownloadUpdate(downloadUrl, downloadDestinationPath);
+                    await DownloadUpdate(downloadUrl, downloadArchiveFullName);
                     Version = await _modVersionService.GetModVersionInfo(SharedData);
 
-                    DownloadCompleted(downloadArchiveFilename);
+                    DownloadCompleted(downloadArchiveFullName);
                 }
             }
         }
@@ -299,16 +298,16 @@ namespace RiseofMordorLauncher
             }
         }
 
-        public Task DownloadUpdate(string downloadUrl, string downloadDestPath)
+        public Task DownloadUpdate(string downloadUrl, string downloadDestFilePath)
         {
             var tcs = new TaskCompletionSource<bool>();
 
             long downloadedFileSize = 0;
             long remoteFileSize = GetRemoteFileSize(downloadUrl);
 
-            if (File.Exists(downloadDestPath))
+            if (File.Exists(downloadDestFilePath))
             {
-                downloadedFileSize = new FileInfo(downloadDestPath).Length;
+                downloadedFileSize = new FileInfo(downloadDestFilePath).Length;
                 var isModFullyDownloaded = downloadedFileSize == remoteFileSize;
 
                 if (isModFullyDownloaded)
@@ -346,7 +345,7 @@ namespace RiseofMordorLauncher
 
                     using (var resp = req.GetResponse())
                     using (var stream = resp.GetResponseStream())
-                    using (var fs = new FileStream(downloadDestPath, FileMode.Append, FileAccess.Write))
+                    using (var fs = new FileStream(downloadDestFilePath, FileMode.Append, FileAccess.Write))
                     {
                         var buffer = new byte[8192];
                         var bytesRead = 0;

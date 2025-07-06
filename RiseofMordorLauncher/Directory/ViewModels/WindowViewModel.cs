@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -10,8 +7,6 @@ using RiseofMordorLauncher.Directory.Pages;
 using System.Threading;
 using RiseofMordorLauncher.Directory.Services;
 using DiscordRPC;
-using System.IO;
-using System.Diagnostics;
 using System.Windows;
 
 namespace RiseofMordorLauncher

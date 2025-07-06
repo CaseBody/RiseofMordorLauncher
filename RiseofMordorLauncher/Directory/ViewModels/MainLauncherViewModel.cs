@@ -14,6 +14,8 @@ using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace RiseofMordorLauncher
 {
@@ -38,7 +40,7 @@ namespace RiseofMordorLauncher
         public string SteamAvatarUrl { get; set; }
         public string VersionText { get; set; }
         public string ChangelogText { get; set; }
-        public string YouTubeVideoURL { get; set; }
+        public ImageSource YouTubeThumbnailImage { get; set; }
         public SharedData SharedData { get; set; }
         public Visibility ShowVideo { get; set; } = Visibility.Visible;
         public Visibility ShowPreview { get; set; } = Visibility.Visible;
@@ -112,7 +114,21 @@ namespace RiseofMordorLauncher
             {
                 _youTubeDataService = new APIYouTubeDataService();
                 var data = await _youTubeDataService.GetYouTubeData();
-                YouTubeVideoURL = data.VideoUrl;
+                _youtubeThumbnailUrl = data.VideoUrl;
+
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = new Uri(data.ThumbnailUrl);
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.EndInit();
+
+                if (bitmap.CanFreeze)
+                {
+                    bitmap.Freeze();
+                }
+
+                YouTubeThumbnailImage = bitmap;
+                OnPropertyChanged(nameof(YouTubeThumbnailImage));
             }
             else
             {
@@ -432,7 +448,6 @@ namespace RiseofMordorLauncher
             {
                 percent_finished = 100;
                 ProgressText = "EXTRACTING DATA...";
-
             }
 
             ProgressBarProgress = percent_finished;
@@ -452,14 +467,11 @@ namespace RiseofMordorLauncher
             using (var archiveFile = new ArchiveFile(downloadArchiveFilename))
             {
                 var extractPath = $"{SharedData.AttilaDir}/data/";
-                foreach (var entry in archiveFile.Entries)
-                {
-                    entry.Extract(Path.Combine(extractPath, entry.FileName));
-                }
+                archiveFile.Extract(extractPath);
             }
 
             Logger.Log($"Deleting {downloadArchiveFilename}...");
-            File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
+            //File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
             WebClient client = new WebClient();
@@ -624,12 +636,35 @@ namespace RiseofMordorLauncher
             }
         }
 
+        private const string YOUTUBE_CHANNEL_URL = "https://www.youtube.com/channel/UCangGj6TUjUb9ri8CXcxQuw";
+
         private ICommand _YoutubeCommand;
         public ICommand YoutubeCommand
         {
             get
             {
-                return _YoutubeCommand ?? (_YoutubeCommand = new CommandHandler(() => Process.Start("https://www.youtube.com/channel/UCangGj6TUjUb9ri8CXcxQuw"), () => true)); ;
+                return _YoutubeCommand ?? (_YoutubeCommand = new CommandHandler(() => Process.Start(YOUTUBE_CHANNEL_URL), () => true)); ;
+            }
+        }
+
+        private string _youtubeThumbnailUrl;
+
+        private ICommand _youtubeThumbnailCommand;
+        public ICommand YouTubeThumbnailCommand
+        {
+            get
+            {
+                if (_youtubeThumbnailUrl == null)
+                {
+                    _youtubeThumbnailUrl = YOUTUBE_CHANNEL_URL;
+                }
+
+                if (_youtubeThumbnailCommand == null)
+                {
+                    _youtubeThumbnailCommand = new CommandHandler(() => Process.Start(_youtubeThumbnailUrl), () => true);
+                }
+
+                return _youtubeThumbnailCommand;
             }
         }
 

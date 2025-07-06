@@ -4,14 +4,13 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:RiseofMordorLauncher.Directory.Pages"
-      xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
       mc:Ignorable="d"
       d:DesignHeight="650"
       d:DesignWidth="1200"
       Title="MainLauncher">
 
     <Page.Resources>
-        <BitmapImage x:Key="DefaultImage" UriSource="../Images/unknown.png" />
+        <BitmapImage x:Key="DefaultImage" UriSource="../Images/background.png" />
     </Page.Resources>
 
     <Grid>
@@ -43,7 +42,7 @@
                     Height="45">
 
                 <Image Source="{Binding SteamAvatarUrl}"
-                       RenderOptions.BitmapScalingMode="Fant"
+                       RenderOptions.BitmapScalingMode="HighQuality"
                        Stretch="Uniform"/>
                 
             </Border>
@@ -107,7 +106,7 @@
                             <Image Grid.Row="0"
                                    Height="100"
                                    HorizontalAlignment="Center" 
-                                   RenderOptions.BitmapScalingMode="Fant"
+                                   RenderOptions.BitmapScalingMode="HighQuality"
                                    Source="../Images/rom_logo.png"/>
 
                             <TextBlock Grid.Row="1"
@@ -194,44 +193,60 @@
                                />
                     
                 </Border>
-                
-                <Grid>
-                    <Border Height="220"
-                            Background="#080808"
+
+                <Grid Height="220">
+                    <Border Background="#080808"
                             BorderBrush="#080808"
                             BorderThickness="1">
+
+                        <Image Source="{Binding YouTubeThumbnailImage}"
+                               SnapsToDevicePixels="True"
+                               Stretch="UniformToFill"
+                               RenderOptions.BitmapScalingMode="HighQuality"
+                               Height="220"
+                               Cursor="Hand">
                         
-                        <wpf:ChromiumWebBrowser Address="{Binding YouTubeVideoURL}"
-                                                Height="220" />
+                            <Image.InputBindings>
+                                <MouseBinding Command="{Binding YouTubeThumbnailCommand}" MouseAction="LeftClick"/>
+                            </Image.InputBindings>
                         
+                        </Image>
                     </Border>
+
+                    <Image Source="../Images/play_icon.png"
+                           Width="64"
+                           Height="64"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           IsHitTestVisible="False" />
+                    
                 </Grid>
             </StackPanel>
 
         </Grid>
 
         <StackPanel Orientation="Vertical" Grid.Row="1" HorizontalAlignment="Right" Width="80">
-            <Image Source="../Images/discord_icon.png" Cursor="Hand" Margin="20 4 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/discord_icon.png" Cursor="Hand" Margin="20 4 20 10" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding DiscordCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
-            <Image Source="../Images/youtube_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/youtube_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding YoutubeCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
-            <Image Source="../Images/nexus_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/nexus_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding NexusCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
-            <Image Source="../Images/reddit_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/reddit_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding RedditCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
             </Image>
-            <Image Source="../Images/instagram_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="Fant">
+            <Image Source="../Images/instagram_icon.png" Cursor="Hand" Margin="20 0 20 10" RenderOptions.BitmapScalingMode="HighQuality">
                 <Image.InputBindings>
                     <MouseBinding Command="{Binding InstagramCommand}" MouseAction="LeftClick"/>
                 </Image.InputBindings>
@@ -252,7 +267,7 @@
                    Margin="80 0 0 0"
                    HorizontalAlignment="Left" 
                    VerticalAlignment="Center"
-                   RenderOptions.BitmapScalingMode="Fant"
+                   RenderOptions.BitmapScalingMode="HighQuality"
                    Source="../Images/rom_logo.png"/>
 
             <Button Grid.Column="1"

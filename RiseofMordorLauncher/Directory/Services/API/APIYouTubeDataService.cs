@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using System.Threading;
 using YoutubeExplode;
 using YoutubeExplode.Common;
-using YoutubeExplode.Videos.Streams;
+using YoutubeExplode.Playlists;
 
 namespace RiseofMordorLauncher
 {
@@ -20,8 +17,25 @@ namespace RiseofMordorLauncher
                 var rom_channel_videos = await youtube_api.Channels.GetUploadsAsync("UCangGj6TUjUb9ri8CXcxQuw");
 
                 var data = new YouTubeData();
-                data.ThumbnailUrl = rom_channel_videos.ElementAt(0).Thumbnails.ElementAt(0).Url;
-                data.VideoUrl = $"https://youtube.com/embed/{rom_channel_videos.ElementAt(0).Id}";
+                PlaylistVideo firstNonShortVideo = null;
+
+                foreach (var item in rom_channel_videos)
+                {
+                    if (item.Duration.HasValue == false)
+                    {
+                        continue;
+                    }
+
+                    if (item.Duration.Value > TimeSpan.FromSeconds(90))
+                    {
+                        firstNonShortVideo = item;
+                        break;
+                    }
+                }
+
+                //data.ThumbnailUrl = firstNonShortVideo.Thumbnails.ElementAt(0).Url;
+                data.ThumbnailUrl = $"https://img.youtube.com/vi/{firstNonShortVideo.Id}/maxresdefault.jpg";
+                data.VideoUrl = $"https://youtube.com/embed/{firstNonShortVideo.Id}";
                 return data;
             }
             catch (Exception ex)

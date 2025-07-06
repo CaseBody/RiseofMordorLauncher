@@ -235,17 +235,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Directory\Images\background_one.png" />
-    <Resource Include="Directory\Images\background_two.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Directory\Images\example_avatar.jpg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Directory\Images\background_three.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Directory\Images\play_button.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Directory\Images\warning_sign.png" />
@@ -255,9 +245,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Directory\Images\buffering.gif" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Directory\Images\unknown.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Directory\Images\downvote.png" />
@@ -270,9 +257,6 @@
     </PackageReference>
     <PackageReference Include="AutoMapper">
       <Version>10.1.1</Version>
-    </PackageReference>
-    <PackageReference Include="CefSharp.Wpf">
-      <Version>137.0.100</Version>
     </PackageReference>
     <PackageReference Include="Discord.Net">
       <Version>2.4.0</Version>
@@ -289,7 +273,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Google.Apis.Drive.v3">
-      <Version>1.54.0.2397</Version>
+      <Version>1.55.0.2502</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.36</Version>
@@ -347,16 +331,16 @@
     <Resource Include="Directory\Images\rom_logo_small.jpeg" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Directory\Images\background_rohirrim.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Directory\Images\background_uruk_hai.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Directory\Images\submods_title.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Directory\Images\nexus_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\play_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Directory\Images\background.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

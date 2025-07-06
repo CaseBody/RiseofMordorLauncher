@@ -1,16 +1,14 @@
-﻿using System;
-using System.Linq;
+﻿using SevenZipExtractor;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.IO;
-using System.Threading;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Net;
 using System.Windows.Threading;
-using SevenZipExtractor;
 
 namespace AutoUpdater
 {
@@ -32,14 +30,14 @@ namespace AutoUpdater
 
         private void InitAppData()
         {
-            modAppData = System.IO.Path.Combine(AppData, "RiseofMordor");
+            modAppData = Path.Combine(AppData, "RiseofMordor");
 
             if (!Directory.Exists(modAppData))
             {
                 Directory.CreateDirectory(modAppData);
             }
 
-            launcherAppData = System.IO.Path.Combine(modAppData, "RiseofMordorLauncher");
+            launcherAppData = Path.Combine(modAppData, "RiseofMordorLauncher");
 
             if (!Directory.Exists(launcherAppData))
             {
@@ -78,30 +76,29 @@ namespace AutoUpdater
 
             var currentDirectory = Directory.GetCurrentDirectory();
             var launcherDownloadPath = Path.Combine(launcherAppData, "launcher.7z");
-            var launcherExecPath = Path.Combine(currentDirectory, "..TheDawnlessDaysLauncher.exe");
+            var launcherExecPath = Path.Combine(currentDirectory, "..");
+            var launcherExecFile = Path.Combine(launcherExecPath, "TheDawnlessDaysLauncher.exe"); 
 
-            if (remoteVersion > localVersion || !File.Exists(launcherExecPath))
+            var launcherDownloadUrl = "http://3ba9.l.time4vps.cloud/launcher/launcher.7z";
+
+            var isNewVersionAvailable = remoteVersion > localVersion;
+            var isLauncherInstaller = File.Exists(launcherExecPath);
+
+            if (isNewVersionAvailable || !isLauncherInstaller)
             {
                 StatusText.Dispatcher.Invoke(new Action(() => {
-                   StatusText.Text = "Update found, downloading now...";
+                   StatusText.Text = "Update found, downloading...";
                 }));
 
-                if (!File.Exists(launcherDownloadPath))
-                {
-                    await DownloadLauncher(launcherDownloadPath, StatusText);
-                }
+                await DownloadLauncher(launcherDownloadUrl, launcherDownloadPath, StatusText);
 
                 Dispatcher.Invoke(new Action(() => {
-                    StatusText.Text = "Update Downloaded, extracting now...";
+                    StatusText.Text = "Update downloaded, extracting...";
                 }));
 
                 using (var archiveFile = new ArchiveFile(launcherDownloadPath))
                 {
-                    var extractPath = $"{currentDirectory}/../";
-                    foreach (var entry in archiveFile.Entries)
-                    {
-                        entry.Extract(Path.Combine(extractPath, entry.FileName));
-                    }
+                    archiveFile.Extract(launcherExecPath);
                 }
 
                 if (File.Exists($"{AppData}/RiseofMordor/RiseofMordorLauncher/installed_launcher_version.txt"))
@@ -115,8 +112,8 @@ namespace AutoUpdater
                 }
 
                 var launcher = new Process();
-                launcher.StartInfo.FileName = launcherExecPath; 
-                launcher.StartInfo.WorkingDirectory = $"{currentDirectory}/../";
+                launcher.StartInfo.FileName = launcherExecFile; 
+                launcher.StartInfo.WorkingDirectory = launcherExecPath;
                 launcher.Start();
 
                 Process.GetCurrentProcess().Kill();
@@ -144,30 +141,69 @@ namespace AutoUpdater
             return int.Parse(t.Result);
         }
 
-        private Task DownloadLauncher(string downloadDestPath, TextBlock textBlock)
+        private Task DownloadLauncher(string downloadUrl, string downloadDestPath, TextBlock textBlock)
         {
             var tcs = new TaskCompletionSource<bool>();
-            var client = new WebClient();
 
-            client.DownloadProgressChanged += (s, e) =>
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    textBlock.Text = $"Update found, download progress: {e.ProgressPercentage}%";
-                });
-            };
+            var isLauncherFullyDownloaded = false;
+            long downloadedFileSize = 0;
+            long remoteFileSize = GetRemoteFileSize(downloadUrl);
 
-            client.DownloadFileCompleted += (s, e) =>
+            if (File.Exists(downloadDestPath))
             {
-                Dispatcher.Invoke(() =>
+                downloadedFileSize = new FileInfo(downloadDestPath).Length;
+                isLauncherFullyDownloaded = downloadedFileSize == remoteFileSize;
+
+                if (downloadedFileSize == remoteFileSize)
                 {
-                    textBlock.Text = "Update found, download completed";
+                    //textBlock.Text = "File already downloaded.";
                     tcs.SetResult(true);
-                });
-            };
+                    return tcs.Task;
+                }
+            }
 
-            var url = "http://3ba9.l.time4vps.cloud/launcher/launcher.7z";
-            client.DownloadFileAsync(new Uri(url), downloadDestPath);
+            Task.Run(() =>
+            {
+                try
+                {
+                    var req = (HttpWebRequest)WebRequest.Create(downloadUrl);
+
+                    if (downloadedFileSize > 0)
+                    {
+                        req.AddRange(downloadedFileSize);
+                    }
+
+                    using (var resp = req.GetResponse())
+                    using (var stream = resp.GetResponseStream())
+                    using (var fs = new FileStream(downloadDestPath, FileMode.Append, FileAccess.Write))
+                    {
+                        var buffer = new byte[8192];
+                        var bytesRead = 0;
+                        var totalRead = downloadedFileSize;
+
+                        while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fs.Write(buffer, 0, bytesRead);
+                            totalRead += bytesRead;
+
+                            int percent = (int)(totalRead * 100 / remoteFileSize);
+                            Dispatcher.Invoke(() =>
+                            {
+                                textBlock.Text = $"Update download progress: {percent}%";
+                            });
+                        }
+                    }
+
+                    Dispatcher.Invoke(() => textBlock.Text = "Update download completed");
+                    tcs.SetResult(true);
+                }
+                catch (Exception ex)
+                {
+                    Dispatcher.Invoke(() => textBlock.Text = $"Update download failed");
+                    MessageBox.Show(ex.Message);
+                    tcs.SetException(ex);
+                }
+            });
 
             return tcs.Task;
         }
@@ -185,6 +221,17 @@ namespace AutoUpdater
             else
             {
                 return 0;
+            }
+        }
+
+        private static long GetRemoteFileSize(string url)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "HEAD";
+
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                return response.ContentLength;
             }
         }
 

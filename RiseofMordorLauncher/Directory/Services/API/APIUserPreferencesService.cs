@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Resources;
 
 namespace RiseofMordorLauncher
 {
@@ -68,9 +69,22 @@ namespace RiseofMordorLauncher
                     pref.LoadOrder = Packs;
                 }
 
-                if (pref.BackgroundImage == null)
+                var doesBackgroundExist = false;
+
+                try
                 {
-                    pref.BackgroundImage = "unknown.png";
+                    var uri = new Uri($"Directory/Images/{pref.BackgroundImage}", UriKind.Relative);
+                    var info = System.Windows.Application.GetResourceStream(uri);
+                    doesBackgroundExist = info != null;
+                }
+                catch
+                {
+                    doesBackgroundExist = false;
+                }
+
+                if (pref.BackgroundImage == null || !doesBackgroundExist)
+                {
+                    pref.BackgroundImage = "background.png";
                 }
 
                 if (pref.ShowLatestVideo == null)
@@ -89,10 +103,10 @@ namespace RiseofMordorLauncher
             {
                 using (var x = new StreamWriter($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
                 {
-                    x.Write($"auto_update=true{Environment.NewLine}show_latest_preview=true{Environment.NewLine}show_latest_video=true{Environment.NewLine}background=unknown.png{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
+                    x.Write($"auto_update=true{Environment.NewLine}show_latest_preview=true{Environment.NewLine}show_latest_video=true{Environment.NewLine}background=background.png{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
                 }
                 pref.AutoUpdate = true;
-                pref.BackgroundImage = "unknown.png";
+                pref.BackgroundImage = "background.png";
                 pref.ShowLatestPreview = true;
                 pref.ShowLatestVideo = true;
                 pref.LoadOrder = new List<string>();

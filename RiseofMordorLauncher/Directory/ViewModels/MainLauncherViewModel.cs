@@ -775,11 +775,13 @@ namespace RiseofMordorLauncher
                 MessageBox.Show($"An exception occured while trying to extract mod files. Please forward the below message to the devs:\n{ex.Message}", "Failed to extract");
             }
 
-            Logger.Log($"Deleting {downloadArchiveFilename}...");
-            File.Delete($"{SharedData.AttilaDir}/data/{downloadArchiveFilename}");
+            Logger.Log($"Deleting {downloadArchiveFullName}...");
+            File.Delete(downloadArchiveFullName);
+
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-            WebClient client = new WebClient();
+
+            var client = new WebClient();
             client.DownloadFile("http://80.208.231.54/launcher/local_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
 
             using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))

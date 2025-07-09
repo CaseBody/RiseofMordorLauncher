@@ -75,12 +75,13 @@ namespace AutoUpdater
             var remoteVersion = GetCurrentVersion();
 
             var currentDirectory = Directory.GetCurrentDirectory();
-            var launcherDownloadPath = Path.Combine(launcherAppData, "launcher.7z");
+
+            var launcherDownloadUrl = "http://3ba9.l.time4vps.cloud/launcher/launcher.7z";
+            var launcherDownloadFile = Path.GetFileName(launcherDownloadUrl);
+            var launcherDownloadPath = Path.Combine(launcherAppData, launcherDownloadFile);
 
             var launcherExecPath = currentDirectory;
             var launcherExecFile = Path.Combine(launcherExecPath, "TheDawnlessDaysLauncher.exe"); 
-
-            var launcherDownloadUrl = "http://3ba9.l.time4vps.cloud/launcher/launcher.7z";
 
             var isNewVersionAvailable = remoteVersion > localVersion;
             var isLauncherInstalled = File.Exists(launcherExecFile);

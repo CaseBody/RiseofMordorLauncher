@@ -98,7 +98,7 @@ namespace AutoUpdater
                     StatusText.Text = "Update downloaded, extracting...";
                 }));
 
-                if (File.Exists(launcherDownloadPath))
+                if (!File.Exists(launcherDownloadPath))
                 {
                     MessageBox.Show($"Send this error to devs: {launcherDownloadPath}", "File not found");
                     return;

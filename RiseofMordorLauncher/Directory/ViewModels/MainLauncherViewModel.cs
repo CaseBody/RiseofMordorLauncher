@@ -778,7 +778,7 @@ namespace RiseofMordorLauncher
             Logger.Log($"Deleting {downloadArchiveFullName}...");
             File.Delete(downloadArchiveFullName);
 
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMororLauncher/enabled_submods.txt"); } catch { }
+            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
             try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
 
             var client = new WebClient();

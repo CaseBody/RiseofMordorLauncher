@@ -1,5 +1,5 @@
 ﻿using DiscordRPC;
-using Newtonsoft.Json.Linq;
+using MaxMind.GeoIP2;
 using RiseofMordorLauncher.Directory.Pages;
 using RiseofMordorLauncher.Directory.Services;
 using SevenZipExtractor;
@@ -14,7 +14,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
@@ -54,6 +53,9 @@ namespace RiseofMordorLauncher
         public string BackgroundImage { get; set; }
         private ModVersion Version { get; set; }
         private LauncherVersion LauncherVersion { get; set; }
+
+        private string modAppData = null;
+        public string launcherAppData = null;
 
         public Visibility SettingsVisibility { get; set; } = Visibility.Hidden;
         public Settings SettingsPage { get; set; } = new Settings();
@@ -158,14 +160,14 @@ namespace RiseofMordorLauncher
 
         private void InitAppDataFolders()
         {
-            var modAppData = Path.Combine(SharedData.AppData, "RiseofMordor");
+            modAppData = Path.Combine(SharedData.AppData, "RiseofMordor");
 
             if (!System.IO.Directory.Exists(modAppData))
             {
                 System.IO.Directory.CreateDirectory(modAppData);
             }
 
-            var launcherAppData = Path.Combine(modAppData, "RiseofMordorLauncher");
+            launcherAppData = Path.Combine(modAppData, "RiseofMordorLauncher");
 
             if (!System.IO.Directory.Exists(launcherAppData))
             {
@@ -328,6 +330,11 @@ namespace RiseofMordorLauncher
                     tcs.SetResult(true);
                     return tcs.Task;
                 }
+                else if (downloadedFileSize > remoteFileSize)
+                {
+                    File.Delete(downloadDestFilePath);
+                    downloadedFileSize = 0;
+                }
             }
 
             Logger.Log("Updating mod files...");
@@ -455,18 +462,22 @@ namespace RiseofMordorLauncher
 
         private async Task<string> GetRegionByIPAsync()
         {
-            using (var client = new HttpClient())
-            {
-                const string API_KEY = "11e33285579b0472f4e8b8ed03b6a367";
-                var url = $"http://api.ipapi.com/api/check?access_key={API_KEY}&fields=continent_name,ip";
-                var json = await client.GetStringAsync(url);
+            var license = Environment.GetEnvironmentVariable("MAXMIND_LICENSE_KEY");
+            var client = new WebServiceClient(1195590, license, host: "geolite.info");
+            var country = await client.CountryAsync();
+            return country.Continent.Name;
+            //using (var client = new HttpClient())
+            //{
+            //    const string API_KEY = "11e33285579b0472f4e8b8ed03b6a367";
+            //    var url = $"http://api.ipapi.com/api/check?access_key={API_KEY}&fields=continent_name,ip";
+            //    var json = await client.GetStringAsync(url);
 
-                var obj = JObject.Parse(json);
+            //    var obj = JObject.Parse(json);
 
-                var continent = obj["continent_name"]?.ToString();
+            //    var continent = obj["continent_name"]?.ToString();
 
-                return continent ?? "Unknown";
-            }
+            //    return continent ?? "Unknown";
+            //}
         }
 
         private bool HasEnoughSpace(string modDownloadLocation, long remoteFileSize, long downloadedFileSize)
@@ -476,24 +487,24 @@ namespace RiseofMordorLauncher
             return drive.AvailableFreeSpace >= requiredSpace;
         }
 
-        private Task<bool> IsEndpointReachableAsync(string url)
+        private async Task<bool> IsEndpointReachableAsync(string url)
         {
-            return Task.Run(async () =>
+            try
             {
-                try
+                using (var httpClient = new HttpClient())
                 {
-                    using (var httpClient = new HttpClient())
-                    {
-                        httpClient.Timeout = TimeSpan.FromSeconds(5);
-                        var response = await httpClient.GetAsync(url);
-                        return response.IsSuccessStatusCode;
-                    }
+                    httpClient.Timeout = TimeSpan.FromSeconds(5);
+
+                    var request = new HttpRequestMessage(HttpMethod.Head, url);
+                    var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
+
+                    return response.IsSuccessStatusCode;
                 }
-                catch
-                {
-                    return false;
-                }
-            });
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private bool isLatestModPacksInstalled(string installLocation, List<string> requiredPacksList)
@@ -532,12 +543,12 @@ namespace RiseofMordorLauncher
 
             prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
-            string Arguments = "";
-            string used_mods = "";
+            var Arguments = "";
+            var used_mods = "";
 
-            if (File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            if (File.Exists($"{launcherAppData}enabled_submods.txt"))
             {
-                var EnabledSubmodsRaw = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
+                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}enabled_submods.txt").ToList();
                 var EnabledSubmods = new List<SubmodInstallation>();
 
                 for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
@@ -748,18 +759,12 @@ namespace RiseofMordorLauncher
             var formatDownloadSpeed = FormatSpeed(downloadSpeed);
 
             DownloadProgressText = $"{formatSizeDownloaded} / {formatSizeTotal} ({formatDownloadSpeed})";
-
-            if (percent_finished > 95)
-            {
-                percent_finished = 100;
-                ProgressText = "EXTRACTING DATA...";
-            }
-
             ProgressBarProgress = percent_finished;
         }
 
         private async void DownloadCompleted(string downloadArchiveFullName, string extractPath)
         {
+            ProgressText = "EXTRACTING DATA...";
             Logger.Log($"Extracting {downloadArchiveFullName}...");
 
             try
@@ -778,13 +783,29 @@ namespace RiseofMordorLauncher
             Logger.Log($"Deleting {downloadArchiveFullName}...");
             File.Delete(downloadArchiveFullName);
 
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
-            try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
+            try
+            {
+                var enabledSubmodsFile = $"{launcherAppData}enabled_submods.txt";
+                if (File.Exists(enabledSubmodsFile))
+                {
+                    File.Delete(enabledSubmodsFile);
+                }
+
+                var localVersionFile = $"{launcherAppData}local_version.txt";
+                if (File.Exists(localVersionFile))
+                {
+                    File.Delete(localVersionFile);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"An error happened. Please forward this to devs: {ex.Message}", "Exception");
+            }
 
             var client = new WebClient();
-            client.DownloadFile("http://80.208.231.54/launcher/local_version.txt", $"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
+            client.DownloadFileAsync(new Uri("http://80.208.231.54/launcher/local_version.txt"), $"{launcherAppData}local_version.txt");
 
-            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            using (var x = new StreamWriter($"{launcherAppData}user_preferences.txt"))
             {
                 x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
             }
@@ -804,15 +825,15 @@ namespace RiseofMordorLauncher
         {
             string output = "";
 
-            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            if (!File.Exists($"{launcherAppData}enabled_submods.txt"))
             {
                 return;
             }
 
-            string[] lines = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt");
+            string[] lines = File.ReadAllLines($"{launcherAppData}enabled_submods.txt");
             if (lines.Count() == 0)
             {
-                try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                try { File.Delete($"{launcherAppData}enabled_submods.txt"); } catch { }
                 return;
             }
             else
@@ -821,7 +842,7 @@ namespace RiseofMordorLauncher
                 {
                     if (lines.ToString() == id)
                     {
-                        try { File.Delete($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
+                        try { File.Delete($"{launcherAppData}enabled_submods.txt"); } catch { }
                         return;
                     }
                     else
@@ -859,7 +880,7 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            using (StreamWriter writer = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            using (StreamWriter writer = new StreamWriter($"{launcherAppData}enabled_submods.txt"))
             {
                 writer.Write(output);
             }
@@ -867,13 +888,13 @@ namespace RiseofMordorLauncher
 
         private void WritePrefs(UserPreferences prefs2)
         {
-            if (!File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
-                File.CreateText($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt");
+            if (!File.Exists($"{launcherAppData}user_preferences.txt"))
+                File.CreateText($"{launcherAppData}user_preferences.txt");
 
-            if (File.Exists($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"))
+            if (File.Exists($"{launcherAppData}enabled_submods.txt"))
             {
 
-                var EnabledSubmodsRaw = File.ReadAllLines($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt").ToList();
+                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}enabled_submods.txt").ToList();
                 List<SubmodInstallation> EnabledSubmods2 = new List<SubmodInstallation>();
 
                 for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
@@ -920,7 +941,7 @@ namespace RiseofMordorLauncher
 
             output = output + Environment.NewLine + "}";
 
-            using (var x = new StreamWriter($"{SharedData.AppData}/RiseofMordor/RiseofMordorLauncher/user_preferences.txt"))
+            using (var x = new StreamWriter($"{launcherAppData}user_preferences.txt"))
             {
                 x.Write(output);
             }

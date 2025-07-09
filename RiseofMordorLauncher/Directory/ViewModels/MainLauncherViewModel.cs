@@ -242,6 +242,15 @@ namespace RiseofMordorLauncher
                 downloadUrl = Version.DownloadUrlOther;
             }
 
+            isDownloadUrlReachable = await IsEndpointReachableAsync(downloadUrl);
+
+            if (isDownloadUrlReachable == false)
+            {
+                Logger.Log("PostUiLoadAsync: Download link is invalid.");
+                MessageBox.Show($"The launcher is trying to download the mod from an invalid link. Please forward this error to the developers.", "Download link is invalid");
+                return;
+            }
+
             var archiveFileName = Path.GetFileName(downloadUrl);
             var downloadArchiveFullName = Path.Combine(modDownloadLocation, archiveFileName);
 

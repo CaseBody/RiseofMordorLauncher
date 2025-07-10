@@ -108,7 +108,7 @@ namespace AutoUpdater
                 {
                     using (var archiveFile = new ArchiveFile(launcherDownloadPath))
                     {
-                        archiveFile.Extract(currentDirectory);
+                        archiveFile.Extract(currentDirectory, true);
                     }
                 }
                 catch (Exception ex)

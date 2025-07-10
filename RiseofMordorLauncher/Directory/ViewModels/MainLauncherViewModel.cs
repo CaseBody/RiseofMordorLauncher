@@ -305,7 +305,7 @@ namespace RiseofMordorLauncher
 
             if (shouldDownloadUpdate)
             {
-                Logger.Log("Loading user preferences...");
+                Logger.Log("PostUiLoadAsync: Loading user preferences...");
                 UserPreferencesService = new APIUserPreferencesService();
                 var prefs = UserPreferencesService.GetUserPreferences(SharedData);
 
@@ -837,7 +837,7 @@ namespace RiseofMordorLauncher
             {
                 using (var archiveFile = new ArchiveFile(downloadArchiveFullName))
                 {
-                    archiveFile.Extract(extractPath);
+                    archiveFile.Extract(extractPath, true);
                 }
             }
             catch (Exception ex)

@@ -114,13 +114,15 @@ namespace AutoUpdater
                         foreach (var file in Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories))
                         {
                             var destFile = Path.Combine(currentDirectory, Path.GetFileName(file));
-                            if (destFile.Contains("SevenZipExtractor.dll")) // Skip shared lib that Auto-Updater is using
+
+                            var overrideFile = true;
+                            if (destFile.Contains("SevenZipExtractor.dll"))
                             {
-                                File.Delete(file);
-                                continue;
+                                // Skip shared lib that Auto-Updater is using
+                                overrideFile = false;
                             }
 
-                            File.Copy(file, destFile, overwrite: true);
+                            File.Copy(file, destFile, overwrite: overrideFile);
                             File.Delete(file);
                         }
 

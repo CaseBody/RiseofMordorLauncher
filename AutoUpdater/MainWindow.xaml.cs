@@ -108,7 +108,23 @@ namespace AutoUpdater
                 {
                     using (var archiveFile = new ArchiveFile(launcherDownloadPath))
                     {
-                        archiveFile.Extract(currentDirectory, true);
+                        var extractPath = Path.Combine(currentDirectory, "temp");
+                        archiveFile.Extract(extractPath, true);
+
+                        foreach (var file in Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories))
+                        {
+                            var destFile = Path.Combine(currentDirectory, Path.GetFileName(file));
+                            if (destFile.Contains("SevenZipExtractor.dll")) // Skip shared lib that Auto-Updater is using
+                            {
+                                File.Delete(file);
+                                continue;
+                            }
+
+                            File.Copy(file, destFile, overwrite: true);
+                            File.Delete(file);
+                        }
+
+                        Directory.Delete(extractPath, true);
                     }
                 }
                 catch (Exception ex)

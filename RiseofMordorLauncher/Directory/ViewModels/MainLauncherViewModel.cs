@@ -435,8 +435,6 @@ namespace RiseofMordorLauncher
 
                         while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                         {
-                            Logger.Log($"DownloadUpdateTask. Read stream to file buffer: {downloadDestFilePath}");
-
                             fs.Write(buffer, 0, bytesRead);
                             totalRead += bytesRead;
                             bytesSinceLastUpdate += bytesRead;
@@ -824,8 +822,6 @@ namespace RiseofMordorLauncher
 
             DownloadProgressText = $"{formatSizeDownloaded} / {formatSizeTotal} ({formatDownloadSpeed})";
             ProgressBarProgress = percent_finished;
-
-            Logger.Log($"DownloadProgressUpdate. Progress: {DownloadProgressText}");
         }
 
         private async void DownloadCompleted(string downloadArchiveFullName, string extractPath)

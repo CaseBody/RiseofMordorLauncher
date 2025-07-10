@@ -14,7 +14,7 @@ namespace RiseofMordorLauncher
 {
     public class LatestPreviewModDBViewModel : BaseViewModel, ILatestPreview
     {
-        private static string ROM_MODDB_URL = "https://www.nexusmods.com/totalwarattila/mods/1";
+        private static string ROM_MODDB_URL = "https://www.nexusmods.com/totalwarattila/mods/1?tab=files";
         private static int MODDB_LATEST_IMAGE_NODE_NUM = 7;
 
         public BitmapImage PreviewImage { get; set; } = new BitmapImage();

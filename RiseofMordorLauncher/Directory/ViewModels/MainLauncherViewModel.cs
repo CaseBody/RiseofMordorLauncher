@@ -198,6 +198,8 @@ namespace RiseofMordorLauncher
 
         private async Task TryStartDownload()
         {
+            Logger.Log("PostUiLoadAsync: TryStartDownload");
+
             var modDownloadLocation = Path.Combine(SharedData.AttilaDir, "data");
             var requiredPacks = Version.LatestPackFiles;
 
@@ -215,9 +217,11 @@ namespace RiseofMordorLauncher
             }
             else
             {
+                Logger.Log("PostUiLoadAsync: Getting region from IP...");
                 regionCode = await GetRegionByIPAsync();
             }
 
+            Logger.Log($"PostUiLoadAsync: Region: {regionCode}");
             var downloadUrl = Version.DownloadUrlOther;
 
             switch (regionCode)
@@ -235,14 +239,18 @@ namespace RiseofMordorLauncher
                     break;
             }
 
+            Logger.Log("PostUiLoadAsync: Checking if the endpoint is reachable...");
             var isDownloadUrlReachable = await IsEndpointReachableAsync(downloadUrl);
+            Logger.Log($"PostUiLoadAsync: isDownloadUrlReachable: {isDownloadUrlReachable}");
 
             if (downloadUrl == null || !isDownloadUrlReachable)
             {
                 downloadUrl = Version.DownloadUrlOther;
             }
 
+            Logger.Log("PostUiLoadAsync: Re-checking if the endpoint is reachable...");
             isDownloadUrlReachable = await IsEndpointReachableAsync(downloadUrl);
+            Logger.Log($"PostUiLoadAsync: isDownloadUrlReachable: {isDownloadUrlReachable}");
 
             if (isDownloadUrlReachable == false)
             {
@@ -263,12 +271,20 @@ namespace RiseofMordorLauncher
                 downloadedFileSize = new FileInfo(downloadArchiveFullName).Length;
             }
 
+            Logger.Log($"PostUiLoadAsync: archiveFileName - {archiveFileName}");
+            Logger.Log($"PostUiLoadAsync: downloadArchiveFullName - {downloadArchiveFullName}");
+            Logger.Log($"PostUiLoadAsync: remoteFileSize - {remoteFileSize}");
+            Logger.Log($"PostUiLoadAsync: downloadedFileSize - {downloadedFileSize}");
+            Logger.Log($"PostUiLoadAsync: doesDownloadFileExist - {doesDownloadFileExist}");
+
             var isModFullyDownloaded = remoteFileSize == downloadedFileSize;
             if (isModFullyDownloaded)
             {
                 Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
                 return;
             }
+
+            Logger.Log($"PostUiLoadAsync: isModFullyDownloaded - {isModFullyDownloaded}");
 
             if (HasEnoughSpace(modDownloadLocation, remoteFileSize, downloadedFileSize) == false)
             {
@@ -277,9 +293,15 @@ namespace RiseofMordorLauncher
                 return;
             }
 
+            Logger.Log($"PostUiLoadAsync: HasEnoughSpace");
+
             var remoteVersion = Version.LatestVersionNumber;
             var installedVersion = Version.InstalledVersionNumber;
             var shouldDownloadUpdate = (remoteVersion > installedVersion) || !isModFullyDownloaded;
+
+            Logger.Log($"PostUiLoadAsync: remoteVersion - {remoteVersion}");
+            Logger.Log($"PostUiLoadAsync: installedVersion - {installedVersion}");
+            Logger.Log($"PostUiLoadAsync: shouldDownloadUpdate - {shouldDownloadUpdate}");
 
             if (shouldDownloadUpdate)
             {
@@ -291,21 +313,30 @@ namespace RiseofMordorLauncher
 
                 if (prefs.AutoUpdate)
                 {
+                    Logger.Log($"PostUiLoadAsync: AutoUpdate on");
                     downloadUpdate = true;
                 }
                 else
                 {
+                    Logger.Log($"PostUiLoadAsync: AutoUpdate off");
+
                     if (MessageBox.Show($"A new update is available for download, would you like to download it?", "Update Available", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         downloadUpdate = true;
                     }
                 }
 
+                Logger.Log($"PostUiLoadAsync: downloadUpdate - {downloadUpdate}");
+
                 if (downloadUpdate)
                 {
+                    Logger.Log($"PostUiLoadAsync: Downloading...");
                     await DownloadUpdate(downloadUrl, downloadArchiveFullName);
+
+                    Logger.Log($"PostUiLoadAsync: Get mod version info...");
                     Version = await _modVersionService.GetModVersionInfo(SharedData);
 
+                    Logger.Log($"PostUiLoadAsync: Download completed");
                     DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
                 }
             }
@@ -324,6 +355,8 @@ namespace RiseofMordorLauncher
 
         public Task DownloadUpdate(string downloadUrl, string downloadDestFilePath)
         {
+            Logger.Log($"DownloadUpdate: Downloading start");
+
             var tcs = new TaskCompletionSource<bool>();
 
             long downloadedFileSize = 0;
@@ -331,8 +364,12 @@ namespace RiseofMordorLauncher
 
             if (File.Exists(downloadDestFilePath))
             {
+                Logger.Log($"DownloadUpdate: File {downloadDestFilePath} exists");
+
                 downloadedFileSize = new FileInfo(downloadDestFilePath).Length;
                 var isModFullyDownloaded = downloadedFileSize == remoteFileSize;
+
+                Logger.Log($"DownloadUpdate: isModFullyDownloaded - {isModFullyDownloaded}");
 
                 if (isModFullyDownloaded)
                 {
@@ -341,12 +378,18 @@ namespace RiseofMordorLauncher
                 }
                 else if (downloadedFileSize > remoteFileSize)
                 {
+                    Logger.Log($"DownloadUpdate: Deleting {downloadDestFilePath}");
                     File.Delete(downloadDestFilePath);
+                    Logger.Log($"DownloadUpdate: Deleted {downloadDestFilePath}");
                     downloadedFileSize = 0;
                 }
             }
+            else
+            {
+                Logger.Log($"DownloadUpdate: File {downloadDestFilePath} does not exist");
+            }
 
-            Logger.Log("Updating mod files...");
+            Logger.Log("DownloadUpdate: Updating mod files...");
 
             PlayButtonText = "UPDATING";
             PlayButtonEnabled = false;
@@ -357,11 +400,11 @@ namespace RiseofMordorLauncher
             if (!Debugger.IsAttached)
             {
                 var httpClient = new HttpClient();
-                Logger.Log("Adding download log to RoM server...");
+                Logger.Log("DownloadUpdate. Adding download log to RoM server...");
 
                 _ = httpClient.GetAsync("http://80.208.231.54:7218/api/statistics/addLauncherDownload");
-                Logger.Log("Reporting a new download to the statistics server...");
-                Logger.Log("Downloading latest version from RoM server...");
+                Logger.Log("DownloadUpdate. Reporting a new download to the statistics server...");
+                Logger.Log("DownloadUpdate. Downloading latest version from RoM server...");
             }
 
             Task.Run(() =>
@@ -370,9 +413,12 @@ namespace RiseofMordorLauncher
                 {
                     var req = (HttpWebRequest)WebRequest.Create(downloadUrl);
 
+                    Logger.Log("DownloadUpdateTask. Create WebRequest");
+
                     if (downloadedFileSize > 0)
                     {
                         req.AddRange(downloadedFileSize);
+                        Logger.Log($"DownloadUpdateTask. Add range: {downloadedFileSize}");
                     }
 
                     using (var resp = req.GetResponse())
@@ -389,6 +435,8 @@ namespace RiseofMordorLauncher
 
                         while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                         {
+                            Logger.Log($"DownloadUpdateTask. Read stream to file buffer: {downloadDestFilePath}");
+
                             fs.Write(buffer, 0, bytesRead);
                             totalRead += bytesRead;
                             bytesSinceLastUpdate += bytesRead;
@@ -418,10 +466,13 @@ namespace RiseofMordorLauncher
                 }
                 catch (Exception ex)
                 {
+                    Logger.Log($"DownloadUpdate. Exception: {ex.Message}");
                     MessageBox.Show(ex.Message);
                     tcs.SetException(ex);
                 }
             });
+
+            Logger.Log($"DownloadUpdate. tcs task return");
 
             return tcs.Task;
         }
@@ -493,6 +544,10 @@ namespace RiseofMordorLauncher
         {
             var requiredSpace = remoteFileSize - downloadedFileSize;
             var drive = new DriveInfo(Path.GetPathRoot(modDownloadLocation));
+
+            Logger.Log($"Drive Info. Drive: {drive.Name}");
+            Logger.Log($"Drive Info. Available free space: {drive.AvailableFreeSpace}");
+
             return drive.AvailableFreeSpace >= requiredSpace;
         }
 
@@ -724,8 +779,8 @@ namespace RiseofMordorLauncher
                         State = "Tweaking Settings",
                         Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/tdd" },
-                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/KMhmdCb7Ut" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1?tab=files" },
                         },
                         Assets = new Assets()
                         {
@@ -745,8 +800,8 @@ namespace RiseofMordorLauncher
                         Details = "The Dawnless Days Launcher",
                         Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/RzYRVdQezF" },
-                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/KMhmdCb7Ut" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1?tab=files" },
                         },
                         Assets = new Assets()
                         {
@@ -769,12 +824,14 @@ namespace RiseofMordorLauncher
 
             DownloadProgressText = $"{formatSizeDownloaded} / {formatSizeTotal} ({formatDownloadSpeed})";
             ProgressBarProgress = percent_finished;
+
+            Logger.Log($"DownloadProgressUpdate. Progress: {DownloadProgressText}");
         }
 
         private async void DownloadCompleted(string downloadArchiveFullName, string extractPath)
         {
             ProgressText = "EXTRACTING DATA...";
-            Logger.Log($"Extracting {downloadArchiveFullName}...");
+            Logger.Log($"DownloadCompleted. Extracting {downloadArchiveFullName}...");
 
             try
             {
@@ -785,33 +842,41 @@ namespace RiseofMordorLauncher
             }
             catch (Exception ex)
             {
-                Logger.Log($"Extraction failed: {ex.Message}");
+                Logger.Log($"DownloadCompleted. Extraction failed: {ex.Message}");
                 MessageBox.Show($"An exception occured while trying to extract mod files. Please forward the below message to the devs:\n{ex.Message}", "Failed to extract");
             }
 
-            Logger.Log($"Deleting {downloadArchiveFullName}...");
+            Logger.Log($"DownloadCompleted. Deleting {downloadArchiveFullName}...");
             File.Delete(downloadArchiveFullName);
+            Logger.Log($"DownloadCompleted. Deleted {downloadArchiveFullName}");
 
             try
             {
                 var enabledSubmodsFile = $"{launcherAppData}enabled_submods.txt";
                 if (File.Exists(enabledSubmodsFile))
                 {
+                    Logger.Log($"DownloadCompleted. Deleting {enabledSubmodsFile}...");
                     File.Delete(enabledSubmodsFile);
+                    Logger.Log($"DownloadCompleted. Deleted{enabledSubmodsFile}");
                 }
 
                 var localVersionFile = $"{launcherAppData}local_version.txt";
                 if (File.Exists(localVersionFile))
                 {
+                    Logger.Log($"DownloadCompleted. Deleting {localVersionFile}...");
                     File.Delete(localVersionFile);
+                    Logger.Log($"DownloadCompleted. Deleted{localVersionFile}");
                 }
             }
             catch (Exception ex)
             {
+                Logger.Log($"DownloadCompleted. Exception: {ex.Message}");
                 MessageBox.Show($"An error happened. Please forward this to devs: {ex.Message}", "Exception");
             }
 
             var client = new WebClient();
+
+            Logger.Log($"DownloadCompleted. Downloading launcher local version");
             client.DownloadFileAsync(new Uri("http://80.208.231.54/launcher/local_version.txt"), $"{launcherAppData}local_version.txt");
 
             using (var x = new StreamWriter($"{launcherAppData}user_preferences.txt"))

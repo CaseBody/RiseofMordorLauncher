@@ -154,8 +154,8 @@ namespace RiseofMordorLauncher
                     Details = "The Dawnless Days Launcher",
                     Buttons = new DiscordRPC.Button[]
                         {
-                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/RzYRVdQezF" },
-                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1" },
+                            new DiscordRPC.Button() { Label = "Join Discord", Url = "https://discord.gg/KMhmdCb7Ut" },
+                            new DiscordRPC.Button() { Label = "Download Mod", Url = "https://www.nexusmods.com/totalwarattila/mods/1?tab=files" },
                         },
                     Assets = new Assets()
                     {

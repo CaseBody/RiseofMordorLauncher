@@ -1,5 +1,4 @@
 ﻿using DiscordRPC;
-using MaxMind.GeoIP2;
 using RiseofMordorLauncher.Directory.Pages;
 using RiseofMordorLauncher.Directory.Services;
 using SevenZipExtractor;
@@ -520,22 +519,12 @@ namespace RiseofMordorLauncher
 
         private async Task<string> GetRegionByIPAsync()
         {
-            var license = Environment.GetEnvironmentVariable("MAXMIND_LICENSE_KEY");
-            var client = new WebServiceClient(1195590, license, host: "geolite.info");
-            var country = await client.CountryAsync();
-            return country.Continent.Name;
-            //using (var client = new HttpClient())
-            //{
-            //    const string API_KEY = "11e33285579b0472f4e8b8ed03b6a367";
-            //    var url = $"http://api.ipapi.com/api/check?access_key={API_KEY}&fields=continent_name,ip";
-            //    var json = await client.GetStringAsync(url);
+            var client = new HttpClient();
 
-            //    var obj = JObject.Parse(json);
+            var publicIP = await client.GetStringAsync("https://api.ipify.org");
+            var regionCode = await client.GetStringAsync($"http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/region?ip_address={publicIP}");
 
-            //    var continent = obj["continent_name"]?.ToString();
-
-            //    return continent ?? "Unknown";
-            //}
+            return regionCode;
         }
 
         private bool HasEnoughSpace(string modDownloadLocation, long remoteFileSize, long downloadedFileSize)

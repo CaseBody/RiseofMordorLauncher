@@ -114,15 +114,18 @@ namespace AutoUpdater
                         foreach (var file in Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories))
                         {
                             var destFile = Path.Combine(currentDirectory, Path.GetFileName(file));
+                            var skipFile = false;
 
-                            var overrideFile = true;
-                            if (destFile.Contains("SevenZipExtractor.dll"))
+                            if (destFile.Contains("SevenZipExtractor.dll") && File.Exists(destFile))
                             {
-                                // Skip shared lib that Auto-Updater is using
-                                overrideFile = false;
+                                skipFile = true;
                             }
 
-                            File.Copy(file, destFile, overwrite: overrideFile);
+                            if (!skipFile)
+                            {
+                                File.Copy(file, destFile, overwrite: true);
+                            }
+
                             File.Delete(file);
                         }
 

@@ -40,7 +40,7 @@ namespace RiseofMordorLauncher
 
             // Get list of rom submods id's
 
-            HttpClient client = new HttpClient();
+            var client = new HttpClient();
             var a = client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/approved_submods");
             a.Wait();
 

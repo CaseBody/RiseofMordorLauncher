@@ -288,13 +288,7 @@ namespace RiseofMordorLauncher
             if (isModFullyDownloaded)
             {
                 Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
-
-                Logger.Log($"PostUiLoadAsync: Get mod version info...");
-                Version = await _modVersionService.GetModVersionInfo(SharedData);
-
-                Logger.Log($"PostUiLoadAsync: Download completed");
                 await ExtractArchive(downloadArchiveFullName, modDownloadLocation);
-
                 return true;
             }
 
@@ -894,7 +888,7 @@ namespace RiseofMordorLauncher
             Logger.Log($"DownloadCompleted. Downloading launcher local version");
             client.DownloadFileAsync(new Uri("http://80.208.231.54/launcher/local_version.txt"), $"{launcherAppData}local_version.txt");
 
-            using (var x = new StreamWriter($"{launcherAppData}user_preferences.txt"))
+            using (var x = new StreamWriter($"{launcherAppData}/user_preferences.txt"))
             {
                 x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
             }
@@ -988,7 +982,7 @@ namespace RiseofMordorLauncher
                 }
             }
 
-            using (StreamWriter writer = new StreamWriter($"{launcherAppData}enabled_submods.txt"))
+            using (StreamWriter writer = new StreamWriter($"{launcherAppData}/enabled_submods.txt"))
             {
                 writer.Write(output);
             }
@@ -996,13 +990,13 @@ namespace RiseofMordorLauncher
 
         private void WritePrefs(UserPreferences prefs2)
         {
-            if (!File.Exists($"{launcherAppData}user_preferences.txt"))
-                File.CreateText($"{launcherAppData}user_preferences.txt");
+            if (!File.Exists($"{launcherAppData}/user_preferences.txt"))
+                File.CreateText($"{launcherAppData}/user_preferences.txt");
 
-            if (File.Exists($"{launcherAppData}enabled_submods.txt"))
+            if (File.Exists($"{launcherAppData}/enabled_submods.txt"))
             {
 
-                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}enabled_submods.txt").ToList();
+                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}/enabled_submods.txt").ToList();
                 List<SubmodInstallation> EnabledSubmods2 = new List<SubmodInstallation>();
 
                 for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
@@ -1049,7 +1043,7 @@ namespace RiseofMordorLauncher
 
             output = output + Environment.NewLine + "}";
 
-            using (var x = new StreamWriter($"{launcherAppData}user_preferences.txt"))
+            using (var x = new StreamWriter($"{launcherAppData}/user_preferences.txt"))
             {
                 x.Write(output);
             }

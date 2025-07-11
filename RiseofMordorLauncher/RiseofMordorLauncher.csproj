@@ -37,6 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -328,11 +329,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-  </PropertyGroup>
-  <PropertyGroup>
-    <PostBuildEvent>xcopy $(ProjectDir)libs\steam_appid.txt $(ProjectDir)$(OutDir) /f/y
+    <PreBuildEvent>xcopy $(ProjectDir)libs\steam_appid.txt $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\credentials.json $(ProjectDir)$(OutDir) /f/y
 xcopy $(ProjectDir)libs\Google.Apis.Auth.OAuth2.Responses.TokenResponse-user $(ProjectDir)$(OutDir)token.json\ /f/y
 
@@ -354,6 +351,10 @@ if "$(PlatformTarget)" == "x86"    xcopy $(ProjectDir)libs\x86\steam_api.dll   $
 :: Copy Steamworks.NET.dll
 if "$(PlatformTarget)" == "AnyCPU" xcopy $(ProjectDir)libs\x64\Steamworks.NET.dll $(ProjectDir)$(OutDir) /f/y
 if "$(PlatformTarget)" == "x64"    xcopy $(ProjectDir)libs\x64\Steamworks.NET.dll $(ProjectDir)$(OutDir) /f/y
-if "$(PlatformTarget)" == "x86"    xcopy $(ProjectDir)libs\x86\Steamworks.NET.dll $(ProjectDir)$(OutDir) /f/y</PostBuildEvent>
+if "$(PlatformTarget)" == "x86"    xcopy $(ProjectDir)libs\x86\Steamworks.NET.dll $(ProjectDir)$(OutDir) /f/y</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
 </Project>

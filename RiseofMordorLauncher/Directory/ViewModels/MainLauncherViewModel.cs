@@ -192,10 +192,18 @@ namespace RiseofMordorLauncher
                 PlayButtonEnabled = false;
             }
 
-            await TryStartDownload();
+            var isReadyToPlay = await TryStartDownload();
+            if (isReadyToPlay)
+            {
+                await MarkReadyToPlay();
+            }
+            else
+            {
+                MarkCannotPlay();
+            }
         }
 
-        private async Task TryStartDownload()
+        private async Task<bool> TryStartDownload()
         {
             Logger.Log("PostUiLoadAsync: TryStartDownload");
 
@@ -205,7 +213,7 @@ namespace RiseofMordorLauncher
             if (isLatestModPacksInstalled(modDownloadLocation, requiredPacks))
             {
                 Logger.Log("PostUiLoadAsync: Latest pack files are already installed. Skipping downloading phase...");
-                return;
+                return true;
             }
 
             var regionCode = "Default";
@@ -255,7 +263,7 @@ namespace RiseofMordorLauncher
             {
                 Logger.Log("PostUiLoadAsync: Download link is invalid.");
                 MessageBox.Show($"The launcher is trying to download the mod from an invalid link. Please forward this error to the developers.", "Download link is invalid");
-                return;
+                return false;
             }
 
             var archiveFileName = Path.GetFileName(downloadUrl);
@@ -280,7 +288,7 @@ namespace RiseofMordorLauncher
             if (isModFullyDownloaded)
             {
                 Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
-                return;
+                return true;
             }
 
             Logger.Log($"PostUiLoadAsync: isModFullyDownloaded - {isModFullyDownloaded}");
@@ -289,7 +297,7 @@ namespace RiseofMordorLauncher
             {
                 Logger.Log("PostUiLoadAsync: Not enough space on drive detected. Aborting download.");
                 MessageBox.Show($"You don't have enough free space on your {Path.GetPathRoot(modDownloadLocation)} disk drive. Clean some space and retry again.", "Insufficient space!");
-                return;
+                return false;
             }
 
             Logger.Log($"PostUiLoadAsync: HasEnoughSpace");
@@ -339,6 +347,8 @@ namespace RiseofMordorLauncher
                     DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
                 }
             }
+
+            return true;
         }
 
         private static long GetRemoteFileSize(string url)
@@ -482,7 +492,7 @@ namespace RiseofMordorLauncher
             }
 
             await TryStartDownload();
-
+            await MarkReadyToPlay();
             // TODO: Reset installed version
         }
 
@@ -813,7 +823,7 @@ namespace RiseofMordorLauncher
             ProgressBarProgress = percent_finished;
         }
 
-        private async void DownloadCompleted(string downloadArchiveFullName, string extractPath)
+        private void DownloadCompleted(string downloadArchiveFullName, string extractPath)
         {
             ProgressText = "EXTRACTING DATA...";
             Logger.Log($"DownloadCompleted. Extracting {downloadArchiveFullName}...");
@@ -868,7 +878,10 @@ namespace RiseofMordorLauncher
             {
                 x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
             }
+        }
 
+        private async Task MarkReadyToPlay()
+        {
             PlayButtonText = "PLAY";
             PlayButtonEnabled = true;
             PlayButtonMargin = "450 30";
@@ -878,6 +891,15 @@ namespace RiseofMordorLauncher
             Version = await _modVersionService.GetModVersionInfo(SharedData);
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
+        }
+
+        private void MarkCannotPlay()
+        {
+            PlayButtonText = "ERROR";
+            PlayButtonEnabled = false;
+            PlayButtonMargin = "450 30";
+            SubmodButtonEnabled = false;
+            ShowProgressBar = Visibility.Hidden;
         }
 
         private void DisableSubmod(string id)

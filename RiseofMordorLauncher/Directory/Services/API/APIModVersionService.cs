@@ -23,12 +23,9 @@ namespace RiseofMordorLauncher
 
             if (!sharedData.IsOffline)
             {
-                HttpClient client = new HttpClient();
-                var t = client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/current_mod");
-                t.Wait();
-
-                var json_string = t.Result;
-                NewModVersion mod_version = JsonSerializer.Deserialize<NewModVersion>(json_string);
+                var client = new HttpClient();
+                var json_string = await client.GetStringAsync("http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/current_mod");
+                var mod_version = JsonSerializer.Deserialize<NewModVersion>(json_string);
 
                 version.ChangeLog = mod_version.change_log;
                 version.LatestPackFiles = mod_version.pack_files;
@@ -149,7 +146,7 @@ namespace RiseofMordorLauncher
                             version.InstalledVersionNumber = version.LatestVersionNumber;
                             try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/enabled_submods.txt"); } catch { }
                             try { System.IO.File.Delete($"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt"); } catch { }
-                            WebClient client = new WebClient();
+                            var client = new WebClient();
                             client.DownloadFile("http://80.208.231.54/launcher/local_version.txt", $"{sharedData.AppData}/RiseofMordor/RiseofMordorLauncher/local_version.txt");
                         }
                     }

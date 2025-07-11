@@ -209,8 +209,9 @@ namespace RiseofMordorLauncher
 
             var modDownloadLocation = Path.Combine(SharedData.AttilaDir, "data");
             var requiredPacks = Version.LatestPackFiles;
+            var isLatestPacksInstalled = isLatestModPacksInstalled(modDownloadLocation, requiredPacks);
 
-            if (isLatestModPacksInstalled(modDownloadLocation, requiredPacks))
+            if (Version.InstalledVersionNumber == Version.LatestVersionNumber && isLatestPacksInstalled)
             {
                 Logger.Log("PostUiLoadAsync: Latest pack files are already installed. Skipping downloading phase...");
                 return true;
@@ -289,6 +290,21 @@ namespace RiseofMordorLauncher
             {
                 Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
                 await ExtractArchive(downloadArchiveFullName, modDownloadLocation);
+
+                Logger.Log($"PostUiLoadAsync: Update local version");
+                UpdateLocalVersion();
+
+                return true;
+            }
+
+            if (isLatestPacksInstalled)
+            {
+                Logger.Log($"PostUiLoadAsync: Get mod version info (isLatestPacksInstalled)...");
+                Version = await _modVersionService.GetModVersionInfo(SharedData);
+
+                UpdateLocalVersion();
+
+                Logger.Log("PostUiLoadAsync: Mod fully installed. Skipping download & install phases.");
                 return true;
             }
 
@@ -346,6 +362,9 @@ namespace RiseofMordorLauncher
 
                     Logger.Log($"PostUiLoadAsync: Download completed");
                     await ExtractArchive(downloadArchiveFullName, modDownloadLocation);
+
+                    Logger.Log($"PostUiLoadAsync: Update local version");
+                    UpdateLocalVersion();
                 }
             }
 
@@ -608,9 +627,9 @@ namespace RiseofMordorLauncher
             var Arguments = "";
             var used_mods = "";
 
-            if (File.Exists($"{launcherAppData}enabled_submods.txt"))
+            if (File.Exists($"{launcherAppData}/enabled_submods.txt"))
             {
-                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}enabled_submods.txt").ToList();
+                var EnabledSubmodsRaw = File.ReadAllLines($"{launcherAppData}/enabled_submods.txt").ToList();
                 var EnabledSubmods = new List<SubmodInstallation>();
 
                 for (int i = 0; i < EnabledSubmodsRaw.Count; i++)
@@ -758,7 +777,6 @@ namespace RiseofMordorLauncher
             Attila.StartInfo.WorkingDirectory = SharedData.AttilaDir;
             Attila.Start();
             Attila.WaitForInputIdle();
-            
         }
 
         private void SettingsButtonClick()
@@ -861,7 +879,7 @@ namespace RiseofMordorLauncher
 
             try
             {
-                var enabledSubmodsFile = $"{launcherAppData}enabled_submods.txt";
+                var enabledSubmodsFile = $"{launcherAppData}/enabled_submods.txt";
                 if (File.Exists(enabledSubmodsFile))
                 {
                     Logger.Log($"DownloadCompleted. Deleting {enabledSubmodsFile}...");
@@ -869,7 +887,7 @@ namespace RiseofMordorLauncher
                     Logger.Log($"DownloadCompleted. Deleted{enabledSubmodsFile}");
                 }
 
-                var localVersionFile = $"{launcherAppData}local_version.txt";
+                var localVersionFile = $"{launcherAppData}/local_version.txt";
                 if (File.Exists(localVersionFile))
                 {
                     Logger.Log($"DownloadCompleted. Deleting {localVersionFile}...");
@@ -882,11 +900,14 @@ namespace RiseofMordorLauncher
                 Logger.Log($"DownloadCompleted. Exception: {ex.Message}");
                 MessageBox.Show($"An error happened. Please forward this to devs: {ex.Message}", "Exception");
             }
+        }
 
+        private void UpdateLocalVersion()
+        {
             var client = new WebClient();
 
             Logger.Log($"DownloadCompleted. Downloading launcher local version");
-            client.DownloadFileAsync(new Uri("http://80.208.231.54/launcher/local_version.txt"), $"{launcherAppData}local_version.txt");
+            client.DownloadFile(new Uri("http://80.208.231.54/launcher/local_version.txt"), $"{launcherAppData}/local_version.txt");
 
             using (var x = new StreamWriter($"{launcherAppData}/user_preferences.txt"))
             {
@@ -903,15 +924,15 @@ namespace RiseofMordorLauncher
 
         private async Task MarkReadyToPlay()
         {
+            Version = await _modVersionService.GetModVersionInfo(SharedData);
+            VersionText = "Version " + Version.VersionText;
+            ChangelogText = Version.ChangeLog;
+
             PlayButtonText = "PLAY";
             PlayButtonEnabled = true;
             PlayButtonMargin = "450 30";
             SubmodButtonEnabled = true;
             ShowProgressBar = Visibility.Hidden;
-
-            Version = await _modVersionService.GetModVersionInfo(SharedData);
-            VersionText = "Version " + Version.VersionText;
-            ChangelogText = Version.ChangeLog;
         }
 
         private void MarkCannotPlay()
@@ -927,15 +948,15 @@ namespace RiseofMordorLauncher
         {
             string output = "";
 
-            if (!File.Exists($"{launcherAppData}enabled_submods.txt"))
+            if (!File.Exists($"{launcherAppData}/enabled_submods.txt"))
             {
                 return;
             }
 
-            string[] lines = File.ReadAllLines($"{launcherAppData}enabled_submods.txt");
+            string[] lines = File.ReadAllLines($"{launcherAppData}/enabled_submods.txt");
             if (lines.Count() == 0)
             {
-                try { File.Delete($"{launcherAppData}enabled_submods.txt"); } catch { }
+                try { File.Delete($"{launcherAppData}/enabled_submods.txt"); } catch { }
                 return;
             }
             else
@@ -944,7 +965,7 @@ namespace RiseofMordorLauncher
                 {
                     if (lines.ToString() == id)
                     {
-                        try { File.Delete($"{launcherAppData}enabled_submods.txt"); } catch { }
+                        try { File.Delete($"{launcherAppData}/enabled_submods.txt"); } catch { }
                         return;
                     }
                     else

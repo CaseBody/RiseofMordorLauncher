@@ -288,6 +288,13 @@ namespace RiseofMordorLauncher
             if (isModFullyDownloaded)
             {
                 Logger.Log("PostUiLoadAsync: Mod fully downloaded. Skipping download phase.");
+
+                Logger.Log($"PostUiLoadAsync: Get mod version info...");
+                Version = await _modVersionService.GetModVersionInfo(SharedData);
+
+                Logger.Log($"PostUiLoadAsync: Download completed");
+                DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
+
                 return true;
             }
 

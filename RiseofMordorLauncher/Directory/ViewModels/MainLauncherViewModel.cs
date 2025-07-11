@@ -1,7 +1,7 @@
 ﻿using DiscordRPC;
 using RiseofMordorLauncher.Directory.Pages;
 using RiseofMordorLauncher.Directory.Services;
-using SevenZipExtractor;
+using SevenZip;
 using Steamworks;
 using System;
 using System.Collections.Generic;
@@ -293,7 +293,7 @@ namespace RiseofMordorLauncher
                 Version = await _modVersionService.GetModVersionInfo(SharedData);
 
                 Logger.Log($"PostUiLoadAsync: Download completed");
-                DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
+                await ExtractArchive(downloadArchiveFullName, modDownloadLocation);
 
                 return true;
             }
@@ -351,7 +351,7 @@ namespace RiseofMordorLauncher
                     Version = await _modVersionService.GetModVersionInfo(SharedData);
 
                     Logger.Log($"PostUiLoadAsync: Download completed");
-                    DownloadCompleted(downloadArchiveFullName, modDownloadLocation);
+                    await ExtractArchive(downloadArchiveFullName, modDownloadLocation);
                 }
             }
 
@@ -830,22 +830,35 @@ namespace RiseofMordorLauncher
             ProgressBarProgress = percent_finished;
         }
 
-        private void DownloadCompleted(string downloadArchiveFullName, string extractPath)
+        private async Task ExtractArchive(string downloadArchiveFullName, string extractPath)
         {
             ProgressText = "EXTRACTING DATA...";
-            Logger.Log($"DownloadCompleted. Extracting {downloadArchiveFullName}...");
+            ShowProgressBar = Visibility.Visible;
 
+            Logger.Log($"DownloadCompleted. Extracting {downloadArchiveFullName}...");
+            
             try
             {
-                using (var archiveFile = new ArchiveFile(downloadArchiveFullName))
+                var workingDir = AppDomain.CurrentDomain.BaseDirectory;
+                var architecture = Environment.Is64BitProcess ? "x64" : "x86";
+                var sevenZipPath = Path.Combine(workingDir, architecture, "7z.dll");
+                SevenZipExtractor.SetLibraryPath(sevenZipPath);
+
+                using (var archiveFile = new SevenZipExtractor(downloadArchiveFullName))
                 {
-                    archiveFile.Extract(extractPath, true);
+                    archiveFile.Extracting += (s, e) =>
+                    {
+                        ExtractProgressUpdate(e.PercentDone);
+                    };
+
+                    await archiveFile.ExtractArchiveAsync(extractPath);
                 }
             }
             catch (Exception ex)
             {
                 Logger.Log($"DownloadCompleted. Extraction failed: {ex.Message}");
                 MessageBox.Show($"An exception occured while trying to extract mod files. Please forward the below message to the devs:\n{ex.Message}", "Failed to extract");
+                return;
             }
 
             Logger.Log($"DownloadCompleted. Deleting {downloadArchiveFullName}...");
@@ -885,6 +898,13 @@ namespace RiseofMordorLauncher
             {
                 x.Write($"auto_update=true{Environment.NewLine}load_order = {{{Environment.NewLine}rom_base{Environment.NewLine}}}");
             }
+        }
+
+        private void ExtractProgressUpdate(int progress)
+        {
+            var percent_finished = progress;
+            ProgressText = $"EXTRACTING {progress}%";
+            ProgressBarProgress = percent_finished;
         }
 
         private async Task MarkReadyToPlay()

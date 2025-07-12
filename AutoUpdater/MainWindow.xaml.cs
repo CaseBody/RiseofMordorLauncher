@@ -108,31 +108,41 @@ namespace AutoUpdater
 
                 try
                 {
+                    var extractPath = Path.Combine(currentDirectory, "temp");
+
                     using (var archiveFile = new ArchiveFile(launcherDownloadPath))
                     {
-                        var extractPath = Path.Combine(currentDirectory, "temp");
                         archiveFile.Extract(extractPath, true);
+                    }
 
-                        foreach (var file in Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories))
+                    foreach (var file in Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories))
+                    {
+                        File.SetAttributes(file, FileAttributes.Normal);
+
+                        var destFile = Path.Combine(currentDirectory, Path.GetFileName(file));
+                        var skipFile = destFile.Contains("SevenZipExtractor.dll") && File.Exists(destFile);
+
+                        if (!skipFile)
                         {
-                            var destFile = Path.Combine(currentDirectory, Path.GetFileName(file));
-                            var skipFile = false;
-
-                            if (destFile.Contains("SevenZipExtractor.dll") && File.Exists(destFile))
-                            {
-                                skipFile = true;
-                            }
-
-                            if (!skipFile)
-                            {
-                                File.Copy(file, destFile, overwrite: true);
-                            }
-
-                            File.Delete(file);
+                            File.Copy(file, destFile, overwrite: true);
                         }
 
-                        Directory.Delete(extractPath, true);
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
                     }
+
+                    foreach (var dir in Directory.GetDirectories(extractPath, "*", SearchOption.AllDirectories))
+                    {
+                        File.SetAttributes(dir, FileAttributes.Normal);
+                    }
+
+                    Directory.Delete(extractPath, true);
                 }
                 catch (Exception ex)
                 {

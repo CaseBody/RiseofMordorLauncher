@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=The Dawnless Days Official Launcher Installer
-AppVersion=3.0
+AppVersion=3.5
 DefaultDirName={userappdata}\..\Local\Programs\The Dawnless Days Launcher
 DefaultGroupName=The Dawnless Days Launcher
 OutputDir=.

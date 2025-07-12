@@ -104,6 +104,8 @@ namespace AutoUpdater
                     return;
                 }
 
+                KillRunningInstances();
+
                 try
                 {
                     using (var archiveFile = new ArchiveFile(launcherDownloadPath))
@@ -267,10 +269,42 @@ namespace AutoUpdater
             }
         }
 
+        private void KillRunningInstances()
+        {
+            var processName = "TheDawnlessDaysLauncher";
+
+            try
+            {
+                var processes = Process.GetProcessesByName(processName);
+
+                if (processes.Length == 0)
+                {
+                    Console.WriteLine($"No process named {processName} found.");
+                    return;
+                }
+
+                foreach (Process proc in processes)
+                {
+                    Console.WriteLine($"Killing process {proc.ProcessName} (ID: {proc.Id})...");
+                    proc.Kill();
+                    proc.WaitForExit();
+                }
+
+                Console.WriteLine("Done.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Pass this to developers: {ex.Message}", "An error occured");
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+        }
+
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
+            {
                 DragMove();
+            }
         }
     }
 }

@@ -89,6 +89,18 @@ namespace RiseofMordorLauncher
             }
         }
 
+        private static readonly string[] PUBLIC_IP_SERVICES = 
+        {
+            "https://api.ipify.org",
+            "https://ipinfo.io/ip",
+            "https://ifconfig.me/ip",
+            "https://icanhazip.com",
+            "https://checkip.amazonaws.com",
+            "https://wtfismyip.com/text",
+            "https://myexternalip.com/raw",
+            "https://ipapi.co/ip",
+        };
+
         public async void Load()
         {
             Logger.Log("Started loading Main Launcher");
@@ -149,7 +161,34 @@ namespace RiseofMordorLauncher
             VersionText = "Version " + Version.VersionText;
             ChangelogText = Version.ChangeLog;
 
-            //LatestPreviewVM = new LatestPreviewDiscordViewModel(SharedData);
+            if (Version != null)
+            {
+                Logger.Log($"Version. Latest mod version: {Version.LatestVersionNumber}");
+                Logger.Log($"Version. Installed mod version: {Version.InstalledVersionNumber}");
+
+                var latestPacks = string.Join(", ", Version.LatestPackFiles);
+                var installedPacks = string.Join(", ", Version.InstalledPackFiles);
+
+                Logger.Log($"Version. Latest pack files: {latestPacks}");
+                Logger.Log($"Version. Installed pack files: {installedPacks}");
+            }
+
+            var launcherVersionFilePath = $"{launcherAppData}/installed_launcher_version.txt";
+            if (File.Exists(launcherVersionFilePath))
+            {
+                var launcherVersion = File.ReadAllText(launcherVersionFilePath);
+
+                if (int.TryParse(launcherVersion, out int launcherVersionInt))
+                {
+                    Logger.Log($"Launcher parsed version: {launcherVersionInt}");
+                }
+                else
+                {
+                    Logger.Log("Failed to parse version to integer");
+                    Logger.Log($"Launcher unparsed version: {launcherVersion}");
+                }
+            }
+
             LatestPreviewVM = new LatestPreviewModDBViewModel(SharedData);
 
             SwitchPage(ApplicationPage.MainLauncher);
@@ -556,14 +595,43 @@ namespace RiseofMordorLauncher
 
         private async Task<string> GetRegionByIPAsync()
         {
+            Logger.Log("GetRegionByIPAsync. Obtaining IP...");
+
+            var publicIP = string.Empty;
+
+            var rng = new Random();
+            var shuffledServices = PUBLIC_IP_SERVICES.OrderBy(_ => rng.Next()).ToArray();
+
             var client = new HttpClient();
 
-            Logger.Log("GetRegionByIPAsync. Obtaining IP...");
-            var publicIP = await client.GetStringAsync("https://api.ipify.org");
-            Logger.Log($"GetRegionByIPAsync. IP address: {publicIP}");
+            foreach (var url in shuffledServices)
+            {
+                try
+                {
+                    var response = await client.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var ip = await response.Content.ReadAsStringAsync();
+                        publicIP = ip.Trim();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"GetRegionByIPAsync. Failed: {ex.Message}");
+                }
+            }
 
+            if (string.IsNullOrEmpty(publicIP))
+            {
+                Logger.Log($"GetRegionByIPAsync. Failed to obtain public IP. Returning a default region code...");
+                return "Default";
+            }
+
+            Logger.Log($"GetRegionByIPAsync. IP address: {publicIP}");
             Logger.Log("GetRegionByIPAsync. Requesting region...");
+
             var regionCode = await client.GetStringAsync($"http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/region?ip_address={publicIP}");
+
             Logger.Log($"GetRegionByIPAsync. Region code: {regionCode}");
 
             return regionCode;

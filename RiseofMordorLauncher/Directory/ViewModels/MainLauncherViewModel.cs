@@ -1,5 +1,4 @@
 ﻿using DiscordRPC;
-using Google.Apis.Drive.v3.Data;
 using RiseofMordorLauncher.Directory.Pages;
 using RiseofMordorLauncher.Directory.Services;
 using SevenZip;

@@ -1,4 +1,5 @@
 ﻿using DiscordRPC;
+using Google.Apis.Drive.v3.Data;
 using RiseofMordorLauncher.Directory.Pages;
 using RiseofMordorLauncher.Directory.Services;
 using SevenZip;
@@ -558,8 +559,13 @@ namespace RiseofMordorLauncher
         {
             var client = new HttpClient();
 
+            Logger.Log("GetRegionByIPAsync. Obtaining IP...");
             var publicIP = await client.GetStringAsync("https://api.ipify.org");
+            Logger.Log($"GetRegionByIPAsync. IP address: {publicIP}");
+
+            Logger.Log("GetRegionByIPAsync. Requesting region...");
             var regionCode = await client.GetStringAsync($"http://3ba9.l.time4vps.cloud:7218/api/LauncherVersion/region?ip_address={publicIP}");
+            Logger.Log($"GetRegionByIPAsync. Region code: {regionCode}");
 
             return regionCode;
         }

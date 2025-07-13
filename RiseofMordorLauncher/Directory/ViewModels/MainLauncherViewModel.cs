@@ -226,7 +226,14 @@ namespace RiseofMordorLauncher
             else
             {
                 Logger.Log("PostUiLoadAsync: Getting region from IP...");
-                regionCode = await GetRegionByIPAsync();
+                try
+                {
+                    regionCode = await GetRegionByIPAsync();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log($"PostUiLoadAsync: GetRegionByIPAsync exception: {ex.Message}");
+                }
             }
 
             Logger.Log($"PostUiLoadAsync: Region: {regionCode}");
